@@ -1,0 +1,75 @@
+{% extends "main/base.html" %}
+{% load static %}
+
+{% block content %}
+    <div class="container mt-5 mb-5">
+        <h2 class="mb-4 ml-1 text-muted">Students</h2>
+        <ul class="list-group">
+            {% for student in students %}
+                <li class="list-group-item mt-3">
+                    <div class="row">
+                        <div class="col-8">
+                            <a class="y" data-toggle="collapse" href="#collapse{{ student.toggle_id }}" role="button" aria-expanded="false" aria-controls="collapseExample">
+                                <span>{{ student.user.first_name}} {{student.user.last_name }}</span>
+                            </a>
+                        </div>
+                        <div class="col-4">
+                            <p class="text-right m-0 text-light">
+                                {% if student.approved %}
+                                    <a class="btn btn-success">Approved Student</a>
+                                {% else %}
+                                    <a class="btn btn-danger">Pending Approval</a>
+                                {% endif %}
+                            </p>
+                        </div>
+                    </div>
+                </li>
+                <div class="collapse mb-3" id="collapse{{ student.toggle_id }}">
+                    <div class="card card-body ">
+                        <div class="row">
+                            <div class="col-5">
+                                <img src="{{ student.profile.id_photo.url }}" class="text-center" style="max-width: 100%; height: 250px">
+                            </div><!-- col-5 -->
+                            <div class="col-7">
+                                <table class="table table-borderless table-hover table-sm">
+                                  <thead>
+                                    <tr>
+                                      <th scope="col"></th>
+                                      <th scope="col"></th>
+                                    </tr>
+                                  </thead>
+                                  <tbody>
+                                    <tr>
+                                      <th scope="row"><b>REG NO :</th>
+                                      <td>{{ student.user.reg_no }}</td>
+                                    </tr>
+                                    <tr>
+                                      <th scope="row"><b>First Name :</b></th>
+                                      <td>{{ student.user.first_name }}</td>
+                                    </tr>
+                                    <tr>
+                                      <th scope="row">Last Name :</th>
+                                      <td colspan="2">{{ student.user.last_name }}</td>
+                                    </tr>
+                                    <tr>
+                                      <th scope="row">Email :</th>
+                                      <td colspan="2">{{ student.user.email }}</td>
+                                    </tr>
+                                  </tbody>
+                                </table>
+                            </div><!-- col-7 -->
+                        </div><!-- row -->
+                        <div class="text-right a-buttons">
+                            {% if not student.approved %}
+                                <a href="{% url 'unapprove-student' student.pk %}" class="btn btn-secondary">Delete Request</a>
+                                <a href="{% url 'approve-student' student.pk %}" class="btn btn-primary">Approve</a>
+                            {% else %}
+                                <a href="{% url 'unapprove-student' student.pk %}" class="btn btn-primary">Remove Student</a>
+                            {% endif %}
+                        </div>
+                    </div><!-- card-body-->
+                </div>
+            {% endfor %}
+        </ul>
+    </div>
+{% endblock %}

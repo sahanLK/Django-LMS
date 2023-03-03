@@ -1,0 +1,27 @@
+{% extends "main/base.html" %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+    <div class="container mb-lg-5 w-75 mt-4 bg-secondary rounded">
+        <div class="row mb-5 text-light p-5 shadow profile-info-content">
+            <div class="col-lg-5 text-center text-muted">
+                <img src="{{ user.profile.id_photo.url }}" class="rounded-circle shadow-lg" style="width: 250px; height: 250px">
+                <h4 class="username text-light mt-3 font-weight-bold">@{{ user.username }}</h4>
+            </div>
+            <div class="col-md-7 p-3 profile-info">
+                <h2 class="name mt-5">{{ user.first_name }}&nbsp;{{ user.last_name }}
+                    <small class="ml-3 btn btn-info shadow-lg">{{ user.profile.role }}</small>
+                </h2>
+            </div>
+        </div><!-- row -->
+    </div>
+    <div class="container w-75 mb-5 pt-lg-">
+        <form method="POST" enctype="multipart/form-data" class="pb-3 text-muted">
+            {% csrf_token %}
+            <legend class="border-bottom pb-1 mb-4">Profile Info</legend>
+            {{ u_form|crispy }}
+            {{ p_form|crispy }}
+            <button type="submit" class="btn btn-primary mt-3">Update</button>
+        </form>
+    </div>
+{% endblock %}

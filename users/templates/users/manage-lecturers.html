@@ -1,0 +1,76 @@
+{% extends "main/base.html" %}
+{% load static %}
+
+{% block content %}
+    <div class="container mt-5 mb-5">
+        <h2 class="mb-4 ml-1 text-muted">Lecturers</h2>
+
+        <ul class="list-group">
+            {% for lecturer in lecturers %}
+                <li class="list-group-item mt-3">
+                    <div class="row">
+                        <div class="col-8">
+                            <a class="y" data-toggle="collapse" href="#collapse{{ lecturer.toggle_id }}" role="button" aria-expanded="false" aria-controls="collapseExample">
+                                <span>{{ lecturer.user.first_name}} {{lecturer.user.last_name }}</span>
+                            </a>
+                        </div>
+                        <div class="col-4">
+                            <p class="text-right text-light m-0">
+                                {% if lecturer.approved %}
+                                    <a class="btn btn-success">Verified Lecturer</a>
+                                {% else %}
+                                    <a class="btn btn-danger">Pending Approval</a>
+                                {% endif %}
+                            </p>
+                        </div>
+                    </div>
+                </li>
+                <div class="collapse mb-3" id="collapse{{ lecturer.toggle_id }}">
+                    <div class="card card-body ">
+                        <div class="row">
+                            <div class="col-5">
+                                <img src="{{ lecturer.user.profile.id_photo.url }}" class="text-center" style="max-width: 100%; height: 250px">
+                            </div><!-- col-5 -->
+                            <div class="col-7">
+                                <table class="table table-borderless table-hover table-sm">
+                                  <thead>
+                                    <tr>
+                                      <th scope="col"></th>
+                                      <th scope="col"></th>
+                                    </tr>
+                                  </thead>
+                                  <tbody>
+                                    <tr>
+                                      <th scope="row"><b>First Name :</b></th>
+                                      <td>{{ lecturer.user.first_name }}</td>
+                                    </tr>
+                                    <tr>
+                                      <th scope="row">Last Name :</th>
+                                      <td colspan="2">{{ lecturer.user.last_name }}</td>
+                                    </tr>
+                                    <tr>
+                                      <th scope="row">Email :</th>
+                                      <td colspan="2">{{ lecturer.user.email }}</td>
+                                    </tr>
+                                    <tr>
+                                      <th scope="row">Department :</th>
+                                      <td colspan="2">{{ lecturer.user.profile.department }}</td>
+                                    </tr>
+                                  </tbody>
+                                </table>
+                            </div><!-- col-7 -->
+                        </div><!-- row -->
+                        <div class="text-right a-buttons">
+                            {% if not lecturer.approved %}
+                                <a href="{% url 'unapprove-lecturer' lecturer.pk %}" class="btn btn-secondary">Delete Request</a>
+                                <a href="{% url 'approve-lecturer' lecturer.pk %}" class="btn btn-primary">Approve</a>
+                            {% else %}
+                                <a href="{% url 'unapprove-lecturer' lecturer.pk %}" class="btn btn-primary">Remove Lecturer</a>
+                            {% endif %}
+                        </div>
+                    </div><!-- card-body-->
+                </div>
+            {% endfor %}
+        </ul>
+    </div>
+{% endblock %}

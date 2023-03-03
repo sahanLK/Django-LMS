@@ -1,0 +1,57 @@
+/*
+* Overriding W3.CSS
+*/
+.w3-top {
+    position: sticky !important;
+}
+
+
+body,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    font-family: "Raleway", sans-serif
+}
+
+body,
+html {
+  height: 100%;
+  line-height: 1.8;
+}
+
+.logo {
+    width: 60px;
+    height: 40px;
+}
+
+/* Full height image header */
+.bgimg-1 {
+  background-position: center;
+  background-size: cover;
+  background-image: url("/static/main/free-learning.jpg");
+  min-height: 100%;
+}
+
+.bgimg-1 img {
+    opacity: 0.6;
+}
+
+.w3-bar .w3-button {
+  padding: 16px;
+}
+
+.a-buttons {
+    color: #ffffff;
+}
+
+.profile-info .name {
+    font-size: 22px !important;
+    font-weight: 500;
+}
+
+.profile-info-content {
+    border-radius: 20px;
+}
