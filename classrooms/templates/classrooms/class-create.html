@@ -1,0 +1,13 @@
+{% extends 'main/base.html' %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+    <div class="container text-muted mt-5 mb-5">
+        <h2 class="mb-5">Create a Classroom</h2>
+        <form method="POST" action="{% url 'class-create' %}" class="mb-4 mt-3">
+          {% csrf_token %}
+          {{ form|crispy }}
+          <button type="submit" class="btn btn-primary mt-3">Create Classroom</button>
+      </form>
+    </div>
+{% endblock %}

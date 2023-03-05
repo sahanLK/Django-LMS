@@ -69,7 +69,7 @@ body {
     border-top-right-radius: 15px !important;
 }
 
-.card {
+.card-header {
     background-color: inherit !important;
     border-top-left-radius: 17px !important;
     border-top-right-radius: 17px !important;
@@ -86,8 +86,7 @@ body {
   border-top-right-radius: .45rem;
 }
 
-.aqua-gradient,
-.card {
+.aqua-gradient {
   background: linear-gradient(15deg, #13547a 0%, #80d0c7 100%);
 }
 
@@ -101,4 +100,5 @@ body {
 
 .class-detail-header {
     min-height: 200px;
+    background: linear-gradient(15deg, #13547a 0%, #80d0c7 100%);
 }

@@ -1,0 +1,39 @@
+{% extends 'main/base.html' %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+    <div class="container-fluid p-5">
+            <div class="col-12 text-right pb-4"> <!-- Model Trigger item-->
+                <a href="{% url 'class-create' %}" class="btn btn-primary">New Classroom</a>
+            </div>
+
+            <div class="row">
+                {% for classroom in class_rooms  %}
+                    <div class="col-xl-3 col-lg-4 col-md-6 col-sm-12">
+                        <div class="container">
+                            <section class="mx-auto my-5" style="max-width: 23rem;">
+                                <div class="card testimonial-card mt-2 mb-3">
+                                    <div class="card-up aqua-gradient text-right">
+                                        <i class="fa-solid fa-ellipsis-vertical fa-lg text-light p-3 pt-4 pb-4" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></i>
+                                        <div class="dropdown-menu dropdown-menu-right"><!-- dropdown menu for edit and delete-->
+                                            <a href="{% url 'class-update' classroom.pk %}" class="dropdown-item">Edit</a>
+                                            <a href="{% url 'class-delete' classroom.pk %}" class="dropdown-item">Delete</a>
+                                        </div>
+                                    </div>
+                                    <div class="avatar mx-auto white">
+                                        <img src="{{ classroom.owner.profile.id_photo.url }}" class="rounded-circle img-fluid" alt="woman avatar">
+                                    </div>
+                                    <div class="card-body text-center">
+                                        <h5 class="card-title font-weight-bold">
+                                            <a href="{% url 'class-info' classroom.pk %}" class="class-name">{{ classroom.name }}</a>
+                                        </h5><hr>
+                                        <p>{{ classroom.description }}</p>
+                                    </div>
+                                </div>
+                            </section>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+    </div>
+{% endblock %}

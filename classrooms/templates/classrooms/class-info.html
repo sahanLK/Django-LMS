@@ -4,14 +4,38 @@
 {% block content %}
     <div class="container-fluid">
         <div class="container mt-5 mb-5">
-            <div class="card mb-3 text-light class-detail-header">
+            <div class="card card-header mb-3 text-light class-detail-header bg-dark">
                 <div class="card-body">
                     <h5 class="card-title">{{ class_details.name }}</h5>
                     <p class="card-text">{{ class_details.subtitle_1 }}</p>
                 </div>
             </div>
-            <h3>Some</h3>
-        </div>
+            <div class="row text-muted">
+                <div class="col-3">
+                    <div class="card p-3 shadow-sm">
+                        <h6 class="font-weight-bold mb-4 pl-2">Upcoming</h6>
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item">Assignment 1</li>
+                            <li class="list-group-item">Assignment 2</li>
+                            <li class="list-group-item">Assignment 3</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-9">
+                  <div class="card card-body p-3 mb-5 shadow">
+                      <a href="" class="m-0 font-weight-bold pl-2">Announce something to your class</a>
+                  </div>
 
+                    <!--Class posts goes here-->
+                    <div class="card card-body mb-3 p-3">
+                        <a href="" class="m-0 font-weight-bold pl-2">Announce something to your class</a>
+                    </div>
+                    <div class="card card-body mb-3 p-3">
+                        <a href="" class="m-0 font-weight-bold pl-2">Announce something to your class</a>
+                    </div>
+                    <!-- end of class posts -->
+                </div>
+            </div>
+        </div>
     </div>
 {% endblock %}
