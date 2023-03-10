@@ -1,0 +1,126 @@
+{% extends 'main/base.html' %}
+
+{% block content %}
+    <div class="container-fluid">
+        <div class="container mt-5 mb-5 min-body-height">
+            <div class="card card-header mb-3 text-light class-detail-header bg-dark shadow">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="row">
+                            <div class="col-10">
+                                <h3 class="pl-3 pt-5">{{ class.name }}</h3>
+                            </div>
+                            <div class="col-2">
+                                <a href="{% url 'class-update' class.pk %}" class="btn btn-light float-right shadow-sm"><i class="far fa-edit text-dark"></i></a>
+                            </div>
+                        </div>
+                        <p class="card-text pl-3">{{ class.subtitle_1 }}</p>
+                    </div>
+                </div>
+            </div>
+            <ul class="nav nav-tabs mb-4 shadow-sm classroom-sub-nav" id="myTab" role="tablist"><!-- Stream, Classwork and People -->
+                <li class="nav-item">
+                    <a class="nav-link active" id="home-tab" data-toggle="tab" href="#stream" role="tab" aria-controls="home" aria-selected="true">Stream</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="profile-tab" data-toggle="tab" href="#classwork" role="tab" aria-controls="profile" aria-selected="false">Classwork</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="contact-tab" data-toggle="tab" href="#people" role="tab" aria-controls="contact" aria-selected="false">People</a>
+                </li>
+            </ul><!-- End of Stream, Classwork and People -->
+
+            <div class="row text-muted">
+                <div class="col-md-12 col-lg-9 mb-5 tab-content">
+                    <div class="tab-pane fade show active" id="stream" role="tabpanel" aria-labelledby="pills-home-tab"><!-- stream -->
+                        <div class="card shadow-sm mb-5">
+                            <div class="card-body p-3">
+                                <span class="pl-2"><i class="fas fa-bell pr-4"></i><a href="{% url 'post-new' class.pk %}">Announce something to your class</a></span>
+                            </div>
+                        </div>
+
+                        {% for post in posts %} <!--Class posts goes here-->
+                            <div class="card card-body pl-4 pr-3 pt-0 pb-0 mb-3 rounded">
+                                <div class="row">
+                                    <div class="col-1 pad-20">
+                                        <i class="fas fa-pen-alt w-100 h-100 size-20"></i>
+                                    </div>
+                                    <div class="col-11 pt-2 pb-2">
+                                        <a href="{% url 'post-detail' class_pk=class.pk pk=post.pk %}" class="m-0 text-info">{{ post.title }}</a><br/>
+                                        <small class="m-0">{{ post.date_posted }}</small>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %} <!-- end of class posts -->
+
+                    </div><!-- stream -->
+
+                    <div class="tab-pane fade" id="classwork" role="tabpanel" aria-labelledby="pills-home-tab"><!-- classwork -->
+                        <div class="mb-5">
+                            <a href="{% url 'assignment-new' class_pk=class.pk %}" class="btn btn-outline-success new-assignment">New Assignment<i class="fas fa-plus pl-3 font-weight-bold"></i></a>
+                        </div>
+                        {% for assignment in assignments %}
+                            <div class="card card-body pl-4 pr-3 pt-0 pb-0 mb-3 rounded">
+                                <div class="row">
+                                    <div class="col-1 pad-20">
+                                        <i class="fas fa-pen-alt w-100 h-100 size-20"></i>
+                                    </div>
+                                    <div class="col-11 pt-2 pb-2">
+                                        <a href="{% url 'assignment-detail' class_pk=class.pk pk=assignment.pk %}" class="m-0 text-info">{{ assignment.title }}</a><br/>
+                                        <small class="m-0">{{ assignment.date_posted }}</small>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div><!-- classwork -->
+
+                    <div class="tab-pane fade" id="people" role="tabpanel" aria-labelledby="pills-home-tab"><!-- people -->
+                        <div class="lecturers mb-5 mt-3">
+                            <h4 class="text-muted mb-3">Lecturers</h4>
+                            {% for lecturer in lecturers %}
+                                <!-- lecturer is a User object -->
+                                <div class="card card-body pl-4 pr-3 pt-3 pb-3 mb-3 br-10 shadow-sm">
+                                    <div class="">
+                                        <img src="{{ lecturer.profile.id_photo.url }}" class="rounded-circle mr-4 shadow-lg" style="max-width: 65px; max-height: 65px;">
+                                        <a class="m-0 pl-2">{{ lecturer.first_name }} {{ lecturer.last_name }}</a>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                        <div class="students mb-5">
+                            <h4 class="text-muted mb-3">Students</h4>
+                            {% for student in students %}
+                                <!-- Student is a Profile object -->
+                                <div class="card card-body pl-4 pr-3 pt-3 pb-3 mb-3 br-10 shadow-sm">
+                                    <div class="">
+                                        <img src="{{ student.id_photo.url }}" class="rounded-circle mr-4 shadow-lg" style="max-width: 65px; max-height: 65px;">
+                                        <a class="m-0 pl-2">{{ student.user.first_name }} {{ student.user.last_name }}</a>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div><!-- people -->
+                </div>
+
+                <div class="col-md-12 col-lg-3">
+                    <div id="accordion">
+                        <div class="card mb-4">
+                            <div class="card-header p-1" id="headingOne">
+                                <h6 class="mb-0"><span class="btn btn-link font-weight-bold" data-toggle="collapse" data-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">Upcoming</span></h6>
+                            </div>
+                            <ul class="list-group upcoming-events">
+                                {% for assignment in events %}
+                                    <li class="list-group-item event bl-0 border-left-0 border-right-0">
+                                        <a href="{% url 'assignment-detail' class_pk=class.pk pk=assignment.pk %}">{{ assignment }}</a><br/>
+                                        <small class="font-weight-bold">On {{ assignment.date_due }}</small>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        </div><!-- card 1-->
+                    </div><!-- accordian -->
+                </div><!-- col -->
+
+            </div><!-- row -->
+        </div><!-- container -->
+    </div><!-- container-fluid -->
+{% endblock %}

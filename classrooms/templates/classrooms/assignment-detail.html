@@ -1,0 +1,62 @@
+{% extends 'main/base.html' %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+    <div class="container-fluid">
+        <div class="container mt-5 mb-5 min-body-height">
+            <div class="row">
+                <div class="col-sm-12 col-lg-8">
+                    <div class="assignment-header border-bottom mb-4">
+                        <div class="col-sm-12 col-lg-9 assignment-title">
+                            <h2>{{ assignment.title }}</h2>
+                            <span class="w-100 text-muted due-date">Due, {{ assignment.date_due }}</span>
+                        </div>
+                    </div><!-- .assignment-title-->
+
+                    {% if assignment.owner == request.user %}
+                        <div class="row assignment-author"><!-- Edit and delete options for publisher -->
+                            <div class="col-12">
+                                <a href="{% url 'assignment-update' class_pk=assignment.classroom.pk pk=assignment.pk %}" class="btn btn-secondary">Edit</a>
+                                <a href="{% url 'assignment-delete' class_pk=assignment.classroom.pk pk=assignment.pk %}" class="btn btn-danger">Delete</a>
+                            </div>
+                        </div>
+                    {% endif %}
+
+                    <div class="assignment-content mt-5">
+                        <p>{{ assignment.content }}</p>
+                        <div class="assignment-files mb-5 mt-5">
+                            <a href="{{ assignment.document.url }}" target="_blank" download>{{ assignment.document.name }}</a>
+                        </div>
+                    </div><!-- .assignment-content -->
+                </div>
+                <div class="col-sm-12 col-lg-4">
+                    <div class="card shadow assignment-submit m-auto">
+                        <div class="card-body text-muted rounded">
+                            <div class="row submit-header border-bottom">
+                                <div class="col-6">
+                                    <h5 class="card-title">Your Work</h5>
+                                </div>
+                                <div class="col-6 text-right">
+                                    <small class="">Turned in late</small>
+                                </div>
+                            </div><!-- submit-header-->
+                            <div class="selected-files pt-3 pb-3" id="selectedFiles">
+                                <p class="mt-3 no-files-chosen" id="noFileChosenMsg">No files chosen</p>
+                            </div><!-- selected-files-->
+                            <form method="POST" class="mt-4" enctype="multipart/form-data">
+                                {% csrf_token %}
+                                <div class="custom-file">
+                                    {{ form }}
+                                    <label class="custom-file-label" for="assignment-submit">Choose files</label>
+                                </div>
+                                <div class="mt-4">
+                                    <button type="submit" class="btn btn-info shadow-sm w-100" id="assignmentSubmit">Submit</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div><!-- col-sm-12 col-md-3 -->
+            </div><!-- row -->
+        </div>
+    </div>
+{% endblock %}

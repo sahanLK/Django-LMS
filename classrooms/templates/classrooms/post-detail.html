@@ -1,0 +1,27 @@
+{% extends 'main/base.html' %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+    <div class="container-fluid min-body-height">
+        <div class="container mt-5 mb-5">
+
+            {% if post.owner == request.user %}
+                <div class="row post-author"><!-- Edit and delete options for publisher -->
+                    <div class="col-12">
+                        <a href="{% url 'post-update' class_pk=post.classroom.pk pk=post.pk %}" class="btn btn-secondary">Edit</a>
+                        <a href="{% url 'post-delete' class_pk=post.classroom.pk pk=post.pk %}" class="btn btn-danger">Delete</a>
+                    </div>
+                </div>
+            {% endif %}
+
+            <div class="post-title border-bottom pb-1">
+                <h2 class="pb-1">{{ post.title }}</h2>
+                <span class="w-100 text-muted due-date">Uploaded on, {{ post.date_posted }}</span><br/>
+                <span class="w-100 text-muted due-date">Last Modified, {{ post.date_modified }}</span>
+            </div>
+            <div class="post-body mt-5">
+                <p>{{ post.content }}</p>
+            </div>
+        </div>
+    </div>
+{% endblock %}

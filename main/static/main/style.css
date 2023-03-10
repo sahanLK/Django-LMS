@@ -16,6 +16,13 @@ h6 {
     font-family: "Raleway", sans-serif
 }
 
+
+/* Overriding Bootstrap */
+.nav-item .nav-link {
+    border: 0px !important;
+}
+
+
 body,
 html {
   height: 100%;
@@ -26,6 +33,23 @@ html {
     width: 60px;
     height: 40px;
 }
+
+/*
+* Navbar
+*/
+.nav-item.bell {
+    margin-top: 8px;
+}
+
+.nav-item-bell i {
+    padding: 20px;
+    border-radius: 50%;
+}
+
+.nav-item-bell i:hover {
+    cursor: pointer;
+}
+
 
 /* Full height image header */
 .bgimg-1 {
@@ -52,14 +76,11 @@ html {
     font-weight: 500;
 }
 
-.profile-info-content {
-    border-radius: 20px;
-}
-
 
 /*
-Classrooms Cards
+Classrooms
 */
+
 body {
 	background-color: #f5f7fa;
 }
@@ -102,3 +123,145 @@ body {
     min-height: 200px;
     background: linear-gradient(15deg, #13547a 0%, #80d0c7 100%);
 }
+
+.class-announce {
+    border-radius: 12px;
+    padding: 5px;
+}
+
+.classroom-sub-nav {
+    font-weight: 600;
+    border-bottom: 1px solid #0c5e8d;;
+
+}
+.classroom-sub-nav .nav-link {
+    border-top-left-radius: 6px;
+    border-top-right-radius: 6px;
+}
+
+.classroom-sub-nav .nav-link.active {
+    background-color: #0c5e8d;
+    color: #ffffff;
+}
+
+.new-class-post i {
+    padding: 7px;
+}
+
+.upcoming-events .event {
+    font-size: 15px !important;
+    line-height: 1.5;
+}
+
+.upcoming-events .event li {
+    font-size: 15px;
+}
+
+/*
+* Classwork Tab
+*/
+
+.new-assignment {
+    border-color: #0c5e8d !important;
+    color: #0c5e8d !important;
+}
+
+.new-assignment:hover {
+    background: linear-gradient(15deg, #13547a 0%, #80d0c7 100%);
+    color: #fff !important;
+}
+
+
+
+/*
+Assignment Details page
+*/
+.profile-info-content {
+    padding-top: 60px !important;
+    padding-bottom: 60px !important;
+}
+
+
+/*
+Assignment Details page
+*/
+
+.assignment-header h2 {
+    margin-bottom: 10px;
+}
+
+.assignment-header .assignment-title {
+    padding-left: 0px !important;
+}
+
+.due-date {
+    font-size: 14px !important;
+}
+
+.selected-files {
+    max-height: 200px !important;
+    overflow-y: scroll !important;
+    padding-right: 15px;
+}
+
+.selected-files .no-files-chosen {
+    text-align: center;
+}
+
+.selected-files .file {
+    width: 100%;
+    border: 1px solid;
+    border-radius: 5px;
+    font-size: 16px;
+    margin-left: 0px;
+    margin-right: 0px;
+    margin-bottom: 10px;
+}
+
+.selected-files .file .remove-file {
+    border-left: 1px solid #000;
+    cursor: pointer;
+}
+
+
+/*
+* Common
+*/
+
+.min-body-height {
+    min-height: 450px !important;
+}
+
+.primary-color {
+    background-color: #0c5e8d;
+}
+
+.primary-back-gradient {
+    background: linear-gradient(15deg, #13547a 0%, #80d0c7 100%);
+    color: #fff;
+}
+
+.size-10 {
+    font-size: 10px !important;
+}
+
+.size-20 {
+    font-size: 20px !important;
+}
+
+.size-30 {
+    font-size: 30px !important;
+}
+
+.pad-10 {
+    padding: 10px !important;
+}
+
+.pad-20 {
+    padding: 20px !important;
+}
+
+.pad-30 {
+    padding: 30px !important;
+}
+
