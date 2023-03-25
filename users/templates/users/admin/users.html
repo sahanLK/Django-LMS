@@ -1,0 +1,27 @@
+{% extends 'main/base.html' %}
+
+{% block content %}
+    <div class="container mt-5 text-muted min-body-height">
+        <ul class="nav nav-tabs mb-5">
+            <li class="nav-item">
+                <a href="#students" class="nav-link active" id="students-tab" data-toggle="tab" aria-controls="students">Students</a>
+            </li>
+            <li class="nav-item">
+                <a href="#lecturers" class="nav-link" id="lecturers-tab" data-toggle="tab" aria-controls="lecturers">Lecturers</a>
+            </li>
+        </ul>
+        <div class="tab-content">
+            <div class="tab-pane fade show active" id="students" role="tabpanel" aria-labelledby="pills-students-tab"><!-- Students -->
+                {% for profile in students %}
+                    {% include 'template-parts/user.html' with profile=profile %}
+                {% endfor %}
+            </div><!-- Lecturers tab -->
+
+            <div class="tab-pane fade" id="lecturers" role="tabpanel" aria-labelledby="pills-lecturers-tab"><!-- Lecturers -->
+                {% for profile in lecturers %}
+                    {% include 'template-parts/user.html' with profile=profile %}
+                {% endfor %}
+            </div><!-- Students tab -->
+        </div>
+    </div><!-- .container -->
+{% endblock %}

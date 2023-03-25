@@ -1,0 +1,131 @@
+
+<!-- Sidebar -->
+<ul class="navbar-nav bg-gradient-secondary sidebar sidebar-dark accordion shadow" id="accordionSidebar">
+    <!-- Divider -->
+    <hr class="sidebar-divider my-0 pb-3">
+    <li class="nav-item active"><!-- Nav Item - Dashboard -->
+        <a class="nav-link" href="{% url 'home' %}">
+            <i class="fas fa-fw fa-tachometer-alt"></i>
+            <span>Dashboard</span></a>
+    </li>
+    <!-- Divider -->
+    <hr class="sidebar-divider pb-3">
+    <div class="sidebar-heading">Actions</div>
+
+    <!-- Nav Item - Classes Collapse Menu -->
+    <li class="nav-item">
+        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseTwo"
+            aria-expanded="true" aria-controls="collapseTwo">
+            <i class="fas fa-university pr-2"></i>
+            <span>Classes</span>
+        </a>
+        <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
+            <div class="bg-white py-2 collapse-inner rounded">
+                <a class="collapse-item" href="{% url 'classrooms' %}">All</a>
+                <a class="collapse-item" href="{% url 'class-create' %}">Create New</a>
+            </div>
+        </div>
+    </li>
+
+    <!-- Nav Item - Assignments Collapse Menu -->
+    <li class="nav-item">
+        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseAssignments"
+            aria-expanded="true" aria-controls="collapseUtilities">
+            <i class="fas fa-pencil-alt pr-2"></i>
+            <span>Assignments</span>
+        </a>
+        <div id="collapseAssignments" class="collapse" aria-labelledby="headingUtilities"
+            data-parent="#accordionSidebar">
+            <div class="bg-white py-2 collapse-inner rounded">
+<!--                    <h6 class="collapse-header">Custom Utilities:</h6>-->
+                <a class="collapse-item" href="{% url 'assignments-list' type='pending' %}">Pending</a>
+                <a class="collapse-item" href="{% url 'assignments-list' type='completed' %}">Completed</a>
+                <a class="collapse-item" href="{% url 'assignments-list' type='missing' %}">Missing</a>
+                <a class="collapse-item" href="{% url 'assignments-list' type='missing' %}">Create New</a>
+            </div>
+        </div>
+    </li>
+
+    <!-- Nav Item - Quizzes Collapse Menu -->
+    <li class="nav-item">
+        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseQuizzes"
+            aria-expanded="true" aria-controls="collapseUtilities">
+            <i class="fas fa-feather pr-2"></i>
+            <span>Quizzes</span>
+        </a>
+        <div id="collapseQuizzes" class="collapse" aria-labelledby="headingUtilities"
+            data-parent="#accordionSidebar">
+            <div class="bg-white py-2 collapse-inner rounded">
+                <a class="collapse-item" href="utilities-color.html">Live Quizzes</a>
+                <a class="collapse-item" href="utilities-border.html">Completed</a>
+                <a class="collapse-item" href="utilities-animation.html">Missing</a>
+            </div>
+        </div>
+    </li>
+
+    <!-- Nav Item - Students Collapse Menu -->
+    <li class="nav-item">
+        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseStudents"
+            aria-expanded="true" aria-controls="collapseUtilities">
+            <i class="fas fa-users pr-2"></i>
+            <span>Students</span>
+        </a>
+        <div id="collapseStudents" class="collapse" aria-labelledby="headingUtilities"
+            data-parent="#accordionSidebar">
+            <div class="bg-white py-2 collapse-inner rounded">
+                <a class="collapse-item" href="{% url 'students-list' %}">Active Students</a>
+<!--                    <a class="collapse-item" href="utilities-border.html">Completed</a>-->
+<!--                    <a class="collapse-item" href="utilities-animation.html">Missing</a>-->
+            </div>
+        </div>
+    </li>
+
+
+
+    <!-- Divider -->
+    <hr class="sidebar-divider">
+
+    <!-- Heading -->
+    <div class="sidebar-heading">
+        Info
+    </div>
+
+    <!-- Nav Item - Examinations Collapse Menu -->
+    <li class="nav-item">
+        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapsePages"
+            aria-expanded="true" aria-controls="collapsePages">
+            <i class="fas fa-toilet-paper pr-2"></i>
+            <span>Examinations</span>
+        </a>
+        <div id="collapsePages" class="collapse" aria-labelledby="headingPages" data-parent="#accordionSidebar">
+            <div class="bg-white py-2 collapse-inner rounded">
+                <h6 class="collapse-header">Details: </h6>
+                <a class="collapse-item" href="login.html">Schedules</a>
+                <a class="collapse-item" href="register.html">Results</a>
+<!--                    <a class="collapse-item" href="forgot-password.html">Forgot Password</a>-->
+<!--                    <div class="collapse-divider"></div>-->
+<!--                    <h6 class="collapse-header">Other Pages:</h6>-->
+<!--                    <a class="collapse-item" href="404.html">404 Page</a>-->
+<!--                    <a class="collapse-item" href="blank.html">Blank Page</a>-->
+            </div>
+        </div>
+    </li>
+
+    <!-- Nav Item - Statistics -->
+    <li class="nav-item">
+        <a class="nav-link" href="charts.html">
+            <i class="fas fa-chart-line pr-2"></i>
+            <span>Statistics</span></a>
+    </li>
+
+    <!-- Nav Item - Settings -->
+    <li class="nav-item">
+        <a class="nav-link" href="tables.html">
+            <i class="fas fa-cog pr-2"></i>
+            <span>Settings</span></a>
+    </li>
+
+    <!-- Divider -->
+    <hr class="sidebar-divider d-none d-md-block">
+</ul>
+<!-- End of Sidebar -->

@@ -1,0 +1,24 @@
+{% extends 'main/base.html' %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+    <div class="container-fluid p-5 text-muted min-body-height">
+        <div class="container">
+            <div class="headline border-bottom">
+                <h3><b class="pr-2">Assignment: </b>{{ assignment.title }}</h3>
+                <small><b>Due Date: </b>{{ assignment.date_due }}</small>
+            </div>
+            <div class="submission-details mt-5">
+                <div id="accordion">
+                    {% for submission in submissions %}
+                        {% include 'template-parts/submission-detail-item.html' with submission=submission profile=submission.profile %}
+                    {% endfor %}
+                    <!-- Non-Submitted students-->
+                    {% for profile in non_submitted %}
+                        {% include 'template-parts/submission-detail-item.html' with profile=profile %}
+                    {% endfor %}
+                </div><!-- .accordian -->
+            </div><!-- .submission-details -->
+        </div><!-- .container -->
+    </div><!-- .container-fluid-->
+{% endblock %}

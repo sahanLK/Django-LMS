@@ -1,105 +1,72 @@
+<!--
+THIS TEMPLATE GETS INHERITED BY ALL OTHER TEMPLATES/PAGES IN THE APPLICATION.
+ -->
 <!DOCTYPE html>
 {% load static %}
+
 <html>
     <head>
         <title>University College Rathmalana</title>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Raleway">
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-        <link rel="stylesheet" href="https://kit.fontawesome.com/5562603f6e.css" crossorigin="anonymous">
-        <link rel="stylesheet" type="text/css" href="{% static '/main/style.css' %}">
+        <!-- Fonts -->
+        <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
+        rel="stylesheet">
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@300&display=swap">
+
+        <!-- Bootstrap -->
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css"
+              integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+        <!-- Font Awesome  -->
+        <link href="{% static 'fontawesomefree/css/all.min.css' %}" rel="stylesheet" type="text/css">
+
+        <!-- Custom dashboard template css -->
+        <link href="{% static 'main/css/sb-admin-2.css' %}?{% now 'U' %}" rel="stylesheet">
+
+        <!-- Custom CSS -->
+        <link rel="stylesheet" type="text/css" href="{% static '/main/css/main.css' %}?{% now 'U' %}">
     </head>
     <body>
-        <div class="w3-top shadow" id="nav">
-          <div class="navbar navbar-expand-lg navbar-light bg-light">
-              <a class="navbar-brand mr-5" href="{% url 'home' %}"><img src="{% static 'main/ucr-logo.jpg' %}" class="logo"></a>
-              <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-                  <span class="navbar-toggler-icon"></span>
-              </button>
+        {% include 'main/navbar.html' %}
+        {% include 'main/messages.html' %}
 
-              <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                  <ul class="navbar-nav mr-auto">
-                      <li class="nav-item"><a class="nav-link" href="/admin">Admin</a></li>
-                      {% block nav-item-1 %}
-                      {% endblock %}
-                  </ul>
-                  <ul class="navbar-nav my-2 my-lg-0 text-muted">
-                      {% if user.is_authenticated %}
-                          <li class="nav-item bell mr-5"><a href="#" class="nav-link"><i class="fas fa-bell" style="font-size: 25px;"></i></a></li>
-                          <li class="nav-item dropdown">
-                              <!--Add after nav-link in below item class <dropdown-toggle>-->
-                              <a class="nav-link " href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                  <img src="{{ user.profile.id_photo.url }}" class="rounded-circle" style="width: 40px; height: 40px">
-                              </a>
-                              <div class="dropdown-menu dropdown-menu-right p-2" aria-labelledby="navbarDropdown">
-                                  <h6 class="dropdown-header">@{{ user.username }}</h6>
-                                  <a class="nav-link" href="{% url 'profile' %}">Profile</a>
-                                  <a class="nav-link" href="{% url 'classrooms' %}">Classes</a>
-                                  <div class="dropdown-divider"></div>
-                                  <a class="nav-link" href="{% url 'logout' %}">Sign Out</a>
-                              </div>
-                          </li>
-                      {% else %}
-                        <li class="nav-item"><a class="nav-link" href="{% url 'login' %}">Login</a></li>
-                        <li class="nav-item"><a class="nav-link" href="{% url 'register' %}">Register</a></li>
-                      {% endif %}
-                  </ul>
-              </div>
-          </div>
-        </div>
-        {% block  content %}
-            <!-- Header with full-height image -->
-            <header class="bgimg-1 w3-display-container w3-grayscale-min shadow-sm" id="header">
-              <div class="w3-display-left w3-text-white" style="padding:48px">
-                <span class="w3-jumbo w3-hide-small">Welcome to UCR Learning Portal</span><br>
-                <span class="w3-xxlarge w3-hide-large w3-hide-medium">Welcome to UCR Learning Portal</span><br>
-                <span class="w3-large">Personalized distance learning experience with UCR LMS</span>
-                <p><a href="{% url 'login' %}" class="w3-button w3-white w3-padding-large w3-large w3-margin-top w3-opacity w3-hover-opacity-off">Join Today</a></p>
-              </div>
-              <div class="w3-display-bottomleft w3-text-grey w3-large" style="padding:24px 48px">
-                <!--  <span>Another text</span>  -->
-              </div>
-            </header>
+        <!-- In all the other templates, this content block should be overridden -->
+        <div class="wrapper" id="wrapper">
+            {% if user.is_authenticated %}
+                {% include 'main/sidebar.html' %}
+            {% endif %}
 
-            <!-- Contact Section -->
-            <div class="w3-container w3-light-grey" style="padding:128px 16px" id="contact">
-              <h3 class="w3-center">CONTACT</h3>
-              <p class="w3-center w3-large">Lets get in touch. Send us a message:</p>
-              <div style="margin-top:48px">
-                <p><i class="fa fa-map-marker fa-fw w3-xxlarge w3-margin-right"></i> Chicago, US</p>
-                <p><i class="fa fa-phone fa-fw w3-xxlarge w3-margin-right"></i> Phone: +00 151515</p>
-                <p><i class="fa fa-envelope fa-fw w3-xxlarge w3-margin-right"> </i> Email: mail@mail.com</p>
-                <br>
-                <form action="/action_page.php" target="_blank">
-                  <p><input class="w3-input w3-border" type="text" placeholder="Name" required name="Name"></p>
-                  <p><input class="w3-input w3-border" type="text" placeholder="Email" required name="Email"></p>
-                  <p><input class="w3-input w3-border" type="text" placeholder="Subject" required name="Subject"></p>
-                  <p><input class="w3-input w3-border" type="text" placeholder="Message" required name="Message"></p>
-                  <p>
-                    <button class="w3-button w3-black" type="submit">
-                      <i class="fa fa-paper-plane"></i> SEND MESSAGE
-                    </button>
-                  </p>
-                </form>
-                <!-- Image of location/map -->
-                <img src="/w3images/map.jpg" class="w3-image w3-greyscale" style="width:100%;margin-top:48px">
-              </div>
+            <!-- Main content block of any page. Should be overridden in any template -->
+            <div id="content-wrapper" class="d-flex flex-column mt-4">
+                {% block content %}
+                {% endblock %}
+                {% include 'main/footer.html' %}
             </div>
-        {% endblock %}
+        </div>
 
-        <!-- Footer -->
-        <footer class="w3-center w3-black w3-padding-64">
-<!--          <a href="#home" class="w3-button w3-light-grey"><i class="fa fa-arrow-up w3-margin-right"></i>To the top</a>-->
-          <p>A Project By: <a href="https://github.com/sahanLK" target="_blank" class="w3-hover-text-green">Sahan Lakshitha</a>  &  Insaf Marzook</p>
-        </footer>
+        <script src="https://code.jquery.com/jquery-3.6.4.min.js"
+                integrity="sha256-oP6HI9z1XaZNBrJURtCoUT5SUnxFr8s3BzRl+cbzUq8=" crossorigin="anonymous"></script>
+        </script>
+        <script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.7/dist/umd/popper.min.js"
+                integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
+                crossorigin="anonymous">
+        </script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/js/bootstrap.min.js"
+                integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+                crossorigin="anonymous">
+        </script>
+        <!-- Font-Awesome Js -->
+        <script src="{% static 'fontawesomefree/js/all.min.js' %}"></script>
+<!--        <script src="{% static 'fontawesomefree/js/solid.js' %}"></script>-->
+<!--        <script src="{% static 'fontawesomefree/js/brands.js' %}"></script>-->
 
-        <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
-        <script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.7/dist/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
-        <script src="https://kit.fontawesome.com/5562603f6e.js" crossorigin="anonymous"></script>
-        <script src="{% static 'main/script.js' %}"></script>
+        <!-- Dashboard page custom Js -->
+        <script src="{% static 'main/js/chart.js' %}"></script>
+
+        <!-- Custom Js -->
+        <script src="{% static 'main/js/main.js' %}"></script>
+        {% include 'main/charts.html' %}
     </body>
 </html>

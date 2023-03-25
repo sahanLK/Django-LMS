@@ -1,0 +1,46 @@
+{% load static %}
+
+<div class="w3-top shadow top-nav" id="nav">
+    <div class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand mr-5" href="{% url 'home' %}"><img src="{% static 'main/ucr-logo.jpg' %}" class="logo"></a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse"
+                data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
+                aria-expanded="false" aria-label="Toggle navigation" id="navToggle">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav mr-auto">
+                {% block nav-item-1 %} {% endblock %}
+            </ul>
+            <ul class="navbar-nav my-2 my-lg-0 text-muted">
+                {% if user.is_authenticated %}
+                    {% if not user.is_superuser %}
+                    <li class="nav-item dropdown">
+                        <!--Add after nav-link in below item class <dropdown-toggle>-->
+                        <a class="nav-link " href="#" id="navbarDropdown" role="button"
+                           data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <img src="{{ user.profile.profile_photo.url }}" class="rounded-circle shadow-sm" style="width: 40px; height: 40px">
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-right header-dropdown p-2" aria-labelledby="navbarDropdown">
+                            <p class="nav-username text-center text-muted">@{{ user.username }}</p>
+                            <a href="#" class="nav-link" name="Notifications">
+                                <i class="fas fa-bell pr-3"></i>
+                                Notifications
+                            </a>
+                            <a class="nav-link" href="{% url 'profile' %}"><i class="fas fa-user pr-3"></i>Profile</a>
+                            <a class="nav-link" href="{% url 'classrooms' %}"><i class="fas fa-graduation-cap pr-3"></i>Classes</a>
+                            <div class="dropdown-divider"></div>
+                            <a class="nav-link" href="{% url 'logout' %}"><i class="fas fa-sign-out-alt pr-3"></i>Sign Out</a>
+                        </div>
+                    </li>
+                    {% endif %}
+                {% else %}
+                    <li class="nav-item link-login"><a class="nav-link" href="{% url 'login' %}">Login</a></li>
+                    <li class="nav-item link-register"><a class="nav-link" href="{% url 'register' %}">Register</a></li>
+              {% endif %}
+            </ul>
+        </div>
+    </div>
+</div>
+

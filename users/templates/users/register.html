@@ -3,41 +3,16 @@
 
 {% block content %}
     <div class="container mt-5 mb-5">
-        <fieldset class="border-bottom text-muted mt-3 mb-2">
-            <legend class="border-bottom mb-3">Registration</legend>
-            <form method="POST" enctype="multipart/form-data" class="mb-4 mt-3">
-                {% csrf_token %}
-                {{ u_form|crispy }}
-                <button type="submit" class="btn btn-primary mt-3">Sign Up</button>
-            </form>
-        </fieldset>
+        <div class="mw-600 ml-auto mr-auto pt-1 background-light border-r-5 p-5">
+            <fieldset class="border-bottom text-muted mb-2">
+                <h3 class="border-bottom mb-4">Create an Account</h3>
+                <form method="POST" enctype="multipart/form-data" class="mb-4 mt-3" id="userRegisterForm" onsubmit="validateRegisterForm();">
+                    {% csrf_token %}
+                    {{ u_form|crispy }}
+                    <button type="submit" class="btn btn-primary mt-4" id="userRegister">Sign Up</button>
+                </form>
+            </fieldset>
+            <small class="text-muted">Already Have an Account ? <a href="{% url 'login' %}">Sign In</a></small>
+        </div>
     </div>
 {% endblock %}
-<!--
-
-<div class="container mt-5 mb-5">
-        <nav>
-          <div class="nav nav-tabs" id="nav-tab" role="tablist">
-            <a class="nav-link active" id="nav-home-tab" data-toggle="tab" data-target="#nav-home" type="button" role="tab" aria-controls="nav-home" aria-selected="true">Student</a>
-            <a class="nav-link" id="nav-profile-tab" data-toggle="tab" data-target="#nav-profile" type="button" role="tab" aria-controls="nav-profile" aria-selected="false">Lecturer</a>
-          </div>
-        </nav>
-        <div class="tab-content" id="nav-tabContent">
-          <div class="tab-pane fade show active" id="nav-home" role="tabpanel" aria-labelledby="nav-home-tab">
-              <fieldset class="border-bottom text-muted mt-3 mb-2">
-                  <form method="POST" class="mb-4 mt-3">
-                      {% csrf_token %}
-                      {{ u_form|crispy }}
-&lt;!&ndash;                      <button type="submit" class="btn btn-primary mt-3">Sign Up</button>&ndash;&gt;
-                  </form>
-                  <form method="POST" enctype="multipart/form-data" class="mb-4 mt-3">
-                      {% csrf_token %}
-                      {{ p_form|crispy }}
-                      <button type="submit" class="btn btn-primary mt-3">Sign Up</button>
-                  </form>
-              </fieldset>
-              <small>Already have an account? <a href="{% url 'login' %}" class="ml-1 text-muted">Sign In</a></small>
-          </div>
-          <div class="tab-pane fade" id="nav-profile" role="tabpanel" aria-labelledby="nav-profile-tab">...</div>
-        </div>
-    </div>-->

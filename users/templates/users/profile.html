@@ -2,26 +2,34 @@
 {% load crispy_forms_tags %}
 
 {% block content %}
-    <div class="container mb-lg-5 w-75 mt-4 bg-secondary rounded">
-        <div class="row mb-5 text-light p-5 shadow profile-info-content">
-            <div class="col-lg-5 text-center text-muted">
-                <img src="{{ user.profile.id_photo.url }}" class="rounded-circle shadow-lg" style="width: 250px; height: 250px">
-                <h4 class="username text-light mt-3 font-weight-bold">@{{ user.username }}</h4>
-            </div>
-            <div class="col-md-7 p-3 profile-info">
-                <h2 class="name mt-5">{{ user.first_name }}&nbsp;{{ user.last_name }}
-                    <small class="ml-3 btn btn-info shadow-lg">{{ user.profile.role }}</small>
-                </h2>
-            </div>
-        </div><!-- row -->
+<div class="container-fluid">
+    <div class="pt-5 mw-1000 m-auto">
+        <div class="container bg-secondary rounded profile-header">
+            <div class="row text-light p-4 shadow profile-info-content">
+                <div class="col-lg-5 col-md-5 text-center text-muted">
+                    <img src="{{ user.profile.profile_photo.url }}" class="rounded-circle shadow-lg" style="width: 250px; height: 250px">
+                    <h4 class="username text-light mt-3 font-weight-bold">@{{ user.username }}</h4>
+                </div>
+                <div class="col-lg-7 col-md-7 p-3 text-center profile-info">
+                    <h2 class="name mt-5">{{ user.get_full_name }}
+                        <small class="ml-3 btn btn-info shadow-lg">{{ user.profile.role }}</small>
+                    </h2>
+                    <h5 class="mt-5 mb-3">{{ user.profile.department }}</h5>
+                    <h5>{% if user.profile.batch %}{{ user.profile.batch }}{% endif %}</h5>
+                </div>
+            </div><!-- row -->
+        </div>
+        <div class="container mb-5 pl-0 pr-0">
+            <div class="background-light p-5 text-muted shadow-sm">
+                <form method="POST" enctype="multipart/form-data" class="mw-600 m-auto pb-4">
+                    {% csrf_token %}
+                    <legend class="border-bottom pb-1 mb-4">Profile Info</legend>
+                    {{ u_form|crispy }}
+                    {{ p_form|crispy }}
+                    <button type="submit" class="btn btn-primary mt-4 shadow">Update Profile</button>
+                </form>
+            </div><!-- .container -->
+        </div><!-- .container -->
     </div>
-    <div class="container w-75 mb-5 pt-lg-">
-        <form method="POST" enctype="multipart/form-data" class="pb-3 text-muted">
-            {% csrf_token %}
-            <legend class="border-bottom pb-1 mb-4">Profile Info</legend>
-            {{ u_form|crispy }}
-            {{ p_form|crispy }}
-            <button type="submit" class="btn btn-primary mt-3">Update</button>
-        </form>
-    </div>
+</div>
 {% endblock %}

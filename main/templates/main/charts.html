@@ -1,0 +1,75 @@
+
+<!--    PENDING WORK CHART  -->
+<script>
+const ctx = document.getElementById('myAreaChart');
+
+new Chart(ctx, {
+    type: 'bar',
+    data: {
+        labels: ['Assignments', 'Quizzes', 'Lectures'],
+        datasets: [{
+            label: '# of Work',
+            data: [10, 20, 6],
+            backgroundColor: [
+              'rgba(28, 200, 138, 1)',
+              'rgba(54, 185, 204, 1)',
+              'rgba(246, 194, 62, 1)',
+            ],
+            borderColor: [
+              'rgba(28, 200, 138, 1)',
+              'rgba(54, 185, 204, 1)',
+              'rgba(246, 194, 62, 1)',
+            ],
+            borderWidth: 1
+        }]
+    },
+    options: {
+        scales: {
+            y: {
+                beginAtZero: true,
+                gridLines: {
+                    display: false,
+                }
+            },
+        },
+        legend: {
+            display: false,
+        }
+    }
+});
+</script>
+
+<!-- ACCOUNT SETUP CHART -->
+<script>
+const pos = document.getElementById('accountSetupChart');
+
+var myPieChart = new Chart(pos, {
+  type: 'doughnut',
+  data: {
+    labels: ["Direct", "Referral", "Social"],
+    datasets: [{
+      data: [55, 30, 15],
+      backgroundColor: ['#4e73df', '#1cc88a', '#36b9cc'],
+      hoverBackgroundColor: ['#2e59d9', '#17a673', '#2c9faf'],
+      hoverBorderColor: "rgba(234, 236, 244, 1)",
+    }],
+  },
+  options: {
+    maintainAspectRatio: false,
+    tooltips: {
+      backgroundColor: "rgb(255,255,255)",
+      bodyFontColor: "#858796",
+      borderColor: '#dddfeb',
+      borderWidth: 1,
+      xPadding: 15,
+      yPadding: 15,
+      displayColors: false,
+      caretPadding: 10,
+    },
+    legend: {
+      display: false
+    },
+    cutoutPercentage: 80,
+  },
+});
+</script>

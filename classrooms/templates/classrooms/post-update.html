@@ -2,12 +2,7 @@
 {% load crispy_forms_tags %}
 
 {% block content %}
-    <div class="container text-muted mt-5 mb-5">
-        <h2 class="mb-5">{{ post.title }}</h2>
-        <form method="POST" class="mb-4 mt-3">
-          {% csrf_token %}
-          {{ form|crispy }}
-          <button type="submit" class="btn btn-primary mt-3">Update</button>
-      </form>
+    <div class="container-fluid">
+        {% include 'template-parts/base-form.html' with title='Post: '|add:post.title button_text='Update' %}
     </div>
 {% endblock %}

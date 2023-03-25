@@ -1,0 +1,18 @@
+<!--
+Single user item
+-->
+
+<div class="card card-body pl-4 pr-3 pt-3 pb-3 mb-3 br-10 shadow-sm">
+    <div class="row">
+        <div class="col-9">
+            <img src="{{ profile.profile_photo.url }}" class="rounded-circle mr-4 shadow-lg"
+                 style="max-width: 65px; max-height: 65px;">
+            <a class="m-0 pl-2">{{ profile.user.first_name }} {{ profile.user.last_name }}</a>
+        </div><!-- .col-9 -->
+        <div class="col-3 text-right">
+            {% if user.is_superuser %}
+                <a href="{% url 'user-delete' pk=profile.user.pk %}" class="btn btn-danger">Remove</a>
+            {% endif %}
+        </div><!-- .col-3 --->
+    </div><!-- .row -->
+</div><!-- .card -->

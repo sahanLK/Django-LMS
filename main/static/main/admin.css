@@ -1,0 +1,44 @@
+.min-body-height {
+    min-height: 550px !important;
+}
+
+
+/*
+Override styles that make unusual changed in admin panel by bootstrap
+*/
+
+a.deletelink,
+a.cancel-link {
+    height: auto !important;
+}
+
+caption {
+    caption-side: inherit !important;
+}
+
+.admin-menu {
+    background-color: #79aec8;
+    color: #fff !important;
+}
+
+.admin-menu a {
+    text-transform: capitalize;
+    font-size: 14px !important;
+    letter-spacing: 1px !important;
+}
+
+.admin-menu a:hover {
+    color: #000 !important;
+}
+
+.admin-menu {
+    padding: 0px !important;
+}
+
+.admin-menu a {
+    padding: 10px;
+}
+
+.nav-link .active {
+    border: 1px solid #000;
+}

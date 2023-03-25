@@ -2,12 +2,19 @@
 {% load crispy_forms_tags %}
 
 {% block content %}
-    <div class="container text-muted mt-5 mb-5">
-        <h2 class="mb-5">{{ classroom.name }}</h2>
-        <form method="POST" action="{% url 'class-update' classroom.pk %}" class="mb-4 mt-3">
-          {% csrf_token %}
-          {{ form|crispy }}
-          <button type="submit" class="btn btn-primary mt-3">Update</button>
-      </form>
+    <div class="container text-muted mt-5 mb-5 mw-800 pb-5">
+        <div class="row post-author pb-4 mw-700 m-auto"><!-- Edit and delete options for publisher -->
+            <div class="col-8 text-left">
+                <a href="{% url 'class-details' classroom.pk %}" class="text-left">
+                    <i class="fas fa-long-arrow-left pr-2"></i>Back to Classroom
+                </a>
+            </div>
+            <div class="col-4 text-right">
+                <a href="{% url 'class-delete' pk=classroom.pk %}">
+                    <i class="fas fa-trash-alt ml-3 text-danger"></i>
+                </a>
+            </div>
+        </div>
+        {% include 'template-parts/base-form.html' with title=classroom.name button_text='Update' %}
     </div>
 {% endblock %}

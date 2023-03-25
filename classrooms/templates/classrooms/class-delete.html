@@ -10,7 +10,7 @@
                     {{ form|crispy }}
                     <h5 class="card-title">Sure you want to delete this class ?</h5>
                     <p class="card-text">{{ classroom.name }}</p>
-                    <a href="{% url 'classrooms' %}" class="btn btn-secondary">Cancel</a>
+                    <a href="{% url 'class-details' pk=classroom.pk %}" class="btn btn-secondary">Cancel</a>
                     <button type="submit" class="btn btn-danger">Yes, Delete</button>
                 </form>
             </div>

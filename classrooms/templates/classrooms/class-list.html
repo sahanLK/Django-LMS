@@ -2,28 +2,33 @@
 {% load crispy_forms_tags %}
 
 {% block content %}
-    <div class="container-fluid p-5">
+    <div class="container-fluid min-body-height">
             <div class="col-12 text-right pb-4"> <!-- Model Trigger item-->
-                <a href="{% url 'class-create' %}" class="btn btn-primary">New Classroom</a>
+                {% if user.profile.role == 'Lecturer' %}
+                    <a href="{% url 'class-create' %}" class="btn btn-primary">New Classroom</a>
+                {% endif %}
             </div>
 
             <div class="row">
                 {% for classroom in class_rooms  %}
-                    <div class="col-xl-3 col-lg-4 col-md-6 col-sm-12">
+                    <div class="col-lg-4 col-md-6 col-sm-12 classroom">
                         <div class="container">
                             <section class="mx-auto my-5" style="max-width: 23rem;">
                                 <div class="card testimonial-card mt-2 mb-3">
                                     <div class="card-up aqua-gradient text-right">
-                                        <i class="fa-solid fa-ellipsis-vertical fa-lg text-light p-3 pt-4 pb-4" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></i>
-                                        <div class="dropdown-menu dropdown-menu-right"><!-- dropdown menu for edit and delete-->
-                                            <a href="{% url 'class-update' classroom.pk %}" class="dropdown-item"><i class="fas fa-edit pr-4 text-primary"></i>Edit</a>
-                                            <a href="{% url 'class-delete' classroom.pk %}" class="dropdown-item"><i class="fas fa-trash-alt pr-4 text-danger"></i>Delete</a>
-                                        </div>
+                                        {% if user.profile.role == 'Lecturer' %}
+                                            <i class="fa-solid fa-ellipsis-vertical fa-lg text-light p-3 pt-4 pb-4" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></i>
+                                            <div class="dropdown-menu dropdown-menu-right"><!-- dropdown menu for edit and delete-->
+                                                <a href="{% url 'class-update' classroom.pk %}" class="dropdown-item"><i class="fas fa-edit pr-4 text-primary"></i>Edit</a>
+                                                <a href="{% url 'class-delete' classroom.pk %}" class="dropdown-item"><i class="fas fa-trash-alt pr-4 text-danger"></i>Delete</a>
+                                            </div>
+                                        {% endif %}
                                     </div>
                                     <div class="avatar mx-auto white">
-                                        <img src="{{ classroom.owner.profile.id_photo.url }}" class="rounded-circle img-fluid" alt="woman avatar">
+                                        <img src="{{ classroom.owner.profile.profile_photo.url }}" class="rounded-circle img-fluid" alt="woman avatar">
                                     </div>
-                                    <div class="card-body text-center">
+                                    <div class="card-body text-center pt-1 text-muted">
+                                        <p>{{ classroom.owner.first_name }} {{ classroom.owner.last_name }}</p>
                                         <h5 class="card-title font-weight-bold">
                                             <a href="{% url 'class-details' classroom.pk %}" class="class-name">{{ classroom.name }}</a>
                                         </h5><hr>
@@ -33,6 +38,8 @@
                             </section>
                         </div>
                     </div>
+                {% empty %}
+                    <h2 class="m-auto text-muted pt-5">No Classrooms</h2>
                 {% endfor %}
             </div>
     </div>

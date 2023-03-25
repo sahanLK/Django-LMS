@@ -1,0 +1,524 @@
+/*
+* Overriding W3.CSS
+*/
+.w3-top {
+    position: sticky !important;
+}
+
+
+body,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    font-family: 'Noto Sans', sans-serif;
+}
+
+
+/* Overriding Bootstrap */
+.nav-item .nav-link {
+    border: 0px !important;
+}
+
+
+body,
+html {
+  height: 100%;
+  line-height: 1.8;
+}
+
+.logo {
+    width: 45px;
+    height: 30px;
+}
+
+.profile-pic {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+}
+
+.top-nav {
+    z-index: 1500 !important;
+    position: fixed !important;
+}
+
+/*
+* Navbar
+*/
+.navbar-toggler {
+    border: 0px !important;
+    outline: none !important;
+}
+
+.link-login,
+.link-register {
+    font-size: 17px;
+}
+
+.nav-username {
+    font-weight: 600;
+    font-size: 13px;
+    padding-top: 8px;
+    letter-spacing: 1px;
+}
+
+.for-dropdown {
+    display: none !important;
+}
+
+.navbar-collapse.show .for-dropdown {
+    display: block !important;
+}
+
+.display-dropdown {
+    display: block !important;
+    border: 0px !important;
+    background-color: inherit !important;
+}
+
+/*
+* Scrollbar
+*/
+
+html::-webkit-scrollbar {
+    width: 15px;
+}
+
+.sidebar::-webkit-scrollbar {
+    width: 10px !important;
+}
+
+html::-webkit-scrollbar-track,
+.sidebar::-webkit-scrollbar-track {
+    border-radius: 4px;
+    background-color: #e7e7e7;
+    border: 1px solid #cacaca;
+}
+
+html::-webkit-scrollbar-thumb,
+.sidebar::-webkit-scrollbar-thumb {
+    border-radius: 8px;
+    border: 3px solid transparent;
+    background-clip: content-box;
+    background-color: #5a5c69 !important;
+}
+
+html::-webkit-scrollbar-thumb:focus,
+.sidebar::-webkit-scrollbar-thumb:focus {
+    background-color: #fff !important;
+}
+
+
+/*
+* Sidebar
+*/
+.sidebar {
+    width: 6.5rem !important;
+    min-height: 100vh;
+    position: fixed !important;
+    height: 100%;
+    overflow-y: scroll;
+    overflow-x: hidden;
+}
+
+.sidebar,
+.sidebar li,
+ sidebar a {
+    transition: 0.3s;
+}
+
+
+/*
+Header
+*/
+
+.welcome-msg {
+    font-size: 50px;
+    letter-spacing: 0.5px;
+    margin-bottom: 25px;
+    font-weight: 600;
+}
+
+.welcome-sub {
+    font-size: 20px;
+    margin-top: 40px;
+}
+
+p.join-today {
+    margin-top: 20px;
+}
+
+
+/*
+Alert
+*/
+
+.alert ul {
+    list-style: none !important;
+    padding: 0px !important;
+}
+
+.messages {
+    list-style: none !important;
+    position: fixed !important;
+}
+
+
+/* Full height image header */
+.bgimg-1 {
+  background-position: center;
+  background-size: cover;
+  background-image: url("/static/main/free-learning.jpg");
+  min-height: 100%;
+}
+
+.bgimg-1 img {
+    opacity: 0.6;
+}
+
+.w3-bar .w3-button {
+  padding: 16px;
+}
+
+.a-buttons {
+    color: #ffffff;
+}
+
+.profile-info .name {
+    font-size: 22px !important;
+    font-weight: 500;
+}
+
+.profile-header {
+    border-bottom-left-radius: 0px !important;
+    border-bottom-right-radius: 0px !important;
+}
+
+/*
+* CANVAS CHARTS
+*/
+canvas {
+}
+
+
+/*
+Classrooms
+*/
+
+body {
+	background-color: #f5f7fa;
+}
+
+.testimonial-card .card-up {
+    border-top-left-radius: 15px !important;
+    border-top-right-radius: 15px !important;
+}
+
+.card-header {
+    background-color: inherit !important;
+    border-top-left-radius: 17px !important;
+    border-top-right-radius: 17px !important;
+}
+
+.card .class-name {
+    color: #13547a;
+}
+
+.testimonial-card .card-up {
+  height: 120px;
+  overflow: hidden;
+  border-top-left-radius: .45rem;
+  border-top-right-radius: .45rem;
+}
+
+.aqua-gradient {
+  background: linear-gradient(15deg, #13547a 0%, #80d0c7 100%);
+}
+
+.testimonial-card .avatar {
+  width: 120px;
+  margin-top: -60px;
+  overflow: hidden;
+  border: 5px solid #fff;
+  border-radius: 50%;
+}
+
+.class-detail-header {
+    min-height: 200px;
+    background: linear-gradient(15deg, #13547a 0%, #80d0c7 100%);
+}
+
+.class-announce {
+    border-radius: 12px;
+    padding: 5px;
+}
+
+.classroom-sub-nav {
+    font-weight: 600;
+    border-bottom: 1px solid #0c5e8d;;
+
+}
+.classroom-sub-nav .nav-link {
+    border-top-left-radius: 6px;
+    border-top-right-radius: 6px;
+}
+
+.classroom-sub-nav .nav-link.active {
+    background-color: #0c5e8d;
+    color: #ffffff;
+}
+
+.new-class-post i {
+    padding: 7px;
+}
+
+.upcoming-events .event {
+    font-size: 15px !important;
+    line-height: 1.5;
+}
+
+.upcoming-events .event li {
+    font-size: 15px;
+}
+
+/*
+* Classwork Tab
+*/
+
+
+
+
+/*
+Assignment Details page
+*/
+.profile-info-content {
+    padding-top: 60px !important;
+    padding-bottom: 60px !important;
+}
+
+
+/*
+Assignment Details page
+*/
+
+.assignment-header h2 {
+    margin-bottom: 10px;
+}
+
+.assignment-header .assignment-title {
+    padding-left: 0px !important;
+}
+
+.due-date {
+    font-size: 14px !important;
+}
+
+.selected-files .no-files-chosen {
+    text-align: center;
+}
+
+.selected-files .file {
+    width: 100%;
+    border: 1px solid;
+    border-radius: 5px;
+    font-size: 16px;
+    margin-left: 0px;
+    margin-right: 0px;
+    margin-bottom: 10px;
+}
+
+.selected-files .file .remove-file {
+    border-left: 1px solid #000;
+    cursor: pointer;
+}
+
+.assignment-file-input ul.errorlist {
+    display: none;
+}
+
+.show-submission {
+    cursor: pointer;
+}
+
+
+/*
+* File
+*/
+
+.box {
+    width: 250px;
+    border-radius: 10px !important;
+    padding: 15px !important;
+    color: brown;
+}
+
+/*
+* FOOTER
+*/
+footer {
+}
+
+/*
+* Common
+*/
+
+.background-light {
+    background-color: #fff !important;
+}
+
+.border-r-5 {
+    border-radius: 5px !important;
+}
+
+.border-r-10 {
+    border-radius: 10px !important;
+}
+
+.border-r-15 {
+    border-radius: 15px !important;
+}
+
+.border-r-20 {
+    border-radius: 20px !important;
+}
+
+
+.min-body-height {
+    min-height: 450px !important;
+}
+
+.primary-color {
+    background-color: #0c5e8d;
+}
+
+.primary-back-gradient {
+    background: linear-gradient(15deg, #13547a 0%, #80d0c7 100%);
+    color: #fff;
+}
+
+.size-10 {
+    font-size: 10px !important;
+}
+
+.size-20 {
+    font-size: 20px !important;
+}
+
+.size-30 {
+    font-size: 30px !important;
+}
+
+.pad-10 {
+    padding: 10px !important;
+}
+
+.pad-20 {
+    padding: 20px !important;
+}
+
+.pad-30 {
+    padding: 30px !important;
+}
+
+.icon-lg {
+    width: 25px !important;
+    height: 25px !important;
+}
+
+.icon-sm {
+    width: 15px !important;
+    height: 15px !important;
+}
+
+.mw-100 {
+    max-width: 100px !important;
+}
+
+.mw-150 {
+    max-width: 150px !important;
+}
+
+.mw-200 {
+    max-width: 200px !important;
+}
+
+.mw-300 {
+    max-width: 300px !important;
+}
+
+.mw-400 {
+    max-width: 400px !important;
+}
+
+.mw-500 {
+    max-width: 500px !important;
+}
+
+.mw-600 {
+    max-width: 600px !important;
+}
+
+.mw-700 {
+    max-width: 700px !important;
+}
+
+.mw-800 {
+    max-width: 800px !important;
+}
+
+.mw-900 {
+    max-width: 900px !important;
+}
+
+.mw-1000 {
+    max-width: 1000px !important;
+}
+
+
+/*
+MEDIA QUERIES
+*/
+
+/* Extra small devices (phones, 600px and down) */
+@media only screen and (max-width: 600px) {
+    .welcome-msg {
+        font-size: 30px;
+    }
+
+}
+
+/* Small devices (portrait tablets and large phones, 600px and up) */
+@media only screen and (min-width: 600px) {
+    .welcome-msg {
+        font-size: 33px;
+    }
+}
+
+/* Medium devices (landscape tablets, 768px and up) */
+@media only screen and (min-width: 768px) {
+    .welcome-msg {
+        font-size: 40px;
+    }
+
+    .sidebar {
+        width: 14rem!important;
+    }
+}
+
+/* Large devices (laptops/desktops, 992px and up) */
+@media only screen and (min-width: 992px) {
+    .welcome-msg {
+        font-size: 50px;
+    }
+
+}
+
+/* Extra large devices (large laptops and desktops, 1200px and up) */
+@media only screen and (min-width: 1200px) {
+    .welcome-msg {
+        font-size: 55px;
+    }
+}
