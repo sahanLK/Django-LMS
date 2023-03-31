@@ -13,7 +13,7 @@
                             </a>
                         </div>
                         <div class="col-4 text-right">
-                            {% if assignment.owner == user %}
+                            {% if assignment.owner == user.profile %}
                                 <a href="{% url 'submit-details' class_pk=assignment.classroom.pk pk=assignment.pk %}">
                                     <i class="fa-solid fa-users"></i>
                                 </a>

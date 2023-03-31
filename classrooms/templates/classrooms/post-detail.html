@@ -11,7 +11,7 @@
                     </a>
                 </div><!-- col-8 -->
                 <div class="col-4 text-right">
-                    {% if post.owner == user %}
+                    {% if post.owner == user.profile %}
                         <a href="{% url 'post-update' class_pk=post.classroom.pk pk=post.pk %}">
                             <i class="fas fa-edit text-secondary"></i>
                         </a>

@@ -71,7 +71,7 @@
 
                     <div class="tab-pane fade" id="classwork" role="tabpanel" aria-labelledby="pills-home-tab"><!-- classwork -->
                         <div class="mb-5">
-                            {% if user.profile.role == 'Lecturer' %}
+                            {% if user.role == 'lecturer' %}
                                 <a href="{% url 'assignment-new' class_pk=class.pk %}" class="btn btn-outline-primary shadow-sm">
                                     New Assignment
                                     <i class="fas fa-plus pl-3 font-weight-bold"></i>

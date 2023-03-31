@@ -1,0 +1,9 @@
+{% load crispy_forms_tags %}
+
+<form method="POST" enctype="multipart/form-data" class="mb-4 mt-3" id="userRegisterForm" onsubmit="validateRegisterForm();">
+    {% csrf_token %}
+    {{ u_form|crispy }}
+    {{ lec_create_form|crispy }}
+    <input type="hidden" name="reg_type" value="lecturer">
+    <button type="submit" class="btn btn-primary mt-4" id="lecRegister">Become a Lecturer</button>
+</form>

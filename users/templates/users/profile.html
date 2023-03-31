@@ -7,15 +7,20 @@
         <div class="container bg-secondary rounded profile-header">
             <div class="row text-light p-4 shadow profile-info-content">
                 <div class="col-lg-5 col-md-5 text-center text-muted">
-                    <img src="{{ user.profile.profile_photo.url }}" class="rounded-circle shadow-lg" style="width: 250px; height: 250px">
+                    <img src="{{ user.profile.profile_pic.url }}" class="rounded-circle shadow-lg"
+                         style="width: 250px; height: 250px">
                     <h4 class="username text-light mt-3 font-weight-bold">@{{ user.username }}</h4>
                 </div>
                 <div class="col-lg-7 col-md-7 p-3 text-center profile-info">
                     <h2 class="name mt-5">{{ user.get_full_name }}
-                        <small class="ml-3 btn btn-info shadow-lg">{{ user.profile.role }}</small>
+                        <small class="ml-3 btn btn-info shadow-lg">{{ user.role|upper }}</small>
                     </h2>
-                    <h5 class="mt-5 mb-3">{{ user.profile.department }}</h5>
-                    <h5>{% if user.profile.batch %}{{ user.profile.batch }}{% endif %}</h5>
+                    <h5 class="mt-5 mb-3">{{ user.profile.department.name }}</h5>
+                    <h5>
+                        {% if user.profile.department.batch %}
+                            {{ user.profile.department.batch.year|add:' Batch' }}
+                        {% endif %}
+                    </h5>
                 </div>
             </div><!-- row -->
         </div>

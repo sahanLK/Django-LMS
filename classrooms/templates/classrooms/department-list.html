@@ -1,0 +1,34 @@
+{% extends 'main/base.html' %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+    <div class="container-fluid min-body-height">
+        <div class="container mt-3 mb-5">
+            <div class="card-columns row">
+                {% for department in departments %}
+                    <div class="card border-top-info list-card shadow m-3">
+                        <div class="card-header text-center pl-4 pt-4">
+                            <h5 class="card-title text-muted mb-0">{{ department.name }}</h5>
+                            <a class="btn btn-info text-light font-weight-bold shadow-sm mt-3">
+                                {{ department.batch.year|add:" Batch" }}</a>
+                        </div>
+                        <div class="card-body text-center p">
+                            {% if department.description %}
+                                <p class="card-text mb-3">{{ department.short_description }}</p>
+                            {% endif %}
+                        </div>
+                        <div class="card-footer text-center pb-3">
+                            {% if user.profile in department.lecturer_set.all %}
+                                <a href="{% url 'dept-leave' dept_pk=department.pk %}"
+                               class="btn btn-outline-danger">Leave</a>
+                            {% else %}
+                            <a href="{% url 'dept-enroll' dept_pk=department.pk %}"
+                               class="btn btn-outline-primary">Enroll</a>
+                            {% endif %}
+                        </div><!-- .card-footer -->
+                    </div><!-- .card -->
+                {% endfor %}
+            </div>
+        </div><!-- .container -->
+    </div><!-- .container-fluid -->
+{% endblock %}

@@ -1,9 +1,8 @@
 from django.contrib import admin
-from .models import Department, Batch, CustomizedUser, Profile, AdminMessage
+from .models import CustomizedUser, Student, Lecturer
 
 
 admin.site.register(CustomizedUser)
-admin.site.register(Profile)
-admin.site.register(Department)
-admin.site.register(Batch)
-admin.site.register(AdminMessage)
+admin.site.register(Student)
+admin.site.register(Lecturer)
+# admin.site.register(AdminMessage)

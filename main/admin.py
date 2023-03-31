@@ -1,3 +1,6 @@
 from django.contrib import admin
+from .models import Batch, Department
 
-# Register your models here.
+
+admin.site.register(Batch)
+admin.site.register(Department)

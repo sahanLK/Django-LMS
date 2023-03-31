@@ -1,7 +1,7 @@
 {% if messages %}
     <ul class="messages w-100 ml-auto mr-auto mt-4 position-fixed" id="messages">
         {% for message in messages %}
-            <li class="alert alert-{{ message.tags }} mw-400 m-auto">{{ message }}</li>
+            <li class="alert alert-{{ message.tags }} mw-400 m-auto shadow">{{ message }}</li>
         {% endfor %}
     </ul>
 {% endif %}

@@ -12,6 +12,22 @@
     <hr class="sidebar-divider pb-3">
     <div class="sidebar-heading">Actions</div>
 
+    <!-- Nav Item - Departments Collapse Menu -->
+    {% if user.role == 'lecturer' %}
+        <li class="nav-item">
+            <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseDepartments"
+                aria-expanded="true" aria-controls="collapseTwo">
+                <i class="fas fa-university pr-2"></i>
+                <span>Departments</span>
+            </a>
+            <div id="collapseDepartments" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
+                <div class="bg-white py-2 collapse-inner rounded">
+                    <a class="collapse-item" href="{% url 'departments' %}">All</a>
+                </div>
+            </div>
+        </li>
+    {% endif %}
+
     <!-- Nav Item - Classes Collapse Menu -->
     <li class="nav-item">
         <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseTwo"
@@ -26,6 +42,8 @@
             </div>
         </div>
     </li>
+
+
 
     <!-- Nav Item - Assignments Collapse Menu -->
     <li class="nav-item">

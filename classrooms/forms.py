@@ -1,5 +1,11 @@
 from django import forms
-from .models import Assignment, SubmittedAssignment
+from .models import Assignment, Submission, Classroom
+
+
+class ClassroomCreateForm(forms.ModelForm):
+    class Meta:
+        model = Classroom
+        fields = ['department', 'lecturers', 'name', 'description']
 
 
 class AssignmentCreationForm(forms.ModelForm):
@@ -16,13 +22,14 @@ class AssignmentCreationForm(forms.ModelForm):
 
 class AssignmentSubmitForm(forms.ModelForm):
     file = forms.FileField(
-        widget=forms.ClearableFileInput(attrs={'class': 'custom-file-input no-mw no-inside-name', 'id': 'assignment-submit'}),
+        widget=forms.ClearableFileInput(
+            attrs={'class': 'custom-file-input no-mw no-inside-name', 'id': 'assignment-submit'}),
         label='',
         required=False,
     )
 
     class Meta:
-        model = SubmittedAssignment
+        model = Submission
         fields = ['file']
 
 
@@ -38,6 +45,6 @@ class AssignmentGradeForm(forms.ModelForm):
     )
 
     class Meta:
-        model = SubmittedAssignment
+        model = Submission
         fields = ['grade', 'comment']
 

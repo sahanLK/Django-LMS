@@ -2,21 +2,22 @@
 Common helpful functions for views.py
 """
 from .models import Classroom, Assignment, Post
-from users.models import Profile  # No error because similar to django Shell import
+# from users.models import Profile  # No error because similar to django Shell import
 from django.db.models.query import QuerySet
 from django.contrib.auth.models import User
 from typing import Union
 from .exceptions import ArgumentNotSpecifiedError
 
 
-def get_user_profile(user: User) -> Profile:
+def get_user_profile(user: User):
     """
     Returns the user profile, using any user instance
     :param user:
     :return:
     """
-    profile = Profile.objects.get(user=user)
-    return profile
+    # profile = Profile.objects.get(user=user)
+    # return profile
+    pass
 
 
 def get_class(class_pk) -> Classroom:
@@ -25,9 +26,10 @@ def get_class(class_pk) -> Classroom:
 
 
 def get_stu_profiles(class_pk) -> QuerySet:
-    owner_dept = get_class(class_pk).owner.profile.department
-    students = Profile.objects.filter(department=owner_dept, role='Student')
-    return students
+    # owner_dept = get_class(class_pk).owner.profile.department
+    # students = Profile.objects.filter(department=owner_dept, role='Student')
+    # return students
+    pass
 
 
 def get_lec_profiles(class_pk: str) -> list:
@@ -36,9 +38,10 @@ def get_lec_profiles(class_pk: str) -> list:
     :param class_pk: Primary key of the class
     :return:
     """
-    cls_owner = get_class(class_pk).owner
-    prof = Profile.objects.get(user=cls_owner)
-    return [prof]
+    # cls_owner = get_class(class_pk).owner
+    # prof = Profile.objects.get(user=cls_owner)
+    # return [prof]
+    pass
 
 
 def get_assignments_all(user):

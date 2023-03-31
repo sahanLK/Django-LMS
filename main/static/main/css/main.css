@@ -46,6 +46,15 @@ html {
 }
 
 /*
+Bootstrap Nav Tabs
+*/
+.nav-tabs .nav-link.active {
+    background-color: #2a96a5 !important;
+    color: #fff !important;
+}
+
+
+/*
 * Navbar
 */
 .navbar-toggler {
@@ -164,6 +173,11 @@ Alert
 .messages {
     list-style: none !important;
     position: fixed !important;
+    z-index: 2500;
+}
+
+.messages li {
+    letter-spacing: 1px;
 }
 
 
@@ -358,8 +372,26 @@ Assignment Details page
 /*
 * FOOTER
 */
-footer {
+
+
+/*
+* CARDS
+*/
+.card.list-card {
+    min-width: 300px !important;
+    max-width: 300px !important;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    height: fit-content !important;
 }
+
+.card-title {
+    font-size: 1.25rem !important;
+    letter-spacing: 0.5px;
+    line-height: 1.5;
+    font-weight: 600;
+}
+
 
 /*
 * Common
