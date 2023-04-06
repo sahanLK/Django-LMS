@@ -1,6 +1,0 @@
-{% extends 'main/base.html' %}
-{% load crispy_forms_tags %}
-
-{% block content %}
-    {% include 'template-parts/base-form.html' with title="Departments: "|add:lecturer.user.get_full_name button_text='Enroll' %}
-{% endblock %}
