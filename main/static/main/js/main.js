@@ -1,95 +1,52 @@
 $(document).ready( function() {
-    /* Set header height properly */
-    var window_height = $(window).innerHeight();
-    var nav_height = $('#nav').outerHeight();
-    $('#header').css('min-height', window_height-nav_height);
+    /* content wrapper */
+    /*$('#wrapper').fadeOut(2)
+    $('#wrapper').fadeIn(500);*/
 
     /* Common interactive elements */
     const sidebar = $('#accordionSidebar');
-    const navbar = $("#nav");
+    const navbar = $("#navbar");
     const contentWrapper = $('#content-wrapper');
 
-    // set positions of main elements at page load
-    setContentPos();
+    /*
+    * Welcome Page
+    */
+    $('#welcomeImg img').css({'height': $(window).innerHeight() - $(navbar).innerHeight()});
+
+    /* some common values */
+    var window_height = $(window).innerHeight();
+    var nav_height = $('#navbar').outerHeight();
 
     /*
-    *  NAVBAR
+    * SITE CONTENT
     */
-    $('#navToggle').on('click', function() {
-        var navToggler = $(this);
-
-        // Get the target content from data-target attribute
-        var targetMenuAttr = $(this).attr('data-target');
-        var targetMenu = $(targetMenuAttr);
-
-        // All the dropdown-menus inside the target menu
-        var dropdownMenus = $(targetMenu).find('.dropdown-menu');
-
-        // All the dropdown togglers
-        var dropdownTogglers = $("a[data-toggle='dropdown']");
-
-        if ( $(navToggler).attr('aria-expanded') == 'false' ) {
-            // Area is collapsed but going to be expanded
-            // Show all the dropdown menus inside the target content
-            $(dropdownMenus).each( function(index, item) {
-                $(item).addClass('display-dropdown');
-            });
-
-            // Hide all the dropdown toggler links
-            $(dropdownTogglers).each( function(index, item) {
-                $(item).css({'display': 'none'});
-            });
-        } else {
-            // Area is expanded but going to be collapsed
-            // Hide all the dropdown menus inside the target content
-            $(dropdownMenus).each( function(index, item) {
-                $(item).removeClass('display-dropdown');
-            });
-
-            // Show all the dropdown toggler links
-            $(dropdownTogglers).each( function(index, item) {
-                $(item).css({'display': 'block'});
-            });
-        }
-    });
+    var wrapper = $('#wrapper');
+    console.log($('#navbar').outerHeight());
+    $(wrapper).css({'top': nav_height+'px',});
 
     /*
-    *   SIDEBAR
+    * *   SIDEBAR
     */
-    // Additional toggle action
-    $('#toggleSideNav').on('click', function() {
-        $('ul.sidebar').toggleClass('toggled');
+    $('#sidebarToggleBtn').on('click', function() {
+        $(sidebar).toggleClass('show');
     });
-
-    // Put all the necessary functions that needs to be run, when window resizing.
+    // When the window is resizing, set the sidebar into initial state.
     $(window).on('resize', function() {
-        setContentPos();
+        $(sidebar).removeClass('show');
     });
-
-    /*
-    When Scrolling down slide-up navbar. When scrolling up slide-sown the navbar
-    */
-    var lastScrollTop = 0;
-    $(document).on('scroll', function() {
-        var st = $(this).scrollTop(); // Current top position
-        if ( st > lastScrollTop ) {
-            // Scrolling Down
-            $(navbar).slideUp(150);
-            $(sidebar).css({'top': 0});
-            $(contentWrapper).css({'top': 0});
-            lastScrollTop = st;
-        } else {
-            // Scrolling Up
-            $(navbar).slideDown(150);
-            $(sidebar).css({'top': nav_height});
-            lastScrollTop = st;
-        }
+    // Close the sidebar when clicking outside the sidebar if it is opened
+    $('.content-inner').on('click', function() {
+        $(sidebar).removeClass('show');
+    });
+    // When opening the navbar dropdown, close the sidebar if it is opened
+    $('#navbarDropdown').on('click', function() {
+        $(sidebar).removeClass('show');
     });
 
     /*
     * MESSAGES
     */
-    // Disapear in few seconds
+    // Disappear in few seconds
     setInterval(function() {
         $('#messages').slideUp(200);
     }, 3000);
@@ -97,6 +54,19 @@ $(document).ready( function() {
     /*
     *   REGISTRATION FORM
     */
+
+    /* clear the previous form when other form is selecting */
+    var lecForm = $('#lecRegisterForm');
+    var stuForm = $('#stuRegisterForm');
+
+    $('#lec-form').on('click', function() {
+        $(stuForm)[0].reset();
+    });
+    $('#stu-form').on('click', function() {
+        $(lecForm)[0].reset();
+    });
+
+
     /* Dealing with select option for batch in registration form */
     if ( $('#reg_role').val() == 'Lecturer' ) {
         $('#reg_batch').val(null);
@@ -114,7 +84,6 @@ $(document).ready( function() {
             $('#reg_batch').val(firstOption.text);
         }
     });
-
 
     /* Display the selected assignment files */
     $('#assignment-submit').change( function() {
@@ -194,7 +163,10 @@ $(document).ready( function() {
 
     }
 
-    /* Functions */
+    /*
+    * Functions
+    */
+
     function  getShortFileName( fileName ) {
         var splitBySlash = fileName.split('/');
         var name = splitBySlash[splitBySlash.length - 1];
@@ -205,21 +177,6 @@ $(document).ready( function() {
         }
         return shortName;
     }
-
-    function setContentPos() {
-        /* Set the site main content and footer position properly. Important */
-        var sidebarWidth = $(sidebar).innerWidth();
-        var windowWidth = $(window).innerWidth();
-
-        var contentWidth = windowWidth - sidebarWidth;
-        $('#content-wrapper').css({'width': contentWidth});    // Set main content width
-        $('#content-wrapper').css({'margin-left': windowWidth-contentWidth});    // Set main content margin-left
-        $('#content-wrapper').slideDown(350);
-
-        /* Set the wrapper top position */
-        $('#wrapper').css({'position': 'relative', 'top': nav_height + 'px'});
-    }
-
 
 });
 

@@ -1,0 +1,30 @@
+<!-- Sidebar card for a lecturer in assignment details page -->
+
+<div class="card assignment-sidebar-card shadow mw-400 m-auto">
+    <div class="card-header">
+        <div class="row">
+            <div class="col-12 text-muted">
+                <h6 class="font-weight-bold pt-2">Assignment Status</h6>
+            </div>
+        </div>
+    </div><!-- .card-header -->
+
+    <div class="card-body text-left text-muted">
+        <table class="table table-striped">
+            <tbody class="text-left text-secondary">
+                <tr>
+                    <th scope="row"><span>Total Submissions:</span></th>
+                    <td><b>{{ assignment.submission_set.count }}</b></td>
+                </tr>
+                <tr>
+                    <th scope="row"><span>Pending:</span></th>
+                    <td>{{ assignment.pending_submissions }}</td>
+                </tr>
+            </tbody>
+        </table>
+        <a href="{% url 'submit-details' class_name=assignment.classroom.name|slugify assignment_pk=assignment.pk %}"
+           class="btn btn-info w-100">
+            View Submissions
+        </a>
+    </div>
+</div>

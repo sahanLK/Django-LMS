@@ -2,73 +2,29 @@
 
 {% block content %}
 <div class="container mt-5 mb-5">
-    <div class="mw-600 ml-auto mr-auto pt-1 background-light border-r-5 p-5 shadow-sm">
-        <h3 class="mb-5 pb-1">Register Today</h3>
+    <div class="mw-600 ml-auto mr-auto pt-1 background-light border-r-5 pl-5 pr-5 pb-5 pt-4 shadow-sm">
+        <h3 class="mb-5 mt-2 roboto-title-muted">Register Today</h3>
         <ul class="nav nav-tabs" id="myTab" role="tablist">
-            <li class="nav-item" role="presentation">
-                <button class="nav-link active" id="home-tab" data-toggle="tab" data-target="#home"
+            <li class="nav-item" role="presentation" id="stu-form">
+                <button class="nav-link active" id="stu-tab" data-toggle="tab" data-target="#home"
                         type="button" role="tab" aria-controls="home" aria-selected="true">Student</button>
             </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link" id="profile-tab" data-toggle="tab" data-target="#profile"
+            <li class="nav-item" role="presentation" id="lec-form">
+                <button class="nav-link" id="lec-tab" data-toggle="tab" data-target="#profile"
                         type="button" role="tab" aria-controls="profile" aria-selected="false">Lecturer</button>
             </li>
         </ul>
-        <div class="tab-content pt-4" id="myTabContent">
-            <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
+        <div class="tab-content pt-4 pb-2 mb-2 border-bottom" id="myTabContent">
+            <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="stu-tab">
                 {% include "users/template-parts/student-reg-form.html" %}
             </div>
-            <div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-tab">
+            <div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="lec-tab">
                 {% include "users/template-parts/lecturer-reg-form.html" %}
             </div>
         </div><!-- .tab-content -->
+        <small class="text-muted">Already Have an Account ? <a href="{% url 'login' %}">Sign In</a></small>
     </div>
 </div><!-- .container -->
-
-
-
-
-
-<!--<div class="container mt-5 mb-5">-->
-<!--    <div class="mw-600 ml-auto mr-auto pt-1 background-light border-r-5 p-5">-->
-<!--        <ul class="nav nav-tabs" id="myTab" role="tablist">-->
-<!--            <li class="nav-item" role="presentation">-->
-<!--                <button class="nav-link active" id="home-tab" data-bs-toggle="tab" data-bs-target="#home"-->
-<!--                        type="button" role="tab" aria-controls="home" aria-selected="true">Student</button>-->
-<!--            </li>-->
-<!--            <li class="nav-item" role="presentation">-->
-<!--                <button class="nav-link" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile"-->
-<!--                        type="button" role="tab" aria-controls="profile" aria-selected="false">Profile</button>-->
-<!--            </li>-->
-<!--        </ul>-->
-<!--        <div class="tab-content" id="myTabContent">-->
-<!--            <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">-->
-<!--                <h2>dcsfds</h2>-->
-<!--            </div>-->
-<!--            <div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-tab">-->
-<!--                <h2>kkl</h2>-->
-<!--            </div>-->
-<!--        </div>&lt;!&ndash; .tab-content &ndash;&gt;-->
-<!--    </div>-->
-<!--</div>&lt;!&ndash; .container &ndash;&gt;-->
-
-
-
-
-
-
-
-<!--
-    <div class="container mt-5 mb-5">
-        <div class="mw-600 ml-auto mr-auto pt-1 background-light border-r-5 p-5">
-            <fieldset class="border-bottom text-muted mb-2">
-                <h3 class="border-bottom mb-4">Create an Account</h3>
-                {% include "users/template-parts/lecturer-reg-form.html" %}
-                {% include "users/template-parts/student-reg-form.html" %}
-            </fieldset>
-            <small class="text-muted">Already Have an Account ? <a href="{% url 'login' %}">Sign In</a></small>
-        </div>
-    </div>-->
 {% endblock %}
 
 

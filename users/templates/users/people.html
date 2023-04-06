@@ -1,0 +1,15 @@
+{% extends 'main/base.html' %}
+
+{% block content %}
+    `<div class="container pt-5 pb-5 min-body-height">
+        <h3>Lecturers</h3>
+        {% for lec in lecturers %}
+            <h4>{{ lec.user.username }}</h4>
+        {% endfor %}
+
+        <h3 class="mt-5 font-weight-bold">Students</h3>
+        {% for stu in students %}
+            <h4>{{ stu.user.username }}</h4>
+        {% endfor %}
+    </div>
+{% endblock %}

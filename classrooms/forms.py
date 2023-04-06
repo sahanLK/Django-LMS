@@ -3,9 +3,19 @@ from .models import Assignment, Submission, Classroom
 
 
 class ClassroomCreateForm(forms.ModelForm):
+    description = forms.CharField(widget=forms.Textarea(attrs={'rows': 4}), max_length=150, required=False)
+
     class Meta:
         model = Classroom
-        fields = ['department', 'lecturers', 'name', 'description']
+        fields = ['department', 'name', 'description']
+
+
+class ClassroomUpdateForm(forms.ModelForm):
+    description = forms.CharField(widget=forms.Textarea(attrs={'rows': 4}), max_length=150, required=False)
+
+    class Meta:
+        model = Classroom
+        fields = ['name', 'lecturers', 'description']
 
 
 class AssignmentCreationForm(forms.ModelForm):
@@ -38,7 +48,7 @@ class AssignmentGradeForm(forms.ModelForm):
     Assignment is graded by the lecturer after the submission.
     """
     grade = forms.CharField(max_length=20, required=False)
-    comment = forms.CharField(
+    lec_comment = forms.CharField(
         widget=forms.Textarea(attrs={'rows': 3, 'placeholder': 'Optional'}),
         required=False,
         max_length=150,
@@ -46,5 +56,5 @@ class AssignmentGradeForm(forms.ModelForm):
 
     class Meta:
         model = Submission
-        fields = ['grade', 'comment']
+        fields = ['grade', 'lec_comment']
 

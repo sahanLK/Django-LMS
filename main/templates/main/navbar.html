@@ -1,46 +1,49 @@
 {% load static %}
 
-<div class="w3-top shadow top-nav" id="nav">
-    <div class="navbar navbar-expand-lg navbar-light bg-light">
-        <a class="navbar-brand mr-5" href="{% url 'home' %}"><img src="{% static 'main/ucr-logo.jpg' %}" class="logo"></a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse"
-                data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
-                aria-expanded="false" aria-label="Toggle navigation" id="navToggle">
-            <span class="navbar-toggler-icon"></span>
-        </button>
+<div class="nav-container position-fixed w-100">
+    <nav class="navbar navbar-expand-lg navbar-light bg-light  pt-3 pb-3 shadow" id="navbar">
+        {% if user.is_authenticated %}
+            <button id="sidebarToggleBtn" class="sidebar-toggler btn btn-link rounded-circle text-secondary mr-3">
+                <i class="fa fa-bars"></i>
+            </button>
+        {% endif %}
 
-        <div class="collapse navbar-collapse" id="navbarSupportedContent">
-            <ul class="navbar-nav mr-auto">
-                {% block nav-item-1 %} {% endblock %}
-            </ul>
-            <ul class="navbar-nav my-2 my-lg-0 text-muted">
-                {% if user.is_authenticated %}
-                    {% if not user.is_superuser %}
-                    <li class="nav-item dropdown">
-                        <!--Add after nav-link in below item class <dropdown-toggle>-->
-                        <a class="nav-link " href="#" id="navbarDropdown" role="button"
-                           data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            <img src="{{ user.profile.profile_pic.url }}" class="rounded-circle shadow-sm" style="width: 40px; height: 40px">
-                        </a>
-                        <div class="dropdown-menu dropdown-menu-right header-dropdown p-2" aria-labelledby="navbarDropdown">
-                            <p class="nav-username text-center text-muted">@{{ user.username }}</p>
-                            <a href="#" class="nav-link" name="Notifications">
-                                <i class="fas fa-bell pr-3"></i>
-                                Notifications
-                            </a>
-                            <a class="nav-link" href="{% url 'profile' %}"><i class="fas fa-user pr-3"></i>Profile</a>
-                            <a class="nav-link" href="{% url 'classrooms' %}"><i class="fas fa-graduation-cap pr-3"></i>Classes</a>
-                            <div class="dropdown-divider"></div>
-                            <a class="nav-link" href="{% url 'logout' %}"><i class="fas fa-sign-out-alt pr-3"></i>Sign Out</a>
-                        </div>
-                    </li>
-                    {% endif %}
-                {% else %}
-                    <li class="nav-item link-login"><a class="nav-link" href="{% url 'login' %}">Login</a></li>
-                    <li class="nav-item link-register"><a class="nav-link" href="{% url 'register' %}">Register</a></li>
-              {% endif %}
-            </ul>
+        <a class="navbar-brand mr-5 p-3" href="{% url 'home' %}">
+            <img src="{% static 'main/ucr-logo.png' %}" class="logo">
+        </a>
+
+        {% if user.is_authenticated %}
+        <div class="dropdown ml-auto">
+            <a href="" id="navbarDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <img src="{{ user.profile.profile_pic.url }}" class="rounded-circle shadow-sm"
+                     style="width: 45px; height: 45px">
+            </a>
+            <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
+                <p class="nav-username text-center text-muted">@{{ user.username }}</p>
+                <a href="#" class="nav-link text-secondary" name="Notifications">
+                    <i class="fas fa-bell"></i>Notifications
+                </a>
+                <a class="nav-link text-secondary" href="{% url 'profile' %}">
+                    <i class="fas fa-user"></i>Profile
+                </a>
+                <div class="dropdown-divider"></div>
+                <a class="nav-link text-secondary" href="{% url 'logout' %}">
+                    <i class="fas fa-sign-out-alt"></i>Sign Out
+                </a>
+            </div>
         </div>
-    </div>
-</div>
 
+        {% else %}<!-- for a visitor -->
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarText" aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="visitor-menu collapse navbar-collapse" id="navbarText">
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item pl-3"><a href="{% url 'login' %}" class="nav-link">Login</a></li>
+                    <li class="nav-item pl-3"><a href="{% url 'register' %}" class="nav-link">Register</a></li>
+                </ul>
+            </div>
+        {% endif %}
+
+    </nav><!-- .navbar -->
+</div>

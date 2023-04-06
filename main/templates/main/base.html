@@ -10,11 +10,12 @@ THIS TEMPLATE GETS INHERITED BY ALL OTHER TEMPLATES/PAGES IN THE APPLICATION.
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <link rel="stylesheet" href="{% static 'main/css/w3.css' %}">
+
         <!-- Fonts -->
         <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
         rel="stylesheet">
         <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@300&display=swap">
+        <link href="https://fonts.googleapis.com/css2?family=Roboto+Slab&display=swap" rel="stylesheet">
 
         <!-- Bootstrap -->
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css"
@@ -32,19 +33,17 @@ THIS TEMPLATE GETS INHERITED BY ALL OTHER TEMPLATES/PAGES IN THE APPLICATION.
         {% include 'main/navbar.html' %}
         {% include 'main/messages.html' %}
 
-        <!-- In all the other templates, this content block should be overridden -->
         <div class="wrapper" id="wrapper">
             {% if user.is_authenticated %}
                 {% include 'main/sidebar.html' %}
             {% endif %}
 
-            <!-- Main content block of any page. Should be overridden in any template -->
-            <div id="content-wrapper" class="d-flex flex-column mt-4">
-                {% block content %}
-                {% endblock %}
+            <div class="container-fluid {% if user.is_authenticated %}content-inner{% endif %} m-0 p-0">
+                <!-- In all the other templates, this content block should be overridden -->
+                {% block content %}{% endblock %}
                 {% include 'main/footer.html' %}
-            </div>
-        </div>
+            </div><!-- .container-fluid -->
+        </div><!-- .wrapper -->
 
         <script src="https://code.jquery.com/jquery-3.6.4.min.js"
                 integrity="sha256-oP6HI9z1XaZNBrJURtCoUT5SUnxFr8s3BzRl+cbzUq8=" crossorigin="anonymous"></script>
@@ -54,14 +53,18 @@ THIS TEMPLATE GETS INHERITED BY ALL OTHER TEMPLATES/PAGES IN THE APPLICATION.
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/js/bootstrap.min.js"
                 integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
                 crossorigin="anonymous"></script>
-        <!-- Font-Awesome Js -->
-        <script src="{% static 'fontawesomefree/js/all.min.js' %}"></script>
 
+        <!-- Font-Awesome Js -->
+        <script type="text/javascript">
+          // Notice how this gets configured before we load Font Awesome
+          // This is for avoiding using svg.
+          window.FontAwesomeConfig = { autoReplaceSvg: false }
+        </script>
+        <script src="{% static 'fontawesomefree/js/all.min.js' %}"></script>
         <!-- Dashboard page custom Js -->
         <script src="{% static 'main/js/chart.js' %}"></script>
-
         <!-- Custom Js -->
-        <script src="{% static 'main/js/main.js' %}"></script>
+        <script src="{% static 'main/js/main.js' %}?{% now 'U' %}"></script>
         {% include 'main/charts.html' %}
     </body>
 </html>

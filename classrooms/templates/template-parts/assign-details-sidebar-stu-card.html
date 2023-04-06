@@ -1,0 +1,118 @@
+<div class="card assignment-sidebar-card shadow mw-400 m-auto">
+    <div class="card-header">
+        <div class="row">
+            <div class="col-6 text-left">
+                <h5 class="pt-2">Your Work</h5>
+            </div>
+            <div class="col-6 text-right">
+                <h6 class="pt-2 text-muted">
+                    {% if submission %}
+                        {% if submission.is_late_submit %}
+                            <b class="text-danger">Late Submission</b>
+                        {% else %}
+                             <b class="text-success">Turned In</b>
+                        {% endif %}
+                    {% else %}
+                        {% if assignment.has_due_expired %}
+                             <b class="text-danger">Missing</b>
+                        {% else %}
+                             <b class="text-secondary">Pending</b>
+                        {% endif %}
+                    {% endif %}
+                </h6>
+            </div>
+        </div>
+    </div><!-- .card-header -->
+
+    <div class="card-body">
+        <div class="row">
+            <div class="col-12">
+                <div class="selected-files pt-3 pb-5" id="selectedFiles">
+                    {% if not submission.file %}
+                        <span class="" id="noFileChosenMsg">No Files Chosen</span>
+                    {% endif %}
+                    {% if submission.file %}
+                        <a href="{{ submission.file.url }}"
+                           class="border p-2 w-100 d-block rounded shadow-sm"
+                           target="_blank">{{ submission.get_short_file_name }}</a>
+                    {% endif %}
+                </div>
+
+                {% if not submission %}
+                    {% if not assignment.review_complete %}
+                        <form method="POST" enctype="multipart/form-data" class="assignment-file-input">
+                            <div class="custom-file">
+                                {% csrf_token %}
+                                {{ form }}
+                            </div>
+                            <button class="btn btn-success w-100 mt-3">Submit</button>
+                        </form>
+                    {% else %}
+                        <a class="btn btn-info disabled w-100">Submissions Not Accepting</a>
+                    {% endif %}
+                {% else %}
+
+                    <!--
+                    UnSubmission should only be allowed if the lecturer has not finished the assignment
+                    review and also if not the assignment is graded
+                    -->
+                    {% if submission.grade %}
+                        <a href="" class="btn btn-info w-100 disabled">Graded</a>
+                    {% elif assignment.review_complete  %}
+                        <a href="" class="btn btn-info w-100 disabled">Review Completed</a>
+                    {% else %}
+                        <a href="#" class="btn btn-danger w-100 mt-3"
+                           data-toggle="modal" data-target="#unsubmitModelConfirm">UnSubmit
+                        </a>
+                    {% endif %}
+
+                    <!-- Popup that opens when enrolling -->
+                    <div class="modal fade" id="unsubmitModelConfirm" tabindex="-1" role="dialog"
+                         aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="exampleModalLongTitle">Are you sure ?</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body text-left">
+                                    This action cannot be undone. Your previous submission
+                                    will be completely removed.
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                    <a href="{% url 'assignment-unsubmit' class_name=assignment.classroom.name|slugify pk=assignment.pk %}"
+                                       class="btn btn-danger">Unsubmit</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div><!-- .model popup unsubmit-confirm -->
+                {% endif %}
+            </div><!-- .col-12 -->
+        </div><!-- .row -->
+    </div><!-- .card-body -->
+
+    <div class="card-footer">
+        <h6 class="text-center roboto-title-muted">Results</h6>
+        <table class="table table-striped mt-4">
+            <tbody class="text-left text-secondary">
+                <tr>
+                    <th scope="row"><span>Grade</span></th>
+                    <td><b>
+                        {% if submission.grade %}
+                            {{ submission.grade }}
+                        {% else %}
+                            Not Graded
+                        {% endif %}
+                    </b></td>
+                </tr>
+                <tr>
+                    <th scope="row"><span>Lecturer Comment</span></th>
+                    <td>{{ submission.lec_comment }}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div><!-- .card-footer -->
+</div>

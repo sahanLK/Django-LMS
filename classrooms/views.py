@@ -1,15 +1,17 @@
 import datetime
 import os.path
+from django.contrib import messages
+from django.http import HttpResponseRedirect
 from django.shortcuts import render, redirect
 from django.urls import reverse_lazy, reverse
-from django.views.generic import (ListView, CreateView, DetailView, UpdateView,
-                                  DeleteView)
+from django.views.generic import (ListView, CreateView, DetailView, UpdateView, DeleteView)
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
-from .forms import AssignmentCreationForm, AssignmentSubmitForm, AssignmentGradeForm, ClassroomCreateForm
+from .forms import AssignmentCreationForm, AssignmentSubmitForm, AssignmentGradeForm, ClassroomCreateForm, \
+    ClassroomUpdateForm
+from django.contrib.auth.decorators import user_passes_test
 from .models import Classroom, Post, Assignment, Submission
-from . import view_funcs as vf
 from users.models import Lecturer, Student
-from main.models import Department
+from main.funcs import is_lecturer, is_student, d_t
 
 
 class ClassroomListView(LoginRequiredMixin, ListView):
@@ -26,7 +28,7 @@ class ClassroomListView(LoginRequiredMixin, ListView):
         role = self.request.user.role
 
         if role == "student":
-            return self.request.user.student.classroom_set.all()
+            return self.request.user.student.department.classroom_set.all()
         elif role == "lecturer":
             return self.request.user.lecturer.classroom_set.all()
 
@@ -45,26 +47,14 @@ class ClassroomDetailView(LoginRequiredMixin, DetailView):
         classroom = self.get_object()
         context['assignments'] = classroom.assignment_set.all()
         context['lecturers'] = classroom.lecturers.all()
-        context['students'] = classroom.students.all()
-        context['events'] = self.get_events()
+        context['students'] = classroom.department.student_set.all()
+        context['events'] = None
         context['posts'] = self.get_posts()
         return context
 
     def get_posts(self):
         posts = self.get_object().post_set.all()
         return posts
-
-    def get_events(self):
-        # role = self.request.user.role
-        #
-        # if role == 'student':
-        #     assignments = self.get_object().assignment_set.all()    # All the assignments in this class
-        #     # All the assignment submissions related to this class
-        #     submissions = Submission.objects.filter(
-        #         assignment__classroom=self.get_object(),
-        #     )
-        # if role == 'lecturer':
-        pass
 
 
 class ClassroomCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
@@ -75,18 +65,14 @@ class ClassroomCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
     model = Classroom
     template_name = "classrooms/class-create.html"
     context_object_name = "classroom"
-    form_class = ClassroomCreateForm
 
-    def get_form_kwargs(self):
-        form_kwargs = super().get_form_kwargs()
-        print(form_kwargs)
-        return form_kwargs
-
-    # def get_form_class(self):
-    #     form = ClassroomCreateForm
-    #     # Allow only enrolled departments to see for current lecturer
-    #     print(form.department.choices)
-    #     return form
+    def get_form_class(self):
+        form = ClassroomCreateForm
+        # Allow lecturer create classrooms only on enrolled departments.
+        enrolled = [(dept.pk, dept) for dept in self.request.user.profile.departments.all()]
+        dept_field = form.base_fields.get('department')
+        dept_field.choices = enrolled
+        return form
 
     def form_valid(self, form):
         # Modifying the form instance with required fields.
@@ -94,22 +80,12 @@ class ClassroomCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
         classroom = form.save(commit=False)
         classroom.owner = self.request.user.profile
         classroom.save()
-        classroom.lecturers.add(self.request.user.profile)  # Add class creator to lecturers list by default
-        self.__add_students(classroom)
-        return redirect('classrooms')
 
-    @staticmethod
-    def __add_students(classroom):
-        """
-        Accepts classroom instance and add all the students relevant to this
-        classroom based on this classroom's department
-        :param classroom:
-        :return:
-        """
-        department = classroom.department
-        students = Student.objects.filter(department=department)
-        for stu in students:
-            classroom.students.add(stu)
+        # Classroom owner(creator), by default should also be a lecturer of that class.
+        # Otherwise, the classroom will not be shown to the creator.
+        classroom.lecturers.add(self.request.user.profile)
+        messages.success(self.request, "Classroom Created !")
+        return redirect('classrooms')
 
     def test_func(self):
         """
@@ -129,11 +105,30 @@ class ClassroomUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Classroom
     template_name = "classrooms/class-update.html"
     context_object_name = 'classroom'
-    fields = ['name', 'lecturers', 'description']
+
+    def get_form_class(self):
+        form = ClassroomUpdateForm
+        lecs_field = form.base_fields.get('lecturers')
+
+        # Allow to update the classroom without selecting any lecturers, because
+        # classroom owner will always be added in <form_valid> method.
+        lecs_field.required = False
+        # Don't show the lecturer himself in lecturers list, when updating the classroom.
+        lecs_field.queryset = lecs_field.queryset.exclude(user=self.request.user)
+        return form
 
     def form_valid(self, form):
-        form.instance.owner = self.request.user.profile
-        return super().form_valid(form)
+        form.instance.owner = self.request.user.profile  # set classroom owner
+        form.save()
+
+        """
+        After saving the form with above line, only the currently selected 
+        lecturer will be saved. So, add the owner again as a lecturer manually.
+        Classroom always need it's owner.
+        """
+        self.request.user.profile.classroom_set.add(self.get_object())
+        messages.success(self.request, "Classroom Updated !")
+        return HttpResponseRedirect(self.get_success_url())
 
     def test_func(self):
         """
@@ -168,6 +163,10 @@ class ClassroomDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
                 return True
         return False
 
+    def form_valid(self, form):
+        messages.success(self.request, "Classroom Deleted !")
+        return super(ClassroomDeleteView, self).form_valid(form)
+
 
 class PostCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
     model = Post
@@ -176,9 +175,10 @@ class PostCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
     fields = ['title', 'content']
 
     def form_valid(self, form):
+        print(self.kwargs)
         # Updating other required fields of the form, modifying the form instance.
         form.instance.owner = self.request.user.profile
-        form.instance.classroom = Classroom.objects.filter(pk=self.kwargs['class_pk']).first()
+        form.instance.classroom = Classroom.objects.filter(pk=self.kwargs['pk']).first()
         form.instance.date_pub = datetime.datetime.now()
         form.instance.date_last_mod = datetime.datetime.now()
         return super().form_valid(form)
@@ -193,7 +193,7 @@ class PostCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
         return False
 
     def get_success_url(self):
-        return reverse('class-details', kwargs={'pk': self.kwargs['class_pk']})
+        return reverse('class-details', kwargs={'pk': self.kwargs['pk']})
 
 
 class PostDetailView(LoginRequiredMixin, DetailView):
@@ -245,6 +245,49 @@ class PostDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
         return False
 
 
+class StudentListView(ListView):
+    model = Student
+    template_name = "classrooms/students-list.html"
+    context_object_name = "students"
+
+    def get_queryset(self):
+        profile = self.request.user.profile
+
+        if isinstance(profile, Student):
+            return self.__get_stu_fellows(profile)
+        elif isinstance(profile, Lecturer):
+            return self.__get_students(profile)
+
+    @staticmethod
+    def __get_students(lecturer: Lecturer):
+        """
+        ONLY FOR LECTURERS
+        Returns a list of all the students from all the departments that
+        the given lecturer is enrolled in.
+        :param lecturer:
+        :return:
+        """
+        # All the enrolled departments
+        depts = lecturer.departments.all()
+        all_students = set()
+
+        for dep in depts:
+            for stu in dep.student_set.all():
+                all_students.add(stu)
+        return all_students
+
+    @staticmethod
+    def __get_stu_fellows(student: Student):
+        """
+        ONLY FOR STUDENTS
+        Returns a list of fellow students for a student
+        :return:
+        """
+        department = student.department
+        fellows = department.student_set.all()
+        return fellows
+
+
 class AssignmentCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
     model = Assignment
     form_class = AssignmentCreationForm
@@ -272,52 +315,62 @@ class AssignmentCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
         return False
 
 
-class AssignmentListView(ListView):
+class AssignmentListView(LoginRequiredMixin, ListView):
     model = Assignment
     template_name = "classrooms/assignments-list.html"
     context_object_name = "assignments"
 
+    page_type = None
+
     def get_queryset(self):
+        profile = self.request.user.profile
         page_type = self.kwargs['type'].lower()
-        user = self.request.user
+        self.page_type = page_type
 
-        # if user.role == 'student':
-        #     if page_type == 'pending':
-        #         assignments = Assignment.objects.filter()
+        if isinstance(profile, Student):
+            if page_type == 'pending':
+                return profile.get_pending_assignments()
+            elif page_type == 'missing':
+                return profile.get_missing_assignments()
+            elif page_type == 'completed':
+                return profile.get_all_completed_assignments()
 
+        elif isinstance(profile, Lecturer):
+            if page_type == 'all':
+                return profile.get_all_assignments()
+            elif page_type == 'ongoing':
+                return profile.get_ongoing_assignments()
+            elif page_type == 'pending-review':
+                return profile.get_pending_review_assignments()
+            elif page_type == 'reviewed':
+                return profile.get_reviewed_assignments()
 
-class StudentListView(ListView):
-    model = Student
-    template_name = "classrooms/students-list.html"
-    context_object_name = "students"
+    def get_context_data(self, **kwargs):
+        """
+        This is overridden here only for design purposes.
+        Assignment list will be colored according to the page_type.
+        :param kwargs:
+        :return:
+        """
+        context = super().get_context_data(**kwargs)
+        t = self.page_type
 
-    def get_queryset(self):
-        user = self.request.user.profile
-
-        if isinstance(user, Student):
-            department = user.department
-            fellows = department.student_set.all()
-            return fellows
-
-        elif isinstance(user, Lecturer):
-            # All the enrolled departments
-            depts = user.departments.all()
-            all_students = set()
-
-            for dep in depts:
-                for stu in dep.students:
-                    all_students.add(stu)
-            return all_students
+        # Generating bootstrap color code for different pages
+        if t == 'completed' or t == 'reviewed':
+            color = 'success'
+        elif t == 'pending' or t == 'pending-review':
+            color = 'warning'
+        elif t == 'missing':
+            color = 'danger'
+        else:
+            color = 'secondary'
+        context['color'] = color
+        return context
 
 
 def assignment_detail_view(request, **kwargs):  # Consider using update view
-    class_pk: str = kwargs['class_pk']
-    assignment_pk: str = kwargs['pk']
-    assignment: Assignment = Assignment.objects.get(pk=assignment_pk)
-    classroom: Classroom = assignment.classroom
+    assignment: Assignment = Assignment.objects.get(pk=kwargs['pk'])
 
-    # Uniqueness of <assignment submission object> should depend on [classroom, assignment and student].
-    # Only in that case, correct previous submission objects will be detected
     submission = None
     if request.user.role == 'student':
         submission = Submission.objects.filter(
@@ -326,56 +379,45 @@ def assignment_detail_view(request, **kwargs):  # Consider using update view
         ).first()
 
     if request.method == 'POST':
+        # Student is trying to make a submission for this assignment.
         form = AssignmentSubmitForm(
             request.POST, request.FILES, instance=submission if submission else None)
         if form.is_valid():
-            obj = form.save(commit=False)
-            obj.date_submitted = datetime.datetime.now()
-            obj.assignment = assignment
-            obj.classroom = classroom
-            obj.profile = vf.get_user_profile(request.user)
-            obj.marked_done = True
-            obj.save()
-            return redirect('assignment-details', class_pk=class_pk, pk=assignment_pk)
-    else:
-        form = AssignmentSubmitForm(request.POST, request.FILES)
+            sub = form.save(commit=False)
+            sub.assignment = assignment
+            sub.owner = request.user.profile
 
-    if submission:
-        # Set submission status
-        if submission.date_sub >= submission.assignment.date_due:
-            submission.status = "Turned in Late"
+            from django.utils import timezone
+            n = timezone.now()
+            sub.date_sub = n
+            sub.save()
+            messages.success(request, "Submission Successful !")
+            return redirect('assignment-details',
+                            class_name=assignment.classroom.name.replace(' ', '-'),
+                            pk=assignment.pk)
         else:
-            submission.status = "Turned In"
-
-        # Set a user-friendly name attribute for the file
-        file_name = submission.file.name
-        submission.file_name = f"... {os.path.basename(file_name)[-28:]}"
+            messages.error(request, "Submission Failed !")
+    else:
+        form = AssignmentSubmitForm()
 
     context = {
         'form': form,
-        'class': classroom,
         'assignment': assignment,
-        'submitted': True if submission else False,
         'submission': submission,
     }
     return render(request, "classrooms/assignment-detail.html", context=context)
 
 
 def assignment_unsubmit_view(request, **kwargs):
-    class_pk: str = kwargs['class_pk']
-    assignment_pk: str = kwargs['pk']
+    assignment: Assignment = Assignment.objects.get(pk=kwargs['pk'])
 
-    classroom: Classroom = Classroom.objects.filter(pk=class_pk).first()
-    assignment: Assignment = Assignment.objects.filter(pk=assignment_pk).first()
-
-    submission: Submission = Submission.objects.filter(
-        classroom=classroom,
+    submission: Submission = Submission.objects.get(
         assignment=assignment,
-        profile=vf.get_user_profile(request.user),
-    ).first()
-    # Delete the submitted file
-    submission.delete()     # Delete the record
-    return redirect('assignment-details', class_pk=class_pk, pk=assignment_pk)
+        owner=request.user.profile,)
+    submission.delete()     # Delete the submission
+    return redirect('assignment-details',
+                    class_name=assignment.classroom.name.replace(' ', '-'),
+                    pk=assignment.pk)
 
 
 class AssignmentUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
@@ -395,7 +437,7 @@ class AssignmentUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
 
     def get_success_url(self):
         return reverse('assignment-details', kwargs={
-            'class_pk': self.kwargs['class_pk'],
+            'class_name': self.kwargs['class_name'],
             'pk': self.kwargs['pk']})
 
 
@@ -405,7 +447,8 @@ class AssignmentDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     context_object_name = "assignment"
 
     def get_success_url(self):
-        return reverse("class-details", kwargs={'pk': self.kwargs['class_pk']})
+        cls_pk = self.get_object().classroom.pk
+        return reverse("class-details", kwargs={'pk': cls_pk})
 
     def test_func(self):
         """
@@ -417,6 +460,7 @@ class AssignmentDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
         return False
 
 
+@user_passes_test(is_lecturer)
 def assignment_submissions_view(request, **kwargs):
     """
     This view should only be visible to lecturers.
@@ -424,45 +468,79 @@ def assignment_submissions_view(request, **kwargs):
     :param request:
     :return:
     """
-    class_pk = kwargs['class_pk']
-    assign_pk = kwargs['pk']
-    assignment: Assignment = Assignment.objects.get(pk=assign_pk)
+    assignment: Assignment = Assignment.objects.get(pk=kwargs['assignment_pk'])
 
-    if request.method == 'POST':
-        profile = Student.objects.get(pk=request.POST['u_profile_id'])
+    if request.method == 'POST':    # Lecturer trying to grade the assignment
+        # To determine which user profile is going to be graded,
+        # SubmissionGrade form uses a hidden input field with the
+        # value of <Student> object primary key.
+        requesting_prof_pk = request.POST.get('u_profile_id')
+
+        # If requesting submission profile id is
+        # not by hidden input field, do not go ahead
+        if not requesting_prof_pk:
+            messages.error(request, "Student id could not be confirmed")
+            return redirect('submit-details',
+                            class_name=assignment.classroom.name.replace(' ', '-'),
+                            assignment_pk=assignment.pk)
+
+        requesting_prof = Student.objects.get(pk=requesting_prof_pk)
         obj = Submission.objects.get(
             assignment=assignment,
-            profile=profile,
+            owner=requesting_prof,
         )
         form = AssignmentGradeForm(request.POST, instance=obj)
+
         if form.is_valid():
             obj = form.save(commit=False)
-            obj.grade = request.POST['grade']
+            obj.grade = request.POST.get('grade')
             obj.save()
-            return redirect('submit-details', class_pk=class_pk, pk=assign_pk)
+            return redirect('submit-details',
+                            class_name=assignment.classroom.name.replace(' ', '-'),
+                            assignment_pk=assignment.pk)
+    else:
+        submissions = assignment.submission_set.all()
 
-    # All the student profiles who submitted the current assignment
-    submissions = [sub for sub in Submission.objects.filter(
-        classroom=vf.get_class(kwargs['class_pk']),
-        assignment=assignment,
-    )]
-    for sub in submissions:
-        sub.form = AssignmentGradeForm(instance=sub)
+        # Add grading form attribute to each submission object
+        for sub in submissions:
+            sub.form = AssignmentGradeForm(instance=sub)
 
-    stu_profiles = vf.get_stu_profiles(kwargs['class_pk'])
-    submitted_user_profiles = [sub.profile for sub in submissions]    # <Profile> objects of submitted students
+        # All the non-submitted students
+        submitted_profiles = [sub.owner for sub in submissions]
+        non_submitted = [prof for prof in assignment.classroom.department.student_set.all()
+                         if prof not in submitted_profiles]
 
-    # Non-submitted students
-    non_submitted = set()
-    for stu_profile in stu_profiles:
-        if stu_profile not in submitted_user_profiles:
-            non_submitted.add(stu_profile)
-
-    context = {
-        'assignment': assignment,
-        'submissions': submissions,
-        'non_submitted': non_submitted,
-    }
-    return render(request, "classrooms/submission-details.html", context=context)
+        context = {
+            'assignment': assignment,
+            'submissions': submissions,
+            'non_submitted': non_submitted,
+        }
+        return render(request, "classrooms/submission-details.html", context=context)
 
 
+@user_passes_test(is_lecturer)
+def assignment_complete_review_view(request, assignment_pk, **kwargs):
+    assignment = Assignment.objects.get(pk=assignment_pk)
+    try:
+        assignment.review_complete = True
+        assignment.save()
+        messages.success(request, "Review completed !")
+    except Exception as e:
+        messages.error(request, "Something went wrong !")
+    return redirect('submit-details',
+                    class_name=assignment.classroom.name.replace(' ', '-'),
+                    assignment_pk=assignment.pk)
+
+
+@user_passes_test(is_lecturer)
+def assignment_undo_complete_review_view(request, assignment_pk, **kwargs):
+    try:
+        assignment = Assignment.objects.get(pk=assignment_pk)
+        assignment.review_complete = False
+        assignment.save()
+        messages.success(request, "Review restarted !")
+    except Exception as e:
+        messages.error(request, "Something went wrong !")
+    return redirect('submit-details',
+                    class_name=assignment.classroom.name.replace(' ', '-'),
+                    assignment_pk=assignment.pk)

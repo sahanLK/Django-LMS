@@ -10,7 +10,7 @@
         <h5 class="mb-0">
             <div class="row">
                 <div class="col-7">
-                    <img src="{{ profile.profile_photo.url }}" class="btn-link rounded-circle" style="max-width: 50px; max-height: 50px">
+                    <img src="{{ profile.profile_pic.url }}" class="btn-link rounded-circle" style="max-width: 50px; max-height: 50px">
                     <a class="btn btn-link">{{ profile.user.get_full_name }}</a>
                 </div>
                 <div class="col-3">
@@ -54,11 +54,11 @@
                             <tbody>
                                 <tr>
                                     <th scope="row">Date:</th>
-                                    <td>{{ submission.date_submitted }}</td>
+                                    <td>{{ submission.date_sub }}</td>
                                 </tr>
                                 <tr>
                                     <th scope="row">Reg No:</th>
-                                    <td>{{ profile.reg_no }}</td>
+                                    <td>{{ submission.owner.reg_no }}</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -68,7 +68,7 @@
                         <form method="POST">
                             {% csrf_token %}
                             {{ submission.form|crispy }}
-                            <input type="hidden" name="u_profile_id" value="{{ submission.profile.pk }}">
+                            <input type="hidden" name="u_profile_id" value="{{ submission.owner.pk }}">
                             <button type="submit" class="btn btn-info">Evaluate</button>
                         </form>
                     </div><!-- .col-lg-4 -->

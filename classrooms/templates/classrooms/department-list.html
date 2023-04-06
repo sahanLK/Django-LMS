@@ -2,32 +2,62 @@
 {% load crispy_forms_tags %}
 
 {% block content %}
-    <div class="container-fluid min-body-height">
+    <div class="container-fluid pt-3 min-body-height">
         <div class="container mt-3 mb-5">
             <div class="card-columns row">
+
                 {% for department in departments %}
                     <div class="card border-top-info list-card shadow m-3">
-                        <div class="card-header text-center pl-4 pt-4">
+                        <div class="text-center pl-3 pr-3 pt-4">
                             <h5 class="card-title text-muted mb-0">{{ department.name }}</h5>
                             <a class="btn btn-info text-light font-weight-bold shadow-sm mt-3">
                                 {{ department.batch.year|add:" Batch" }}</a>
                         </div>
+
+                        {% if department.description %}<hr>{% endif %}
+
                         <div class="card-body text-center p">
                             {% if department.description %}
                                 <p class="card-text mb-3">{{ department.short_description }}</p>
                             {% endif %}
                         </div>
+
                         <div class="card-footer text-center pb-3">
                             {% if user.profile in department.lecturer_set.all %}
                                 <a href="{% url 'dept-leave' dept_pk=department.pk %}"
-                               class="btn btn-outline-danger">Leave</a>
+                                   class="btn btn-outline-danger">Leave</a>
                             {% else %}
-                            <a href="{% url 'dept-enroll' dept_pk=department.pk %}"
-                               class="btn btn-outline-primary">Enroll</a>
+                                <a href="#" class="btn btn-outline-primary"
+                                   data-toggle="modal" data-target="#exampleModalCenter">Enroll
+                                </a>
+
+                                <!-- Popup that opens when enrolling -->
+                                <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog"
+                                     aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                                    <div class="modal-dialog modal-dialog-centered" role="document">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id="exampleModalLongTitle">Are you sure ?</h5>
+                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                    <span aria-hidden="true">&times;</span>
+                                                </button>
+                                            </div>
+                                            <div class="modal-body text-left">
+                                                Make sure this is a department that you want to conduct classes.
+                                                After creating classrooms for this department, you won't be able to leave.
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                                <a href="{% url 'dept-enroll' dept_pk=department.pk %}" class="btn btn-info">Enroll</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div><!-- .model popup -->
                             {% endif %}
                         </div><!-- .card-footer -->
                     </div><!-- .card -->
                 {% endfor %}
+
             </div>
         </div><!-- .container -->
     </div><!-- .container-fluid -->

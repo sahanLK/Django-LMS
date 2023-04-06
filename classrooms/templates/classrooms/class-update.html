@@ -3,7 +3,7 @@
 
 {% block content %}
     <div class="container text-muted mt-5 mb-5 mw-800 pb-5">
-        <div class="row post-author pb-4 mw-700 m-auto"><!-- Edit and delete options for publisher -->
+        <div class="row post-author mw-700 m-auto"><!-- Edit and delete options for publisher -->
             <div class="col-8 text-left">
                 <a href="{% url 'class-details' classroom.pk %}" class="text-left">
                     <i class="fas fa-long-arrow-left pr-2"></i>Back to Classroom
@@ -15,6 +15,6 @@
                 </a>
             </div>
         </div>
-        {% include 'template-parts/base-form.html' with title=classroom.name button_text='Update' %}
+        {% include 'template-parts/base-form.html' with title="Edit: "|add:classroom.name button_text='Update' %}
     </div>
 {% endblock %}

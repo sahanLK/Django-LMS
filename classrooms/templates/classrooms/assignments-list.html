@@ -1,8 +1,36 @@
 {% extends 'main/base.html' %}
-{% load static %}
 
 {% block content %}
-    {% for assignment in assignments %}
-        {{ assignment.title }}
-    {% endfor %}
+    <div class="container-fluid pt-3 min-body-height">
+        <div class="container mt-3 mb-5">
+            <div class="card-columns row">
+
+                {% for assignment in assignments %}
+                    <div class="card font-weight-bold border-top-{{ color }} list-card shadow m-3">
+                        <div class="text-center pl-3 pr-3 pt-4">
+                            <h5 class="card-title text-muted mb-0">{{ assignment.title }}</h5>
+                            <small class="pt-1 pb-4 d-block">By: {{ assignment.owner.user.get_full_name }}</small>
+                            <a href="{% url 'class-details' pk=assignment.classroom.pk %}"
+                               class="font-weight-bold mb-3">
+                                <i class="fas fa-university pr-2 d-block pb-2"></i>
+                                {{ assignment.classroom.name }}</a>
+                        </div>
+                        <div class="card-body text-center pb-2">
+                            <small class="d-block pt-1 pb-1">Due: {{ assignment.date_due }}</small>
+                        </div>
+
+                        <div class="card-footer text-center">
+                            <a href="{% url 'assignment-details' class_name=assignment.classroom.name|slugify pk=assignment.pk %}"
+                               class="btn btn-outline-{{ color }} font-weight-bold d-block">
+                                View Assignment
+                            </a>
+                        </div><!-- .card-footer -->
+                    </div><!-- .card -->
+                {% empty %}
+                    <h3>There is nothing here</h3>
+                {% endfor %}
+
+            </div>
+        </div><!-- .container -->
+    </div><!-- .container-fluid -->
 {% endblock %}

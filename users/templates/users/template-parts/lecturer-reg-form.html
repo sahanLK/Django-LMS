@@ -1,6 +1,6 @@
 {% load crispy_forms_tags %}
 
-<form method="POST" enctype="multipart/form-data" class="mb-4 mt-3" id="userRegisterForm" onsubmit="validateRegisterForm();">
+<form method="POST" enctype="multipart/form-data" class="mb-4 mt-3" id="lecRegisterForm" onsubmit="validateRegisterForm();">
     {% csrf_token %}
     {{ u_form|crispy }}
     {{ lec_create_form|crispy }}

@@ -2,144 +2,51 @@
 {% load crispy_forms_tags %}
 
 {% block content %}
-    <div class="container-fluid">
-        <div class="container mt-5 mb-5 min-body-height">
-            <div class="row">
-                <div class="col-sm-12 {% if user.profile.role == 'Student' %}col-lg-8{% endif %} pr-4">
-                    <div class="row post-author pb-5"><!-- Edit and delete options for publisher -->
-                        <div class="col-8 text-left">
-                            <a href="{% url 'class-details' assignment.classroom.pk %}" class="text-left">
-                                <i class="fas fa-long-arrow-left pr-2"></i>Back to Classroom
-                            </a>
-                        </div>
-                        <div class="col-4 text-right">
-                            {% if assignment.owner == user.profile %}
-                                <a href="{% url 'submit-details' class_pk=assignment.classroom.pk pk=assignment.pk %}">
-                                    <i class="fa-solid fa-users"></i>
-                                </a>
-                                <a href="{% url 'assignment-update' class_pk=assignment.classroom.pk pk=assignment.pk %}"
-                                   class="ml-4"><i class="fas fa-edit text-secondary"></i>
-                                </a>
-                                <a href="{% url 'assignment-delete' class_pk=assignment.classroom.pk pk=assignment.pk %}"
-                                   class="ml-4"><i class="fas fa-trash-alt text-danger"></i>
-                                </a>
-                            {% endif %}
-                        </div>
+    <div class="container pt-5 pb-5">
+        <div class="row">
+            <div class="col-xl-8 col-lg-12 pl-4 pr-4 pb-5 min-body-height"><!-- first-column -->
+                <div class="row"><!-- button-row -->
+                    <div class="col-6">
+                        <a href="{% url 'class-details' pk=assignment.classroom.pk %}">
+                            <i class="fas fa-arrow-left pr-2"></i>Back to Class
+                        </a>
                     </div>
 
-                    <div class="assignment-header border-bottom mb-4">
-                        <div class="col-sm-12 col-lg-9 assignment-title">
-                            <h2 class="text-dark">{{ assignment.title }}</h2>
-                            <span class="w-100 text-muted due-date"><small><b>Due,</b> {{ assignment.date_due }}</small></span>
-                        </div>
-                    </div><!-- .assignment-title-->
-
-                    <div class="assignment-content mt-5">
-                        <p>{{ assignment.content }}</p>
-                        <div class="assignment-files mb-5 mt-5">
-                            <a href="{{ assignment.document.url }}" target="_blank" download>{{ assignment.document.name }}</a>
-                        </div>
-                    </div><!-- .assignment-content -->
-                </div>
-
-                {% if user.profile.role == 'Student' %}
-                    <div class="col-sm-12 col-lg-4 pt-5">
-                        <div class="card shadow assignment-submit m-auto">
-                            <div class="card-body text-muted rounded">
-                                <div class="row submit-header border-bottom">
-                                    <div class="col-6">
-                                        <h5 class="card-title">Your Work</h5>
-                                    </div>
-                                    <div class="col-6 text-right">
-                                        <p class="m-0">{{ submission.status }}</p>
-                                    </div>
-                                </div><!-- submit-header-->
-                                <div class="selected-files pt-3 pb-3 mt-4 text-center" id="selectedFiles">
-                                    {% if submitted %}
-                                        {% if submission.file %}
-                                            <a href="{{ submission.file.url }}" target="_blank"
-                                               class="border p-2 w-100 d-block rounded shadow-sm">
-                                                {{ submission.file_name }}
-                                            </a>
-                                        {% else %}
-                                            <a>No Files Provided</a>
-                                        {% endif %}
-                                    {% else %}
-                                        <p class="mt-3 no-files-chosen" id="noFileChosenMsg">No files chosen</p>
-                                    {% endif %}
-                                </div><!-- selected-files-->
-
-                                {% if not submitted %}
-                                    <form method="POST" class="mt-4" enctype="multipart/form-data">
-                                        {% csrf_token %}
-                                        <div class="custom-file assignment-file-input">
-                                            {{ form }}
-                                        </div>
-                                        <div class="mt-4">
-                                            <button type="submit" class="btn btn-info shadow-sm w-100" id="assignmentSubmit">
-                                                Submit
-                                            </button>
-                                        </div>
-                                    </form>
-                                {% else %}
-                                    <div class="mt-4">
-                                        <!-- Button trigger modal -->
-
-                                        <!-- Do not allow to unsubmit the assignment if lecturer has graded -->
-                                        {% if submission.grade %}
-                                            <a type="button" class="btn btn-info text-light shadow-sm w-100 disabled">Graded</a>
-                                        {% else %}
-                                            <a type="button" class="btn btn-danger text-light shadow-sm w-100"
-                                               data-toggle="modal" data-target="#exampleModalCenter">Unsubmit
-                                            </a>
-                                            <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
-                                                <div class="modal-dialog modal-dialog-centered" role="document">
-                                                    <div class="modal-content">
-                                                        <div class="modal-header"><h5 class="modal-title" id="exampleModalLongTitle">Are you sure ?</h5>
-                                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                                                <span aria-hidden="true">&times;</span>
-                                                            </button>
-                                                        </div>
-                                                        <div class="modal-body">This action cannot be undone.</div>
-                                                        <div class="modal-footer">
-                                                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                                                            <a href="{% url 'assignment-unsubmit' class_pk=class.pk pk=assignment.pk %}" class="btn btn-danger">Unsubmit</a>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        {% endif %}
-                                    </div>
-                                {% endif %}
-
-                                {% if submission %}
-                                    <div class="row submission-data mt-4 p-2 border-top">
-                                        <table class="table table-borderless mb-0" style="font-size: 14px;">
-                                            <tbody>
-                                                <tr>
-                                                    <th scope="row" class="p-2">Submitted On:</th>
-                                                    <td class="p-2">{{ submission.date_submitted }}</td>
-                                                </tr>
-                                                <tr>
-                                                    <th scope="row" class="p-2">Your Score:</th>
-                                                    <td class="p-2">{% if submission.grade %}{{ submission.grade }}{% endif %}</td>
-                                                </tr>
-                                                {% if submission.comment %}
-                                                <tr>
-                                                    <th scope="row" class="p-2">Lecturer Comment:</th>
-                                                    <td class="p-2">{{ submission.comment }}</td>
-                                                </tr>
-                                                {% endif %}
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                {% endif %}
+                    {% if user.is_lecturer %}
+                        <div class="col-6 text-right">
+                            <div class="actions">
+                                <a href="{% url 'assignment-update' class_name=assignment.classroom.name|slugify pk=assignment.pk %}">
+                                    <i class="fas fa-edit text-primary pr-4"></i>
+                                </a>
+                                <a href="{% url 'assignment-delete' class_name=assignment.classroom.name|slugify pk=assignment.pk %}">
+                                    <i class="fas fa-trash-alt  text-danger"></i>
+                                </a>
                             </div>
                         </div>
-                    </div><!-- col-sm-12 col-md-3 -->
+                    {% endif %}
+                </div>
+
+                <div class="row pt-4"><!-- title row -->
+                    <div class="col-12 pb-2 border-bottom">
+                        <h3 class="text-muted">{{ assignment.title }}</h3>
+                        <small class="d-block">Due date: {{ assignment.date_due }}</small>
+                    </div>
+                </div>
+                <div class="row pt-4"><!-- body row -->
+                    <div class="col-12">
+                        {{ assignment.content }}
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-xl-4 col-lg-12 text-center mt-5 pl-2">
+                {% if user.is_student %}
+                    {% include 'template-parts/assign-details-sidebar-stu-card.html' %}
+                {% elif user.is_lecturer %}
+                    {% include 'template-parts/assign-details-sidebar-lec-card.html' %}
                 {% endif %}
 
-            </div><!-- row -->
+            </div><!-- second-column -->
         </div>
     </div>
 {% endblock %}

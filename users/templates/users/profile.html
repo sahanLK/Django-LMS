@@ -13,7 +13,7 @@
                 </div>
                 <div class="col-lg-7 col-md-7 p-3 text-center profile-info">
                     <h2 class="name mt-5">{{ user.get_full_name }}
-                        <small class="ml-3 btn btn-info shadow-lg">{{ user.role|upper }}</small>
+                        <small class="ml-3 btn btn-info shadow-lg role-badge">{{ user.role|upper }}</small>
                     </h2>
                     <h5 class="mt-5 mb-3">{{ user.profile.department.name }}</h5>
                     <h5>

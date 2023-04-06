@@ -1,14 +1,10 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
-from django.urls import reverse_lazy, reverse
 from .forms import (UserRegisterForm, LecturerCreationForm, StudentCreationForm,
                     StudentUpdateForm, LecturerUpdateForm, UserUpdateForm)
-from django.views.generic import ListView, DeleteView, UpdateView
+from django.views.generic import ListView
 from django.contrib import messages
-from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
-from .models import CustomizedUser, Student, Lecturer
 from main.models import Batch, Department
-from classrooms.models import Classroom
 
 
 def register(request):
@@ -40,6 +36,12 @@ def register(request):
                     # Make the created user a lecturer
                     lec = lec_create_form.save(commit=False)
                     lec.user = user
+
+                    if lec.user.gender == 'Male':
+                        lec.profile_pic = 'profile-male.svg'
+                    else:
+                        lec.profile_pic = 'profile-female.svg'
+
                     lec.save()
                     return redirect('login')
 
@@ -48,13 +50,13 @@ def register(request):
                     # Make the created user a student
                     stu = stu_create_form.save(commit=False)
                     stu.user = user
-                    stu.save()
 
-                    # Add the registered student to all the relevant classrooms
-                    department = stu.department
-                    classrooms = Classroom.objects.filter(department=department)
-                    for cls in classrooms:
-                        stu.classroom_set.add(cls)
+                    if stu.user.gender == 'Male':
+                        stu.profile_pic = 'profile-male.svg'
+                    else:
+                        stu.profile_pic = 'profile-female.svg'
+
+                    stu.save()
                     return redirect('login')
     else:
         u_form = UserRegisterForm()
@@ -101,7 +103,73 @@ def profile(request):
     return render(request, "users/profile.html", context={'u_form': u_form, 'p_form': p_form})
 
 
-class LecturerEnrolledDepartmentsListView(ListView):
+class DepartmentListView(ListView):
     model = Department
     context_object_name = "departments"
     template_name = "classrooms/department-list.html"
+
+
+@login_required
+def department_enroll(request, dept_pk, **kwargs):
+    if request.user.role == 'lecturer':
+        department = Department.objects.get(pk=dept_pk)
+        try:
+            request.user.profile.departments.add(department)
+            messages.success(request, "Enroll successful !")
+        except Exception as e:
+            messages.error(request, "Enroll failed !")
+    return redirect('departments')
+
+
+@login_required
+def department_leave(request, dept_pk, **kwargs):
+    if request.user.role == 'lecturer':
+        department = Department.objects.get(pk=dept_pk)
+
+        # Don't allow leaving if lecturer has created classrooms
+        # for this department.
+        classes = request.user.profile.classroom_set.filter(department=department)
+        if classes.count() > 0:
+            messages.error(request, "Leave not allowed after creating classes !")
+            return redirect('departments')
+
+        try:
+            request.user.profile.departments.remove(department)
+            messages.success(request, "Leave successful !")
+        except Exception as e:
+            messages.error(request, "Leave failed !")
+    return redirect('departments')
+
+
+@login_required
+def statistics_view(request):
+    return render(request, "users/statistics.html")
+
+
+@login_required
+def people_view(request):
+    prof = request.user.profile
+    lecturers = set()
+    students = set()
+
+    if request.user.is_student:
+        lecturers = prof.department.lecturer_set.all()
+        students = prof.department.student_set.all()
+    elif request.user.is_lecturer:
+        enrolled = prof.departments.all()
+
+        for dept in enrolled:
+            _lecs = dept.lecturer_set.all()
+            for lec in _lecs:
+                lecturers.add(lec)
+
+            _students = dept.student_set.all()
+            for stu in _students:
+                students.add(stu)
+
+    context = {
+        'students': students,
+        'lecturers': lecturers,
+    }
+    return render(request, "users/people.html", context=context)
+
