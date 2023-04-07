@@ -12,5 +12,5 @@ urlpatterns = [
     path('department/<str:dept_pk>/enroll', views.department_enroll, name='dept-enroll'),
     path('department/<str:dept_pk>/leave', views.department_leave, name='dept-leave'),
     path('user/statistics/', views.statistics_view, name='statistics'),
-    path('people/all/', views.people_view, name='people'),
+    path('people/', views.people_view, name='people'),
 ]

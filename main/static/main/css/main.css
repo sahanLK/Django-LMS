@@ -587,7 +587,7 @@ Alert
 */
 
 .alert-error {
-    background-color: #e74a3b !important;
+    background-color: #ff6666 !important;
     color: #fff !important;
 }
 
@@ -726,8 +726,6 @@ body {
 */
 
 
-
-
 /*
 Assignment Details page
 */
@@ -766,9 +764,12 @@ Assignment Details page
     display: none;
 }
 
-/*.show-submission {
-    cursor: pointer;
-}*/
+/*
+* Submission Details Page
+*/
+.submit-detail-item .type {
+    background-color: #f2f2f2;
+}
 
 
 /*

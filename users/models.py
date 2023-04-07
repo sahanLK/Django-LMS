@@ -56,7 +56,7 @@ class Student(models.Model):
     user = models.OneToOneField(CustomizedUser, on_delete=models.CASCADE, related_name='student')
     department = models.ForeignKey(Department, on_delete=models.CASCADE)
     profile_pic = models.ImageField(null=True, upload_to="stu_profile_pics")
-    id_pic = models.ImageField(null=True, upload_to="stu_id_pics")
+    id_pic = models.ImageField(null=True, blank=True, upload_to="stu_id_pics")
 
     def __str__(self):
         return f"Student: {self.user.username} [{self.department.name}]"
@@ -153,11 +153,63 @@ class Student(models.Model):
     =============================
     """
 
+    def get_all_meetings(self):
+        """
+        Returns all the meetings ever for the student.
+        :return:
+        """
+        classes = self.get_classrooms()
+        meetings_all = set()
+
+        for cls in classes:
+            meets = cls.meeting_set.all()
+            for meet in meets:
+                meetings_all.add(meet)
+        return meetings_all
+
     def get_today_meetings(self):
-        pass
+        """
+        Get all the today meetings.
+        :return:
+        """
+        _all = self.get_all_meetings()
+        today = set()
+
+        for meet in _all:
+            if meet.is_today:
+                today.add(meet)
+        return today
+
+    def get_no_of_today_meetings(self):
+        return len(self.get_today_meetings())
 
     def get_upcoming_meetings(self):
-        pass
+        """
+        Get all the upcoming meetings except today
+        :return:
+        """
+        _all = self.get_all_meetings()
+        upcoming = set()
+
+        for meet in _all:
+            if not meet.is_today:
+                upcoming.add(meet)
+        return upcoming
+
+    def get_prev_meetings(self):
+        _all = self.get_all_meetings()
+        prev = set()
+
+        for meet in _all:
+            if meet.is_expired:
+                prev.add(meet)
+        return prev
+
+    """
+    =============================
+    OTHER
+    =============================
+    """
 
     def get_recent_events(self):
         pass
@@ -166,7 +218,7 @@ class Student(models.Model):
 class Lecturer(models.Model):
     user = models.OneToOneField(CustomizedUser, on_delete=models.CASCADE, related_name='lecturer')
     departments = models.ManyToManyField(Department, blank=True)
-    profile_pic = models.ImageField(null=True, upload_to="lec_profile_pics")
+    profile_pic = models.ImageField(null=True, blank=True, upload_to="lec_profile_pics")
 
     def __str__(self):
         return f"Lecturer: {self.user.username}"
@@ -237,6 +289,9 @@ class Lecturer(models.Model):
                              and d_t(ass.date_due) < d_t(datetime.now()))
         return pending_review
 
+    def get_no_of_pending_review_assignments(self):
+        return len(self.get_pending_review_assignments())
+
     def get_reviewed_assignments(self):
         """
         Returns all the review completed assignments
@@ -248,4 +303,54 @@ class Lecturer(models.Model):
     def get_recent_activities(self):
         pass
 
+    """
+    =============================
+    MEETINGS
+    =============================
+    """
+
+    def get_all_meetings(self):
+        """
+        Returns all the meetings ever for the student.
+        :return:
+        """
+        return self.meeting_set.all()
+
+    def get_today_meetings(self):
+        """
+        Get all the today meetings.
+        :return:
+        """
+        _all = self.get_all_meetings()
+        today = set()
+
+        for meet in _all:
+            if meet.is_today:
+                today.add(meet)
+        return today
+
+    def get_no_of_today_meetings(self):
+        return len(self.get_today_meetings())
+
+    def get_upcoming_meetings(self):
+        """
+        Get all the upcoming meetings except today
+        :return:
+        """
+        _all = self.get_all_meetings()
+        upcoming = set()
+
+        for meet in _all:
+            if not meet.is_today:
+                upcoming.add(meet)
+        return upcoming
+
+    def get_prev_meetings(self):
+        _all = self.get_all_meetings()
+        prev = set()
+
+        for meet in _all:
+            if meet.is_expired:
+                prev.add(meet)
+        return prev
 

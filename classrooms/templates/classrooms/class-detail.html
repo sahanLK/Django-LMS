@@ -64,19 +64,51 @@
                                 </div>
                             </div>
                         {% empty %}
-                            <h3 class="pt-5 text-center">No Posts Yet</h3>
+                            <h4 class="text-center d-block w-100 mt-5 mb-5 roboto-title-muted">No Posts Yet</h4>
                         {% endfor %} <!-- end of class posts -->
 
                     </div><!-- stream -->
 
                     <div class="tab-pane fade" id="classwork" role="tabpanel" aria-labelledby="pills-home-tab"><!-- classwork -->
                         <div class="mb-5">
+
+                            <!--  Assignment and Quiz Create buttons -->
                             {% if user.role == 'lecturer' %}
-                                <a href="{% url 'assignment-new' class_pk=class.pk %}" class="btn btn-outline-primary shadow-sm">
-                                    New Assignment
-                                    <i class="fas fa-plus pl-3 font-weight-bold"></i>
-                                </a>
+                                <div class="row">
+                                    <div class="col-12">
+                                        <a class="btn btn-outline-secondary" href="#" role="button"
+                                           data-toggle="dropdown" id="createNewDropdown">
+                                            Add New<i class="fas fa-plus pl-3 font-weight-bold"></i>
+                                        </a>
+
+                                        <div class="dropdown-menu dropdown-menu-bottom"
+                                             aria-labelledby="createNewDropdown" aria-expanded="false">
+                                            <a class="dropdown-item"
+                                               href="{% url 'assignment-new' class_pk=class.pk %}">Assignment
+                                            </a>
+                                            <a class="dropdown-item" href="{% url 'meeting-create' pk=class.pk %}">Meeting</a>
+                                        </div>
+
+                                        <!--<div class="dropdown btn p-0 mr-3">
+                                            <a class="btn btn-outline-secondary" href="#" role="button"
+                                               id="assignmetnDropdown" data-toggle="dropdown" aria-haspopup="true"
+                                               aria-expanded="false">
+                                                New Assignment<i class="fas fa-plus pl-3 font-weight-bold"></i>
+                                            </a>
+                                            <div class="dropdown-menu shadow" aria-labelledby="assignmetnDropdown">
+                                                <a class="dropdown-item"
+                                                   href="{% url 'assignment-new' class_pk=class.pk %}">Regular
+                                                </a>
+                                                <a class="dropdown-item" href="#">Question</a>
+                                            </div>
+                                        </div>
+                                        <a class="btn btn-outline-secondary" href="{% url 'quiz-create' pk=class.pk %}">
+                                            New Quiz<i class="fas fa-plus pl-3 font-weight-bold"></i>
+                                        </a>-->
+                                    </div>
+                                </div>
                             {% endif %}
+
                         </div>
                         {% for assignment in assignments %}
                             <div class="card card-body pl-4 pr-3 pt-0 pb-0 mb-3 rounded">
@@ -96,22 +128,26 @@
                                 </div>
                             </div>
                         {% empty %}
-                            <h3 class="text-center pt-5">No Assignments</h3>
+                            <h4 class="text-center d-block w-100 mt-5 mb-5 roboto-title-muted">No Assignments</h4>
                         {% endfor %}
                     </div><!-- classwork -->
 
                     <div class="tab-pane fade" id="people" role="tabpanel" aria-labelledby="pills-home-tab"><!-- people -->
-                        <div class="lecturers mb-5 mt-3">
-                            <h4 class="text-muted mb-3">Lecturers</h4>
-                            {% for lecturer in lecturers %}
-                                {% include 'template-parts/user.html' with profile=lecturer %}
-                            {% endfor %}
+                        <div class="lecturers mb-2 mt-3">
+                            <h4 class="roboto-title mb-3 pt-2 pb-2 pr-4">Lecturers</h4>
+                            <div class="card-columns row">
+                                {% for lecturer in lecturers %}
+                                    {% include 'users/template-parts/user.html' with profile=lecturer %}
+                                {% endfor %}
+                            </div>
                         </div>
                         <div class="students mb-5">
-                            <h4 class="text-muted mb-3">Students</h4>
-                            {% for student in students %}
-                                {% include 'template-parts/user.html' with profile=student %}
-                            {% endfor %}
+                            <h4 class="roboto-title mb-3 pt-2 pb-2 pr-4">Students</h4>
+                            <div class="card-columns row">
+                                {% for student in students %}
+                                    {% include 'users/template-parts/user.html' with profile=student %}
+                                {% endfor %}
+                            </div>
                         </div>
                     </div><!-- people -->
                 </div>

@@ -37,9 +37,19 @@ class Post(models.Model):
         return f"Post: {self.title} [{self.classroom}]"
 
 
+"""
+=================================
+    ASSIGNMENT
+=================================
+"""
+
+
 class Assignment(models.Model):
     classroom = models.ForeignKey(Classroom, on_delete=models.CASCADE)
     owner = models.ForeignKey(Lecturer, on_delete=models.CASCADE)
+    type = models.CharField(max_length=8, default='regular',
+                            choices=[('regular', 'Regular'),
+                                     ('question', 'Question')])
     title = models.CharField(max_length=300)
     date_pub = models.DateTimeField()
     date_last_mod = models.DateTimeField()
@@ -63,18 +73,6 @@ class Assignment(models.Model):
         _all_sub_done = self.submission_set.count()
         pending = int(_all_stu) - int(_all_sub_done)
         return pending
-
-
-class Meeting(models.Model):
-    classroom = models.ForeignKey(Classroom, on_delete=models.CASCADE)
-    owner = models.ForeignKey(Lecturer, on_delete=models.CASCADE)
-    topic = models.CharField(max_length=300)
-    time_start = models.DateTimeField()
-    description = models.TextField(null=True, blank=True)
-
-    def __str__(self):
-        return f"Meeting: {self.topic} [Class-> {self.classroom.name}" \
-               f" {self.classroom.department.batch.year} Batch]"
 
 
 class Submission(models.Model):
@@ -103,78 +101,99 @@ class Submission(models.Model):
         return os.path.basename(name)[-28:]
 
 
+"""
+=================================
+    MEETING
+=================================
+"""
+
+
+class Meeting(models.Model):
+    classroom = models.ForeignKey(Classroom, on_delete=models.CASCADE)
+    owner = models.ForeignKey(Lecturer, on_delete=models.CASCADE)
+    topic = models.CharField(max_length=300)
+    start = models.DateTimeField()
+    description = models.TextField(null=True, blank=True)
+    meeting_url = models.URLField(null=True, blank=True)
+    meeting_id = models.CharField(null=True, blank=True, max_length=300)
+    meeting_pwd = models.CharField(null=True, blank=True, max_length=200)
+    recording_url = models.URLField(null=True, blank=True)
+
+    class Meta:
+        unique_together = (('classroom', 'topic'),)
+
+    def __str__(self):
+        return f"Meeting: {self.topic} [Class-> {self.classroom.name}" \
+               f" {self.classroom.department.batch.year} Batch]"
+
+    @property
+    def get_short_meeting_topic(self):
+        if len(str(self.topic)) > 24:
+            return f"{self.topic[:20]} ..."
+        else:
+            return self.topic
+
+    @property
+    def is_today(self):
+        now = datetime.now()
+        t_year, t_month, t_day = now.year, now.month, now.day
+        start = d_t(self.start)
+        s_year, s_month, s_day = start.year, start.month, start.day
+
+        if t_year == s_year and t_month == s_month and t_day == s_day:
+            return True
+        return False
+
+    @property
+    def is_expired(self):
+        if datetime.today() > d_t(self.start):
+            return True
 
 
 
 
+"""
+=================================
+    QUESTION
+=================================
+"""
 
 
+class Question(models.Model):
+    title = models.CharField(max_length=300)
+    question = models.TextField()
+    answer_type = models.CharField(max_length=8, choices=[('fixed', 'Fixed'), ('variable', 'Variable')])
 
 
+"""
+=================================
+    QUIZZES
+=================================
+"""
 
 
+class Quiz(models.Model):
+    classroom = models.ForeignKey(Classroom, on_delete=models.CASCADE)
+    owner = models.ForeignKey(Lecturer, on_delete=models.CASCADE)
+    title = models.CharField(max_length=300)
+    description = models.TextField(null=True, blank=True)
+    date_created = models.DateTimeField(default=datetime.now())
+    start = models.DateTimeField()
+    duration = models.IntegerField()
+    accept_after_expired = models.BooleanField(default=True)
+
+    def get_absolute_url(self):
+        return reverse('')
 
 
+class QuizQuestion(models.Model):
+    quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE)
 
 
+class QuizQuestionAnswer(models.Model):
+    question = models.ForeignKey(QuizQuestion, on_delete=models.CASCADE)
 
 
+class QuizStuResponse(models.Model):
+    pass
 
-#
-#
-# class Classroom(models.Model):
-#     owner = models.ForeignKey(CustomizedUser, on_delete=models.CASCADE)
-#     name = models.CharField(max_length=300, unique=True)
-#     subtitle = models.CharField(max_length=200, null=True)
-#
-#     def __str__(self):
-#         return f"{self.owner.username} | {self.name}"
-#
-#     @staticmethod
-#     def get_absolute_url():
-#         return reverse('classrooms')
-#
-#
-# class Post(models.Model):
-#     owner = models.ForeignKey(CustomizedUser, on_delete=models.CASCADE)
-#     classroom = models.ForeignKey(Classroom, on_delete=models.CASCADE)
-#     date_posted = models.DateTimeField()
-#     date_modified = models.DateTimeField()
-#     title = models.CharField(max_length=300, unique=True)
-#     content = models.TextField()
-#
-#     def __str__(self):
-#         return f"{self.title} --> {self.classroom.name}"
-#
-#
-# class Assignment(models.Model):
-#     owner = models.ForeignKey(CustomizedUser, on_delete=models.CASCADE)
-#     classroom = models.ForeignKey(Classroom, on_delete=models.CASCADE)
-#     date_posted = models.DateTimeField()
-#     date_modified = models.DateTimeField()
-#     date_due = models.DateTimeField()
-#     title = models.CharField(max_length=300, unique=True)
-#     content = models.TextField()
-#     documents = models.FileField(upload_to="assignments", null=True)
-#
-#     def __str__(self):
-#         return f"{self.title} --> {self.classroom.name}"
-#
-#     def get_absolute_url(self):
-#         return reverse('assignment-detail', kwargs={'class_pk': self.classroom.pk, 'pk': self.pk})
-#
-#
-# class SubmittedAssignment(models.Model):
-#     assignment = models.ForeignKey(Assignment, on_delete=models.CASCADE)
-#     classroom = models.ForeignKey(Classroom, on_delete=models.CASCADE)
-#     profile = models.ForeignKey(Profile, on_delete=models.CASCADE)
-#     marked_done = models.BooleanField(default=False)
-#     grade = models.CharField(max_length=10, null=True)  # By lecturer
-#     comment = models.CharField(max_length=150, null=True)  # By lecturer
-#     file = models.FileField(upload_to="submitted_assignments", null=True)
-#     date_submitted = models.DateTimeField(null=True)
-#
-#     def __str__(self):
-#         return f"Submission By: {self.profile.user.username}" \
-#                f" [ Ass.Name: {self.assignment.title}," \
-#                f" Class: {self.assignment.classroom.name} ]"

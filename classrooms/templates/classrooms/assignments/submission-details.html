@@ -17,7 +17,8 @@
                 <div class="row mt-4 mb-3">
                     <div class="col-12">
                         {% if not assignment.review_complete %}
-                            <a href="{% url 'complete-review' assignment_pk=assignment.pk %}" class="btn btn-success">Complete Review</a>
+                            <a href="{% url 'complete-review' assignment_pk=assignment.pk %}"
+                               class="btn btn-success">Complete Review</a>
                         {% else %}
                             <a href="#" class="btn btn-warning"
                                data-toggle="modal" data-target="#undoCompleteReview">Undo Review Completion
@@ -39,7 +40,8 @@
                                         </div>
                                         <div class="modal-footer">
                                             <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                                            <a href="{% url 'undo-review-complete' assignment_pk=assignment.pk %}" class="btn btn-info">Continue</a>
+                                            <a href="{% url 'undo-review-complete' assignment_pk=assignment.pk %}"
+                                               class="btn btn-info">Continue</a>
                                         </div>
                                     </div>
                                 </div>

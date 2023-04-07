@@ -31,7 +31,13 @@
                         <div class="col mr-2">
                             <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
                                 Assignments Pending</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ profile.get_no_of_pending_assignments }}</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                {% if user.is_student %}
+                                    {{ profile.get_no_of_pending_assignments }}
+                                {% elif user.is_lecturer %}
+                                    {{ profile.get_no_of_pending_review_assignments }}
+                                {% endif %}
+                            </div>
                         </div>
                         <div class="col-auto">
                             <i class="fas fa-pencil-alt fa-2x text-gray-300"></i>
@@ -78,7 +84,7 @@
                         <div class="col mr-2">
                             <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
                                 Meetings Today</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">18</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ profile.get_no_of_today_meetings }}</div>
                         </div>
                         <div class="col-auto">
                             <i class="fas fa-video fa-2x text-gray-300"></i>

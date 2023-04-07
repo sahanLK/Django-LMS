@@ -34,7 +34,7 @@
             <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseTwo"
                 aria-expanded="true" aria-controls="collapseTwo">
                 <i class="fas fa-university pr-2"></i>
-                <span>Classes</span>
+                <span>Classrooms</span>
             </a>
             <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
                 <div class="bg-white py-2 collapse-inner rounded">
@@ -42,6 +42,22 @@
                     {% if user.role == 'lecturer' %}
                         <a class="collapse-item" href="{% url 'class-create' %}">Create New</a>
                     {% endif %}
+                </div>
+            </div>
+        </li>
+
+        <!-- Nav Item - Meetings Collapse Menu -->
+        <li class="nav-item">
+            <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#meetings"
+                aria-expanded="true" aria-controls="collapseTwo">
+                <i class="fas fa-video pr-2"></i>
+                <span>Meetings</span>
+            </a>
+            <div id="meetings" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
+                <div class="bg-white py-2 collapse-inner rounded">
+                    <a class="collapse-item" href="{% url 'meetings-list' type='today' %}">Today</a>
+                    <a class="collapse-item" href="{% url 'meetings-list' type='upcoming' %}">Upcoming</a>
+                    <a class="collapse-item" href="{% url 'meetings-list' type='previous' %}">Previous</a>
                 </div>
             </div>
         </li>

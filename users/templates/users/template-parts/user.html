@@ -1,10 +1,14 @@
 <!--
-This template provides a nice card like objects for a user.
-Can be used in peoples tab or anywhere.
+Single user item
 -->
 
-<div class="card">
-    <div class="card-header">
-        {{ profile.user.get_full_name ]}
+<div class="mw-200 m-3">
+    <div class="text-center">
+        <img src="{{ profile.profile_pic.url }}" class="rounded-circle shadow-sm"
+             style="max-width: 75px; max-height: 75px;" id="myImg">
+    </div><!-- .card-header -->
+
+    <div class="card-body pt-2 text-center">
+        <h6 class="roboto-title-muted">{{ profile.user.get_full_name }}</h6>
     </div>
 </div>

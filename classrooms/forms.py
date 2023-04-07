@@ -1,5 +1,5 @@
 from django import forms
-from .models import Assignment, Submission, Classroom
+from .models import Assignment, Submission, Classroom, Quiz, Meeting
 
 
 class ClassroomCreateForm(forms.ModelForm):
@@ -58,3 +58,66 @@ class AssignmentGradeForm(forms.ModelForm):
         model = Submission
         fields = ['grade', 'lec_comment']
 
+
+"""
+==============================
+    QUIZ FORMS
+==============================
+"""
+
+
+class MeetingCreationForm(forms.ModelForm):
+    description = forms.CharField(required=False, widget=forms.Textarea(attrs={'rows': 3}))
+    meeting_url = forms.URLField(required=False, widget=forms.URLInput())
+    start = forms.DateTimeField(widget=forms.TextInput(attrs={'type': 'date'}))
+    recording_url = forms.URLField(required=False, widget=forms.URLInput())
+
+    class Meta:
+        model = Meeting
+        fields = [
+            'classroom',
+            'topic',
+            'start',
+            'description',
+            'meeting_url',
+            'meeting_id',
+            'meeting_pwd',
+            'recording_url',
+        ]
+
+
+class MeetingUpdateForm(forms.ModelForm):
+    description = forms.CharField(required=False, widget=forms.Textarea(attrs={'rows': 3}))
+    meeting_url = forms.URLField(required=False, widget=forms.URLInput())
+    start = forms.DateTimeField(widget=forms.TextInput(attrs={'type': 'date'}))
+    recording_url = forms.URLField(required=False, widget=forms.URLInput())
+
+    class Meta:
+        model = Meeting
+        fields = [
+            'topic',
+            'start',
+            'description',
+            'meeting_url',
+            'meeting_id',
+            'meeting_pwd',
+            'recording_url',
+        ]
+
+"""
+==============================
+    QUIZ FORMS
+==============================
+"""
+
+
+class QuizCreateForm(forms.ModelForm):
+    duration = forms.CharField(widget=forms.NumberInput(attrs={'min': 1, 'max': 300}))
+    start = forms.DateTimeField(widget=forms.TextInput(attrs={'type': 'date'}))
+    description = forms.CharField(widget=forms.Textarea(attrs={'rows': 3}))
+
+    class Meta:
+        model = Quiz
+        fields = ['title', 'description',
+                  'start', 'duration',
+                  'accept_after_expired']

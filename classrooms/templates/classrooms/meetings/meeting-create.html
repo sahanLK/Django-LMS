@@ -1,0 +1,6 @@
+{% extends 'main/base.html' %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+    {% include 'template-parts/base-form.html' with title='New Meeting' button_text='Schedule Meeting' %}
+{% endblock %}

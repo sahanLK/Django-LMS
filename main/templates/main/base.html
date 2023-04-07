@@ -26,8 +26,13 @@ THIS TEMPLATE GETS INHERITED BY ALL OTHER TEMPLATES/PAGES IN THE APPLICATION.
         <!-- Custom dashboard template css -->
         <link href="{% static 'main/css/sb-admin-2.css' %}?{% now 'U' %}" rel="stylesheet">
 
+        <!-- Jquery Ui CSS -->
+        <link rel="stylesheet" type="text/css" href="{% static '/main/css/jquery-ui.min.css' %}">
+
         <!-- Custom CSS -->
         <link rel="stylesheet" type="text/css" href="{% static '/main/css/main.css' %}?{% now 'U' %}">
+
+
     </head>
     <body>
         {% include 'main/navbar.html' %}
@@ -61,10 +66,55 @@ THIS TEMPLATE GETS INHERITED BY ALL OTHER TEMPLATES/PAGES IN THE APPLICATION.
           window.FontAwesomeConfig = { autoReplaceSvg: false }
         </script>
         <script src="{% static 'fontawesomefree/js/all.min.js' %}"></script>
+
         <!-- Dashboard page custom Js -->
         <script src="{% static 'main/js/chart.js' %}"></script>
+
+        <!-- Jquery Ui Js -->
+        <script src="{% static 'main/js/jquery-ui.min.js' %}"></script>
+
         <!-- Custom Js -->
         <script src="{% static 'main/js/main.js' %}?{% now 'U' %}"></script>
+
+        <script>
+            var sectionSet = $('#sectionSet');
+            var sections = $(sectionSet).find('section');
+
+            var children = $(sections[0]).children();
+            console.log(children[children.length-1]);
+
+
+
+            $(sections).each(function(index, elem) {
+                $(elem).hide();
+            });
+
+            $(sections[0]).show(); // display first section
+
+            // Go to next section
+            $('.nextBtn').on('click', function() {
+                var currentSection = $(this).parent('section');
+                var nextSection = $(currentSection).next('section');
+
+                if ( nextSection.length != 0 ) {
+                    $(nextSection).show("fade", { direction: "right" }, 500);
+                    $(currentSection).hide();
+                }
+            });
+
+            // Go to previous section
+            $('.prevBtn').on('click', function() {
+                var currentSection = $(this).parent('section');
+                var prevSection = $(currentSection).prev('section');
+
+                if ( prevSection.length != 0 ) {
+                    $(prevSection).show("fade", { direction: "left" }, 500);
+                    $(currentSection).hide();
+                }
+            });
+
+        </script>
+
         {% include 'main/charts.html' %}
     </body>
 </html>

@@ -7,11 +7,12 @@ from django.urls import reverse_lazy, reverse
 from django.views.generic import (ListView, CreateView, DetailView, UpdateView, DeleteView)
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from .forms import AssignmentCreationForm, AssignmentSubmitForm, AssignmentGradeForm, ClassroomCreateForm, \
-    ClassroomUpdateForm
-from django.contrib.auth.decorators import user_passes_test
-from .models import Classroom, Post, Assignment, Submission
+    ClassroomUpdateForm, QuizCreateForm, MeetingCreationForm
+from django.contrib.auth.decorators import user_passes_test, login_required
+from .models import Classroom, Post, Assignment, Submission, Quiz, QuizQuestion, QuizQuestionAnswer, Meeting
 from users.models import Lecturer, Student
 from main.funcs import is_lecturer, is_student, d_t
+from .forms import MeetingUpdateForm, QuizCreateForm
 
 
 class ClassroomListView(LoginRequiredMixin, ListView):
@@ -170,12 +171,11 @@ class ClassroomDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
 
 class PostCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
     model = Post
-    template_name = "classrooms/post-create.html"
+    template_name = "classrooms/posts/post-create.html"
     context_object_name = "post"
     fields = ['title', 'content']
 
     def form_valid(self, form):
-        print(self.kwargs)
         # Updating other required fields of the form, modifying the form instance.
         form.instance.owner = self.request.user.profile
         form.instance.classroom = Classroom.objects.filter(pk=self.kwargs['pk']).first()
@@ -198,13 +198,13 @@ class PostCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
 
 class PostDetailView(LoginRequiredMixin, DetailView):
     model = Post
-    template_name = "classrooms/post-detail.html"
+    template_name = "classrooms/posts/post-detail.html"
     context_object_name = "post"
 
 
 class PostUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Post
-    template_name = "classrooms/post-update.html"
+    template_name = "classrooms/posts/post-update.html"
     context_object_name = "post"
     fields = ('title', 'content')
 
@@ -229,7 +229,7 @@ class PostUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
 
 class PostDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     model = Post
-    template_name = "classrooms/post-delete.html"
+    template_name = "classrooms/posts/post-delete.html"
     context_object_name = "post"
 
     def get_success_url(self):
@@ -288,10 +288,17 @@ class StudentListView(ListView):
         return fellows
 
 
+"""
+=============================
+    ASSIGNMENT VIEWS
+=============================
+"""
+
+
 class AssignmentCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
     model = Assignment
     form_class = AssignmentCreationForm
-    template_name = "classrooms/assignment-create.html"
+    template_name = "classrooms/assignments/assignment-create.html"
     context_object_name = 'assignment'
 
     def form_valid(self, form):
@@ -317,7 +324,7 @@ class AssignmentCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
 
 class AssignmentListView(LoginRequiredMixin, ListView):
     model = Assignment
-    template_name = "classrooms/assignments-list.html"
+    template_name = "classrooms/assignments/assignments-list.html"
     context_object_name = "assignments"
 
     page_type = None
@@ -405,7 +412,7 @@ def assignment_detail_view(request, **kwargs):  # Consider using update view
         'assignment': assignment,
         'submission': submission,
     }
-    return render(request, "classrooms/assignment-detail.html", context=context)
+    return render(request, "classrooms/assignments/assignment-detail.html", context=context)
 
 
 def assignment_unsubmit_view(request, **kwargs):
@@ -422,7 +429,7 @@ def assignment_unsubmit_view(request, **kwargs):
 
 class AssignmentUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Assignment
-    template_name = "classrooms/assignment-update.html"
+    template_name = "classrooms/assignments/assignment-update.html"
     context_object_name = "assignment"
     form_class = AssignmentCreationForm
 
@@ -443,7 +450,7 @@ class AssignmentUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
 
 class AssignmentDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     model = Assignment
-    template_name = "classrooms/assignment-delete.html"
+    template_name = "classrooms/assignments/assignment-delete.html"
     context_object_name = "assignment"
 
     def get_success_url(self):
@@ -461,6 +468,7 @@ class AssignmentDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
 
 
 @user_passes_test(is_lecturer)
+@login_required
 def assignment_submissions_view(request, **kwargs):
     """
     This view should only be visible to lecturers.
@@ -515,10 +523,11 @@ def assignment_submissions_view(request, **kwargs):
             'submissions': submissions,
             'non_submitted': non_submitted,
         }
-        return render(request, "classrooms/submission-details.html", context=context)
+        return render(request, "classrooms/assignments/submission-details.html", context=context)
 
 
 @user_passes_test(is_lecturer)
+@login_required
 def assignment_complete_review_view(request, assignment_pk, **kwargs):
     assignment = Assignment.objects.get(pk=assignment_pk)
     try:
@@ -533,6 +542,7 @@ def assignment_complete_review_view(request, assignment_pk, **kwargs):
 
 
 @user_passes_test(is_lecturer)
+@login_required
 def assignment_undo_complete_review_view(request, assignment_pk, **kwargs):
     try:
         assignment = Assignment.objects.get(pk=assignment_pk)
@@ -544,3 +554,154 @@ def assignment_undo_complete_review_view(request, assignment_pk, **kwargs):
     return redirect('submit-details',
                     class_name=assignment.classroom.name.replace(' ', '-'),
                     assignment_pk=assignment.pk)
+
+
+"""
+=============================
+    MEETING VIEWS
+=============================
+"""
+
+
+class MeetingCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
+    model = Meeting
+    template_name = "classrooms/meetings/meeting-create.html"
+
+    def get_form_class(self):
+        """
+        Without classroom the invalid form submission displays an
+        error page. To prevent this, classroom field should be added with
+        default value and in disables state. Then, when an invalid submission
+        occurs, a nice error message will be displayed instead of error page.
+        :return:
+        """
+        form = MeetingCreationForm
+        cls_field = form.base_fields.get('classroom')
+        cls_field.queryset = Classroom.objects.filter(pk=self.kwargs['pk']).all()
+        cls_field.initial = cls_field.queryset.first()
+        cls_field.disabled = True
+        return form
+
+    def form_valid(self, form):
+        # form.instance.classroom = Classroom.objects.get(pk=self.kwargs['pk'])
+        form.instance.owner = self.request.user.profile
+        return super().form_valid(form)
+
+    def test_func(self):
+        if self.request.user.is_lecturer:
+            return True
+        return False
+
+    def get_success_url(self):
+        return reverse_lazy('class-details', kwargs={'pk': self.kwargs['pk']})
+
+
+class MeetingListView(LoginRequiredMixin, ListView):
+    model = Meeting
+    template_name = 'classrooms/meetings/meetings-list.html'
+    context_object_name = 'meetings'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        meet_type = self.kwargs['type']
+
+        color = 'secondary'
+        if meet_type == 'today':
+            color = 'danger'
+        elif meet_type == 'upcoming':
+            color = 'warning'
+        elif meet_type == 'previous':
+            color = 'success'
+        context['color'] = color
+        return context
+
+    def get_queryset(self):
+        meet_type = self.kwargs['type']
+        prof = self.request.user.profile
+
+        if isinstance(prof, Student):
+            if meet_type == 'today':
+                return prof.get_today_meetings()
+            elif meet_type == 'upcoming':
+                return prof.get_upcoming_meetings()
+            elif meet_type == 'previous':
+                return prof.get_prev_meetings()
+
+        elif isinstance(prof, Lecturer):
+            if meet_type == 'today':
+                return prof.get_today_meetings()
+            elif meet_type == 'upcoming':
+                return prof.get_upcoming_meetings()
+            elif meet_type == 'previous':
+                return prof.get_prev_meetings()
+
+
+class MeetingUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+    model = Meeting
+    template_name = 'classrooms/meetings/meeting-create.html'
+    form_class = MeetingUpdateForm
+    context_object_name = 'meeting'
+
+    def test_func(self):
+        if self.request.user.is_lecturer:
+            return True
+        return False
+
+
+class MeetingDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
+    model = Meeting
+    template_name = 'classrooms/meetings/meeting-delete.html'
+    context_object_name = 'meeting'
+
+    def test_func(self):
+        if self.request.user.is_lecturer:
+            return True
+        return False
+
+
+class MeetingDetailView(LoginRequiredMixin, UserPassesTestMixin, DetailView):
+    model = Meeting
+    template_name = 'classrooms/meetings/meeting-details.html'
+    context_object_name = 'meeting'
+
+    def test_func(self):
+        if self.request.user.is_lecturer:
+            return True
+        return False
+
+
+"""
+=============================
+    QUIZ VIEWS
+=============================
+"""
+
+
+class QuizCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
+    model = Quiz
+    template_name = 'classrooms/quizzes/quiz-create.html'
+    form_class = QuizCreateForm
+
+    def form_valid(self, form):
+        form.instance.classroom = Classroom.objects.get(pk=self.kwargs['pk'])
+        form.instance.owner = self.request.user.profile
+        return super().form_valid(form)
+
+    def test_func(self):
+        if self.request.user.is_lecturer:
+            return True
+        return False
+
+
+class QuizUpdateView(UpdateView):
+    pass
+
+
+class QuizDeleteView(DeleteView):
+    pass
+
+
+class QuizDetailView(DetailView):
+    pass
+
+

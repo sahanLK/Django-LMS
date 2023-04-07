@@ -3,7 +3,7 @@
 <!-- Common form rendering template for create, update and delete operations -->
 <div class="container text-muted mt-5 mb-5 mw-700 p-5 background-light rounded shadow-sm">
     <form method="POST" class="mb-2" enctype="multipart/form-data">
-        <legend class="pb-1 mb-4 border-bottom text-dark">{{ title }}</legend>
+        <legend class="roboto-title-muted pb-1 mb-4 border-bottom text-dark">{{ title }}</legend>
         {% csrf_token %}
         {{ form|crispy }}
         <button type="submit" class="btn btn-primary mt-4 shadow">{{ button_text }}</button>

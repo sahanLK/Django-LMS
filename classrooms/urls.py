@@ -30,4 +30,20 @@ urlpatterns = [
          views.assignment_undo_complete_review_view, name='undo-review-complete'),
     path('assignments/all/<str:type>/',
          views.AssignmentListView.as_view(), name='assignments-list'),
+
+    # Quizzes Urls
+    path('classroom/<str:pk>/quiz/create-new/',
+         views.QuizCreateView.as_view(), name='quiz-create'),
+
+    # Meeting Urls
+    path('meetings/all/<str:type>/',
+         views.MeetingListView.as_view(), name='meetings-list'),
+    path('classroom/<str:pk>/meeting/create-new/',
+         views.MeetingCreateView.as_view(), name='meeting-create'),
+    path('classroom/<str:class_name>/meeting/<str:pk>/details/',
+         views.MeetingDetailView.as_view(), name='meeting-details'),
+    path('classroom/<str:class_name>/meeting/<str:pk>/delete/',
+         views.MeetingDeleteView.as_view(), name='meeting-delete'),
+    path('classroom/<str:class_name>/meeting/<str:pk>/edit/',
+         views.MeetingUpdateView.as_view(), name='meeting-update'),
 ]

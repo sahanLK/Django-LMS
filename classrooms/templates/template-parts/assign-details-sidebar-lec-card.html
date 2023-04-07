@@ -22,6 +22,15 @@
                 </tr>
             </tbody>
         </table>
+
+        <a class="pt-3 pb-3 text-center d-block">
+            {% if assignment.review_complete %}
+                Review Completed<i class="fas fa-check-circle ml-2 text-success"></i>
+            {% else %}
+                Pending Review<i class="fas fa-info-circle ml-2"></i>
+            {% endif %}
+        </a>
+
         <a href="{% url 'submit-details' class_name=assignment.classroom.name|slugify assignment_pk=assignment.pk %}"
            class="btn btn-info w-100">
             View Submissions

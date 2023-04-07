@@ -5,12 +5,13 @@
         -> submission-details.html
 {% endcomment %}
 
-<div class="card mb-2">
+<div class="card mb-2 submit-detail-item">
     <div class="card-header" id="headingOne">
         <h5 class="mb-0">
             <div class="row">
                 <div class="col-7">
-                    <img src="{{ profile.profile_pic.url }}" class="btn-link rounded-circle" style="max-width: 50px; max-height: 50px">
+                    <img src="{{ profile.profile_pic.url }}" class="btn-link rounded-circle"
+                         style="max-width: 40px; max-height: 40px">
                     <a class="btn btn-link">{{ profile.user.get_full_name }}</a>
                 </div>
                 <div class="col-3">
@@ -24,7 +25,8 @@
                 </div>
                 <div class="col-2 text-right">
                     {% if submission %}
-                        <a class="btn btn-link show-submission" data-toggle="collapse" data-target="#collapse{{ submission.pk }}"
+                        <a class="btn btn-link show-submission" data-toggle="collapse"
+                           data-target="#collapse{{ submission.pk }}"
                            aria-expanded="true" aria-controls="collapseOne">
                             <i class="fas fa-chevron-circle-down"></i>
                         </a>
@@ -35,10 +37,12 @@
     </div>
     {% if submission %}
         <div id="collapse{{ submission.pk }}" class="collapse p-0" aria-labelledby="headingOne" data-parent="#accordion">
-            <div class="card-body pt-0 pb-0">
-                <div class="row">
-                    <div class="col-sm-12 col-lg-4 mb-3 border-right text-center">
-                        <h5 class="mb-4 pb-2 pt-3">Files</h5>
+            <div class="row w-100 m-0">
+                <div class="col-sm-12 col-lg-4 p-0 mb-3 border-right">
+                    <div class="type pl-3 text-center">
+                        <h6 class="pb-2 pt-2 roboto-title">Files</h6>
+                    </div>
+                    <div class="p-3">
                         {% if submission %}
                             {% if submission.file %}
                                 {% include "template-parts/file.html" with file=submission.file design="box" download='download' %}
@@ -46,10 +50,13 @@
                                 <h6 class="mt-5">No Files Submitted</h6>
                             {% endif %}
                         {% endif %}
-                    </div><!-- .col-lg-4 -->
-                    <div class="col-sm-12 col-lg-4 mb-3 border-right">
-                        <h5 class="mb-4 pb-2 pt-3">Submission Details</h5>
-
+                    </div>
+                </div><!-- .col-lg-4 -->
+                <div class="col-sm-12 col-lg-4 p-0 mb-3 border-right">
+                    <div class="type pl-3 text-center">
+                        <h6 class="pb-2 pt-2 roboto-title">Submission Details</h6>
+                    </div>
+                    <div class="p-3">
                         <table class="table table-striped">
                             <tbody>
                                 <tr>
@@ -62,18 +69,22 @@
                                 </tr>
                             </tbody>
                         </table>
-                    </div><!-- .col-lg-4 -->
-                    <div class="col-sm-12 col-lg-4 mb-3 border-right">
-                        <h5 class="mb-4 pb-2 pt-3">Evaluation</h5>
+                    </div>
+                </div><!-- .col-lg-4 -->
+                <div class="col-sm-12 col-lg-4 p-0 mb-3 border-right">
+                    <div class="type pl-3 text-center">
+                        <h6 class="pb-2 pt-2 roboto-title">Evaluation</h6>
+                    </div>
+                    <div class="p-3">
                         <form method="POST">
                             {% csrf_token %}
                             {{ submission.form|crispy }}
                             <input type="hidden" name="u_profile_id" value="{{ submission.owner.pk }}">
                             <button type="submit" class="btn btn-info">Evaluate</button>
                         </form>
-                    </div><!-- .col-lg-4 -->
-                </div><!-- .row -->
-            </div><!-- .card-body -->
+                    </div>
+                </div><!-- .col-lg-4 -->
+            </div><!-- .row -->
         </div><!-- .collapse -->
     {% endif %}
 </div>
