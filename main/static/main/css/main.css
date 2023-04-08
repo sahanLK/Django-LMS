@@ -98,6 +98,7 @@ html {
     font-size: 25px;
     letter-spacing: 1px;
     border-radius: 5px;
+    padding-bottom: 5px;
 }
 
 .welcome-page-image .img-textbox .ucr {
@@ -921,6 +922,14 @@ Assignment Details page
 
 .mw-1000 {
     max-width: 1000px !important;
+}
+
+.minw-300 {
+    min-width: 300px !important;
+}
+
+.minw-200 {
+    min-width: 200px !important;
 }
 
 .minw-300 {

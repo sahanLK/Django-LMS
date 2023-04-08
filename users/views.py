@@ -111,8 +111,11 @@ class DepartmentListView(ListView):
 
 @login_required
 def department_enroll(request, dept_pk, **kwargs):
+    print("clicked on ", dept_pk)
     if request.user.role == 'lecturer':
         department = Department.objects.get(pk=dept_pk)
+        print("Enrolling into: ", department)
+
         try:
             request.user.profile.departments.add(department)
             messages.success(request, "Enroll successful !")

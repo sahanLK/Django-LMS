@@ -22,37 +22,13 @@
                             {% endif %}
                         </div>
 
-                        <div class="card-footer text-center pb-3">
+                        <div class="card-footer text-center pb-3" id="deptFooter">
                             {% if user.profile in department.lecturer_set.all %}
                                 <a href="{% url 'dept-leave' dept_pk=department.pk %}"
                                    class="btn btn-outline-danger">Leave</a>
                             {% else %}
-                                <a href="#" class="btn btn-outline-primary"
-                                   data-toggle="modal" data-target="#exampleModalCenter">Enroll
-                                </a>
-
-                                <!-- Popup that opens when enrolling -->
-                                <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog"
-                                     aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
-                                    <div class="modal-dialog modal-dialog-centered" role="document">
-                                        <div class="modal-content">
-                                            <div class="modal-header">
-                                                <h5 class="modal-title" id="exampleModalLongTitle">Are you sure ?</h5>
-                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                                    <span aria-hidden="true">&times;</span>
-                                                </button>
-                                            </div>
-                                            <div class="modal-body text-left">
-                                                Make sure this is a department that you want to conduct classes.
-                                                After creating classrooms for this department, you won't be able to leave.
-                                            </div>
-                                            <div class="modal-footer">
-                                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                                                <a href="{% url 'dept-enroll' dept_pk=department.pk %}" class="btn btn-info">Enroll</a>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div><!-- .model popup -->
+                                <a href="{% url 'dept-enroll' dept_pk=department.pk %}"
+                                   class="btn btn-outline-primary">Enroll</a>
                             {% endif %}
                         </div><!-- .card-footer -->
                     </div><!-- .card -->

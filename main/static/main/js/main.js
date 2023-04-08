@@ -164,6 +164,14 @@ $(document).ready( function() {
     }
 
     /*
+    * Department Enrollment
+    */
+/*    $('#deptEnrollBtn').on('click', function() {
+        var idElem = $(this).parent('#deptFooter');
+        var deptId =
+    });*/
+
+    /*
     * Functions
     */
 

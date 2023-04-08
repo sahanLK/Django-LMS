@@ -72,6 +72,7 @@ class ClassroomCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
         # Allow lecturer create classrooms only on enrolled departments.
         enrolled = [(dept.pk, dept) for dept in self.request.user.profile.departments.all()]
         dept_field = form.base_fields.get('department')
+        dept_field.help_text = 'only your enrolled departments will be displayed here.'
         dept_field.choices = enrolled
         return form
 
@@ -198,7 +199,7 @@ class PostCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
 
 class PostDetailView(LoginRequiredMixin, DetailView):
     model = Post
-    template_name = "classrooms/posts/post-detail.html"
+    template_name = "classrooms/posts/post-details.html"
     context_object_name = "post"
 
 
@@ -647,6 +648,12 @@ class MeetingUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
             return True
         return False
 
+    def get_success_url(self):
+        meeting = self.get_object()
+        cls_name = meeting.classroom.name.replace(' ', '-')
+        return reverse('meeting-details', kwargs={
+            'class_name': cls_name, 'pk': meeting.pk})
+
 
 class MeetingDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     model = Meeting
@@ -657,6 +664,10 @@ class MeetingDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
         if self.request.user.is_lecturer:
             return True
         return False
+
+    def get_success_url(self):
+        cls_pk = self.get_object().classroom.pk
+        return reverse('class-details', kwargs={'pk': cls_pk})
 
 
 class MeetingDetailView(LoginRequiredMixin, UserPassesTestMixin, DetailView):
@@ -692,16 +703,103 @@ class QuizCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
             return True
         return False
 
+    def get_success_url(self):
+        quiz = self.get_object()
+        print("Redirecting")
+        return reverse('quiz-questions-create', kwargs={
+            'class_name': quiz.classroom.name.replace(' ', '-').lower(),
+            'quiz_pk': quiz.pk,
+        })
+
+
+class QuizListView(LoginRequiredMixin, ListView):
+    model = Quiz
+    template_name = 'classrooms/quizzes/quiz-list.html'
+    context_object_name = 'quizzes'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        quiz_type = self.kwargs['type']
+
+        color = 'secondary'
+        if quiz_type == 'today':
+            color = 'danger'
+        elif quiz_type == 'upcoming':
+            color = 'warning'
+        elif quiz_type == 'previous':
+            color = 'success'
+        context['color'] = color
+        return context
+
+    def get_queryset(self):
+        quiz_type = self.kwargs['type']
+        prof = self.request.user.profile
+
+        if isinstance(prof, Student):
+            if quiz_type == 'today':
+                return prof.get_today_meetings()
+            elif quiz_type == 'upcoming':
+                return prof.get_upcoming_meetings()
+            elif quiz_type == 'previous':
+                return prof.get_prev_meetings()
+
+        elif isinstance(prof, Lecturer):
+            if quiz_type == 'today':
+                return prof.get_today_meetings()
+            elif quiz_type == 'upcoming':
+                return prof.get_upcoming_meetings()
+            elif quiz_type == 'previous':
+                return prof.get_prev_meetings()
+            elif quiz_type == 'all':
+                return prof.get_all_quizzes()
+
 
 class QuizUpdateView(UpdateView):
-    pass
+    model = Quiz
+    template_name = 'classrooms/quizzes/quiz-update.html'
+    context_object_name = 'quiz'
+    fields = [
+        'title',
+        'description',
+        'start',
+        'duration',
+        'accept_after_expired',
+    ]
+
+    def get_success_url(self):
+        quiz = self.get_object()
+        cls_name = quiz.classroom.name.replace(' ', '-').lower()
+        return reverse('quiz-details', kwargs={
+            'class_name': cls_name, 'pk': quiz.pk})
 
 
 class QuizDeleteView(DeleteView):
-    pass
+    model = Quiz
+    template_name = 'classrooms/quizzes/quiz-delete.html'
+    context_object_name = 'quiz'
 
 
 class QuizDetailView(DetailView):
-    pass
+    model = Quiz
+    template_name = 'classrooms/quizzes/quiz-details.html'
+    context_object_name = 'quiz'
 
+
+"""
+=============================
+    QUIZ QUESTIONS VIEWS
+=============================
+"""
+
+
+class QuizQuestionCreateView(CreateView):
+    model = QuizQuestion
+    template_name = 'classrooms/quizzes/quiz-questions/quiz-question-create.html'
+    context_object_name = 'quiz_question'
+    fields = '__all__'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['quiz'] = Quiz.objects.get(pk=self.kwargs['quiz_pk'])
+        return context
 

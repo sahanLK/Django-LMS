@@ -1,0 +1,37 @@
+{% extends 'main/base.html' %}
+
+{% block content %}
+    <div class="container-fluid pt-3 min-body-height">
+        <div class="container mt-3 mb-5">
+            <div class="card-columns row">
+
+                {% for quiz in quizzes %}
+                    <div class="card border-top-{{ color }} shadow mw-300 h-100 m-2 py-2">
+                        <div class="card-body">
+                            <div class="row no-gutters align-items-center">
+                                <div class="col-auto">
+                                    <i class="fas fa-feather fa-2x text-gray-300"></i>
+                                </div>
+                                <div class="col ml-4 pl-1">
+                                    <small class="d-block font-weight-bold text-uppercase mb-2 roboto-title-muted">
+                                        <b><a href="{% url 'quiz-details' class_name=quiz.classroom.name|slugify pk=quiz.pk %}">
+                                            {{ quiz.title }}</a></b>
+                                    </small>
+                                    <small class="font-weight-bold text-uppercase mb-1">
+                                        On, <b>{{ quiz.start }}</b>
+                                    </small>
+                                    <div class="mb-0 font-weight-bold text-gray-800">
+                                        <small class="text-muted">By: {{ quiz.owner.user.get_full_name }}</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% empty %}
+                    <h3>No Quizzes here</h3>
+                {% endfor %}
+
+            </div>
+        </div><!-- .container -->
+    </div><!-- .container-fluid -->
+{% endblock %}

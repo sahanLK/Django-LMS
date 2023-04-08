@@ -1,0 +1,6 @@
+{% extends 'main/base.html' %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+    {% include 'template-parts/base-form.html' with title=quiz.title button_text='Update' %}
+{% endblock %}

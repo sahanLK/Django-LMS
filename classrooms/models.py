@@ -182,8 +182,8 @@ class Quiz(models.Model):
     duration = models.IntegerField()
     accept_after_expired = models.BooleanField(default=True)
 
-    def get_absolute_url(self):
-        return reverse('')
+    def __str__(self):
+        return f"Quiz: {self.title}"
 
 
 class QuizQuestion(models.Model):

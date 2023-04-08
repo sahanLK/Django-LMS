@@ -354,3 +354,11 @@ class Lecturer(models.Model):
                 prev.add(meet)
         return prev
 
+    """
+    =============================
+    QUIZZES
+    =============================
+    """
+    def get_all_quizzes(self):
+        quizzes = self.quiz_set.all()
+        return quizzes

@@ -113,8 +113,10 @@ class MeetingUpdateForm(forms.ModelForm):
 
 class QuizCreateForm(forms.ModelForm):
     duration = forms.CharField(widget=forms.NumberInput(attrs={'min': 1, 'max': 300}))
-    start = forms.DateTimeField(widget=forms.TextInput(attrs={'type': 'date'}))
-    description = forms.CharField(widget=forms.Textarea(attrs={'rows': 3}))
+    start = forms.DateTimeField(label="Start Time", widget=forms.TextInput(
+        attrs={'type': 'date'},
+    ))
+    description = forms.CharField(required=False, widget=forms.Textarea(attrs={'rows': 3}))
 
     class Meta:
         model = Quiz
