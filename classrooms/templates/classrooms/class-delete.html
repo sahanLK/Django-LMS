@@ -8,10 +8,36 @@
                 <form method="POST" class="mb-4 mt-3">
                     {% csrf_token %}
                     {{ form|crispy }}
-                    <h5 class="card-title">Sure you want to delete this class ?</h5>
-                    <p class="card-text">{{ classroom.name }}</p>
+                    <h5 class="roboto-title-muted">Sure you want to delete this classroom ?</h5>
+                    <h6 class="card-text roboto-title-muted mt-4">
+                        <a href="{% url 'class-details' pk=classroom.pk %}">
+                            {{ classroom.name }} ({{ classroom.department.batch.year }} Batch)
+                        </a>
+                    </h6>
+
+                    <div class="class-info mt-4 mb-5">
+                        <table class="table table-striped mw-300 text-muted">
+                            <tr>
+                                <th>Assignments</th>
+                                <th>{{ classroom.assignment_set.count }}</th>
+                            </tr>
+                            <tr>
+                                <th>Posts</th>
+                                <th>{{ classroom.post_set.count }}</th>
+                            </tr>
+                            <tr>
+                                <th>Quizzes</th>
+                                <th>{{ classroom.quiz_set.count }}</th>
+                            </tr>
+                            <tr>
+                                <th>Meetings</th>
+                                <th>{{ classroom.meeting_set.count }}</th>
+                            </tr>
+                        </table>
+                    </div>
+
                     <a href="{% url 'class-details' pk=classroom.pk %}" class="btn btn-secondary">Cancel</a>
-                    <button type="submit" class="btn btn-danger">Yes, Delete</button>
+                    <button type="submit" class="btn btn-danger ml-3">Yes, Delete</button>
                 </form>
             </div>
         </div>

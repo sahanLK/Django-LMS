@@ -2,8 +2,10 @@
 {% load crispy_forms_tags %}
 
 {% block content %}
-    <div class="container text-muted mt-5 mb-5 mw-800 pb-5">
-        <div class="row post-author mw-700 m-auto"><!-- Edit and delete options for publisher -->
+    <div class="container-fluid">
+
+        <!-- Edit and delete options for publisher -->
+        <div class="row post-author mw-700 ml-auto mr-auto mb-3 mt-5">
             <div class="col-8 text-left">
                 <a href="{% url 'class-details' classroom.pk %}" class="text-left">
                     <i class="fas fa-long-arrow-left pr-2"></i>Back to Classroom
@@ -15,6 +17,23 @@
                 </a>
             </div>
         </div>
-        {% include 'template-parts/base-form.html' with title="Edit: "|add:classroom.name button_text='Update' %}
+
+        <div class="container text-muted mt-3 mb-5 mw-700 p-5 background-light rounded shadow-sm">
+            <form method="POST" class="mb-2" enctype="multipart/form-data">
+                {% csrf_token %}
+                <h4 class="mb-5 pb-2 roboto-title-muted border-bottom">
+                    Edit:
+                    <a href="{% url 'class-details' classroom.pk %}">
+                        {{ classroom.name }}
+                    </a>
+                </h4>
+
+                {{ form|crispy }}
+                <button type="submit" class="btn btn-primary pl-3 pr-3 mt-4 shadow mobile-100">
+                    Update Classroom
+                </button>
+            </form>
+        </div><!-- .container -->
     </div>
 {% endblock %}
+

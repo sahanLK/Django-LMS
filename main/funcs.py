@@ -1,4 +1,5 @@
 from datetime import datetime
+import pytz
 
 
 def is_lecturer(user):
@@ -13,18 +14,18 @@ def is_student(user):
     return False
 
 
-def d_t(dt):
+def get_naive_dt(dt):
     """
-    Get a correct datetime object.
-    If a datetime object is given, returns it after proper formatting.
-    Otherwise, get the current datetime
-    :param now: If True current datetime is taken for evaluation
-    :type dt: datetime object
+    Returns a naive datetime object (not timezone aware)
+    in local timezone from given UTC datetime object from
+    django model DatetimeField.
+    Only used for Sri Lanka timezone ('Asia/Colombo')
+    :type dt: datetime object (in UTC)
     :return:
     """
-    year, month, day = dt.year, dt.month, dt.day
-    h, m, s = dt.hour, dt.minute, dt.second
-    datetime_str = f"{year}/{month}/{day} {h}:{m}:{s}"
-    datetime_obj = datetime.strptime(
-        datetime_str, '%Y/%m/%d %H:%M:%S')
-    return datetime_obj
+    local_tz = pytz.timezone('Asia/Colombo')
+    local = local_tz.fromutc(dt.replace(tzinfo=None))
+    fmt = '%Y-%b-%d %a %H:%M:%S %p'
+    dt_str = local.strftime(fmt)
+    dt_obj = datetime.strptime(dt_str, fmt)
+    return dt_obj

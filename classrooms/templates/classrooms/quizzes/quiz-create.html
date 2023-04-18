@@ -2,7 +2,17 @@
 {% load crispy_forms_tags %}
 
 {% block content %}
-    <div class="container">
-        {% include 'template-parts/base-form.html' with title="Create Quiz" button_text='Create' %}
+    <div class="container-fluid">
+        <div class="container text-muted mt-5 mb-5 mw-700 p-5 background-light rounded shadow-sm">
+            <form method="POST" class="mb-2" enctype="multipart/form-data">
+                {% csrf_token %}
+                <h4 class="mb-5 pb-2 border-bottom roboto-title-muted">
+                    Create New Quiz
+                </h4>
+
+                {{ form|crispy }}
+                <button type="submit" class="btn btn-primary mt-4 shadow">Create Quiz</button>
+            </form>
+        </div>
     </div>
 {% endblock %}

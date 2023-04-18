@@ -3,6 +3,20 @@
 
 {% block content %}
     <div class="container-fluid">
-        {% include 'template-parts/base-form.html' with title='Post: '|add:post.title button_text='Update' %}
+        <div class="container text-muted mt-5 mb-5 mw-800 p-5 background-light rounded shadow-sm">
+            <form method="POST" class="mb-2" enctype="multipart/form-data">
+                {% csrf_token %}
+                <h4 class="mb-5 pb-2 border-bottom">
+                    <b class="pr-2">Update:
+                        <a href="{% url 'post-details' class_pk=post.classroom.pk pk=post.pk %}">
+                            {{ post.title }}
+                        </a>
+                    </b>
+                </h4>
+                {{ form.media }}
+                {{ form|crispy }}
+                <button type="submit" class="btn btn-primary mt-4 shadow">Update Post</button>
+            </form>
+        </div>
     </div>
 {% endblock %}

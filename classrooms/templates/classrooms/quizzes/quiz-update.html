@@ -2,5 +2,21 @@
 {% load crispy_forms_tags %}
 
 {% block content %}
-    {% include 'template-parts/base-form.html' with title=quiz.title button_text='Update' %}
+    <div class="container-fluid">
+        <div class="container text-muted mt-5 mb-5 mw-700 p-5 background-light rounded shadow-sm">
+            <form method="POST" class="mb-2" enctype="multipart/form-data">
+                {% csrf_token %}
+                <h4 class="mb-5 pb-2 border-bottom">
+                    <b class="pr-2">Update:
+                        <a href="{% url 'quiz-details' class_name=quiz.classroom.name|slugify pk=quiz.pk %}">
+                            {{ quiz.title }}
+                        </a>
+                    </b>
+                </h4>
+
+                {{ form|crispy }}
+                <button type="submit" class="btn btn-primary mt-4 shadow">Update Quiz</button>
+            </form>
+        </div>
+    </div>
 {% endblock %}

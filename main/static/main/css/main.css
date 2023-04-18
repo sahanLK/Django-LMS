@@ -2,6 +2,10 @@
 * Overriding W3.CSS
 */
 
+p {
+    word-break: break-word;
+}
+
 body,
 h1,
 h2,
@@ -15,15 +19,25 @@ h6 {
 
 .roboto-title {
     font-family: 'Roboto Slab', serif;
+    letter-spacing: 0.5px;
 }
 
 .roboto-title-muted {
     font-family: 'Roboto Slab', serif;
     color: #999999 !important;
+    letter-spacing: 0.5px;
 }
 
 button[data-toggle='tab']:focus {
     outline: none !important;
+}
+
+
+/*
+* CK Editor overrides
+*/
+#cke_id_content {
+    width: 100% !important;
 }
 
 
@@ -40,6 +54,10 @@ body,
 html {
   height: 100%;
   line-height: 1.8;
+}
+
+.body-color {
+    background-color: #f5f7fa !important;
 }
 
 .wrapper {
@@ -638,10 +656,6 @@ Alert
     border-bottom-right-radius: 0px !important;
 }
 
-/*
-* CANVAS CHARTS
-*/
-
 
 /*
 Classrooms
@@ -667,7 +681,7 @@ body {
 }
 
 .testimonial-card .card-up {
-  height: 120px;
+  height: 100px;
   overflow: hidden;
   border-top-left-radius: .45rem;
   border-top-right-radius: .45rem;
@@ -774,6 +788,14 @@ Assignment Details page
 
 
 /*
+* Quiz
+*/
+.questions a {
+    cursor: pointer !important;
+}
+
+
+/*
 * File
 */
 
@@ -834,7 +856,7 @@ Assignment Details page
 
 
 .min-body-height {
-    min-height: 450px !important;
+    min-height: 600px !important;
 }
 
 .primary-color {
@@ -880,6 +902,16 @@ Assignment Details page
     height: 15px !important;
 }
 
+
+
+
+.mw-20 {
+    max-width: 20px !important;
+}
+.mw-30 {
+    max-width: 30px !important;
+}
+
 .mw-100 {
     max-width: 100px !important;
 }
@@ -890,6 +922,10 @@ Assignment Details page
 
 .mw-200 {
     max-width: 200px !important;
+}
+
+.mw-250 {
+    max-width: 250px !important;
 }
 
 .mw-300 {
@@ -924,8 +960,16 @@ Assignment Details page
     max-width: 1000px !important;
 }
 
-.minw-300 {
-    min-width: 300px !important;
+
+.minw-20 {
+    min-width: 20px !important;
+}
+.minw-30 {
+    min-width: 30px !important;
+}
+
+.minw-100 {
+    min-width: 100px !important;
 }
 
 .minw-200 {
@@ -958,6 +1002,45 @@ Assignment Details page
 
 
 /*
+* Common Heights
+*/
+
+.h-5 {
+    height: 5px !important;
+}
+.h-10 {
+    height: 10px !important;
+}
+.h-20 {
+    height: 20px !important;
+}
+.h-30 {
+    height: 30px !important;
+}
+.h-40 {
+    height: 40px !important;
+}
+.h-50 {
+    height: 50px !important;
+}
+.h-60 {
+    height: 60px !important;
+}
+.h-70 {
+    height: 70px !important;
+}
+.h-80 {
+    height: 80px !important;
+}
+.h-90 {
+    height: 90px !important;
+}
+.h-100 {
+    height: 100px !important;
+}
+
+
+/*
 MEDIA QUERIES
 */
 
@@ -982,6 +1065,15 @@ MEDIA QUERIES
         font-size: 18px;
         padding: 15px;
     }
+
+    .mobile-100 {
+        width: 100%;
+    }
+
+    .small-100 {
+        width: 100% !important;
+    }
+
 }
 
 /* Small devices (portrait tablets and large phones, 600px and up) */

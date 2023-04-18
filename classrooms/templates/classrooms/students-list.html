@@ -1,8 +1,0 @@
-{% extends "main/base.html" %}
-
-{% block content %}
-    {% for student in students %}
-        <h3>{{ student.user.get_full_name }}</h3>
-        <h3>{{ student.department }}</h3><br/>
-    {% endfor %}
-{% endblock %}

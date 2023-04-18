@@ -2,5 +2,16 @@
 {% load crispy_forms_tags %}
 
 {% block content %}
-    {% include 'template-parts/base-form.html' with title='New Meeting' button_text='Schedule Meeting' %}
+    <div class="container-fluid">
+        <div class="container text-muted mt-5 mb-5 mw-800 p-5 background-light rounded shadow-sm">
+            <form method="POST" class="mb-2" enctype="multipart/form-data">
+                {% csrf_token %}
+                <h4 class="mb-5 pb-2 border-bottom roboto-title-muted">
+                    Schedule a Meeting
+                </h4>
+                {{ form|crispy }}
+                <button type="submit" class="btn btn-primary mt-4 shadow">Schedule Meeting</button>
+            </form>
+        </div>
+    </div>
 {% endblock %}

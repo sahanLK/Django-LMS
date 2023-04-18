@@ -1,17 +1,44 @@
 import datetime
-import os.path
+import json
+import re
+
 from django.contrib import messages
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponse, HttpResponseForbidden, HttpResponseNotAllowed
 from django.shortcuts import render, redirect
 from django.urls import reverse_lazy, reverse
-from django.views.generic import (ListView, CreateView, DetailView, UpdateView, DeleteView)
+from django.utils.text import slugify
+from django.views.generic import (
+    ListView,
+    CreateView,
+    DetailView,
+    UpdateView,
+    DeleteView
+)
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
-from .forms import AssignmentCreationForm, AssignmentSubmitForm, AssignmentGradeForm, ClassroomCreateForm, \
-    ClassroomUpdateForm, QuizCreateForm, MeetingCreationForm
+from .forms import (
+    AssignmentCreationForm,
+    AssignmentSubmitForm,
+    AssignmentGradeForm,
+    ClassroomCreateForm,
+    ClassroomUpdateForm,
+    MeetingCreationForm,
+    AssignmentUpdateForm,
+    QuizUpdateForm,
+)
 from django.contrib.auth.decorators import user_passes_test, login_required
-from .models import Classroom, Post, Assignment, Submission, Quiz, QuizQuestion, QuizQuestionAnswer, Meeting
+from django.template.defaultfilters import slugify
+from .models import (
+    Classroom,
+    Post,
+    Assignment,
+    Submission,
+    Quiz,
+    QuizQuestion,
+    QuizQuestionAnswer,
+    Meeting, QuizStudentResponseQuestion, QuizStudentResponse, QuizStudentResponseQuestionAnswer
+)
 from users.models import Lecturer, Student
-from main.funcs import is_lecturer, is_student, d_t
+from main.funcs import is_lecturer, is_student, get_naive_dt
 from .forms import MeetingUpdateForm, QuizCreateForm
 
 
@@ -46,7 +73,37 @@ class ClassroomDetailView(LoginRequiredMixin, DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         classroom = self.get_object()
-        context['assignments'] = classroom.assignment_set.all()
+
+        assignments = classroom.assignment_set.all()
+        meetings = classroom.meeting_set.all()
+        quizzes = classroom.quiz_set.all()
+        work = set(a for a in assignments)
+        work.update(set(m for m in meetings))
+        work.update(set(q for q in quizzes))
+
+        for w in work:
+            if isinstance(w, Meeting):
+                w.type = 'meeting'
+            elif isinstance(w, Quiz):
+                w.type = 'quiz'
+            elif isinstance(w, Assignment):
+                w.type = 'assignment'
+
+        # Sort the classwork by date_posted using BUBBLE-SORT ALGORITHM
+        def bubble_sort(array):
+            n = len(array)
+
+            for i in range(n):
+                already_sorted = True
+                for j in range(n - i - 1):
+                    if array[j].date_created < array[j + 1].date_created:
+                        array[j], array[j + 1] = array[j + 1], array[j]
+                        already_sorted = False
+                if already_sorted:
+                    break
+            return array
+
+        context['class_work'] = bubble_sort(list(work))
         context['lecturers'] = classroom.lecturers.all()
         context['students'] = classroom.department.student_set.all()
         context['events'] = None
@@ -174,14 +231,12 @@ class PostCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
     model = Post
     template_name = "classrooms/posts/post-create.html"
     context_object_name = "post"
-    fields = ['title', 'content']
+    fields = ('title', 'content')
 
     def form_valid(self, form):
         # Updating other required fields of the form, modifying the form instance.
         form.instance.owner = self.request.user.profile
         form.instance.classroom = Classroom.objects.filter(pk=self.kwargs['pk']).first()
-        form.instance.date_pub = datetime.datetime.now()
-        form.instance.date_last_mod = datetime.datetime.now()
         return super().form_valid(form)
 
     def test_func(self):
@@ -213,11 +268,6 @@ class PostUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
         return reverse('post-details', kwargs={
             'class_pk': self.kwargs['class_pk'], 'pk': self.kwargs['pk']})
 
-    def get_object(self, queryset=None):
-        obj = super().get_object()
-        obj.date_modified = datetime.datetime.now()
-        return obj
-
     def test_func(self):
         """
         Updating posts only allowed for the post author. Can be a lecturer or a student.
@@ -246,49 +296,6 @@ class PostDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
         return False
 
 
-class StudentListView(ListView):
-    model = Student
-    template_name = "classrooms/students-list.html"
-    context_object_name = "students"
-
-    def get_queryset(self):
-        profile = self.request.user.profile
-
-        if isinstance(profile, Student):
-            return self.__get_stu_fellows(profile)
-        elif isinstance(profile, Lecturer):
-            return self.__get_students(profile)
-
-    @staticmethod
-    def __get_students(lecturer: Lecturer):
-        """
-        ONLY FOR LECTURERS
-        Returns a list of all the students from all the departments that
-        the given lecturer is enrolled in.
-        :param lecturer:
-        :return:
-        """
-        # All the enrolled departments
-        depts = lecturer.departments.all()
-        all_students = set()
-
-        for dep in depts:
-            for stu in dep.student_set.all():
-                all_students.add(stu)
-        return all_students
-
-    @staticmethod
-    def __get_stu_fellows(student: Student):
-        """
-        ONLY FOR STUDENTS
-        Returns a list of fellow students for a student
-        :return:
-        """
-        department = student.department
-        fellows = department.student_set.all()
-        return fellows
-
-
 """
 =============================
     ASSIGNMENT VIEWS
@@ -305,8 +312,6 @@ class AssignmentCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
     def form_valid(self, form):
         form.instance.owner = self.request.user.profile
         form.instance.classroom = Classroom.objects.filter(pk=self.kwargs['class_pk']).first()
-        form.instance.date_pub = datetime.datetime.now()
-        form.instance.date_last_mod = datetime.datetime.now()
         # grade field has a default value. so it is not here
         return super().form_valid(form)
 
@@ -394,10 +399,6 @@ def assignment_detail_view(request, **kwargs):  # Consider using update view
             sub = form.save(commit=False)
             sub.assignment = assignment
             sub.owner = request.user.profile
-
-            from django.utils import timezone
-            n = timezone.now()
-            sub.date_sub = n
             sub.save()
             messages.success(request, "Submission Successful !")
             return redirect('assignment-details',
@@ -424,7 +425,7 @@ def assignment_unsubmit_view(request, **kwargs):
         owner=request.user.profile,)
     submission.delete()     # Delete the submission
     return redirect('assignment-details',
-                    class_name=assignment.classroom.name.replace(' ', '-'),
+                    class_name=slugify(assignment.classroom.name),
                     pk=assignment.pk)
 
 
@@ -432,7 +433,7 @@ class AssignmentUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Assignment
     template_name = "classrooms/assignments/assignment-update.html"
     context_object_name = "assignment"
-    form_class = AssignmentCreationForm
+    form_class = AssignmentUpdateForm
 
     def test_func(self):
         """
@@ -445,7 +446,7 @@ class AssignmentUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
 
     def get_success_url(self):
         return reverse('assignment-details', kwargs={
-            'class_name': self.kwargs['class_name'],
+            'class_name': slugify(self.kwargs['class_name']),
             'pk': self.kwargs['pk']})
 
 
@@ -490,7 +491,7 @@ def assignment_submissions_view(request, **kwargs):
         if not requesting_prof_pk:
             messages.error(request, "Student id could not be confirmed")
             return redirect('submit-details',
-                            class_name=assignment.classroom.name.replace(' ', '-'),
+                            class_name=slugify(assignment.classroom.name),
                             assignment_pk=assignment.pk)
 
         requesting_prof = Student.objects.get(pk=requesting_prof_pk)
@@ -505,7 +506,7 @@ def assignment_submissions_view(request, **kwargs):
             obj.grade = request.POST.get('grade')
             obj.save()
             return redirect('submit-details',
-                            class_name=assignment.classroom.name.replace(' ', '-'),
+                            class_name=slugify(assignment.classroom.name),
                             assignment_pk=assignment.pk)
     else:
         submissions = assignment.submission_set.all()
@@ -538,7 +539,7 @@ def assignment_complete_review_view(request, assignment_pk, **kwargs):
     except Exception as e:
         messages.error(request, "Something went wrong !")
     return redirect('submit-details',
-                    class_name=assignment.classroom.name.replace(' ', '-'),
+                    class_name=slugify(assignment.classroom.name),
                     assignment_pk=assignment.pk)
 
 
@@ -553,7 +554,7 @@ def assignment_undo_complete_review_view(request, assignment_pk, **kwargs):
     except Exception as e:
         messages.error(request, "Something went wrong !")
     return redirect('submit-details',
-                    class_name=assignment.classroom.name.replace(' ', '-'),
+                    class_name=slugify(assignment.classroom.name),
                     assignment_pk=assignment.pk)
 
 
@@ -639,7 +640,7 @@ class MeetingListView(LoginRequiredMixin, ListView):
 
 class MeetingUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Meeting
-    template_name = 'classrooms/meetings/meeting-create.html'
+    template_name = 'classrooms/meetings/meeting-update.html'
     form_class = MeetingUpdateForm
     context_object_name = 'meeting'
 
@@ -650,7 +651,7 @@ class MeetingUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
 
     def get_success_url(self):
         meeting = self.get_object()
-        cls_name = meeting.classroom.name.replace(' ', '-')
+        cls_name = slugify(meeting.classroom.name)
         return reverse('meeting-details', kwargs={
             'class_name': cls_name, 'pk': meeting.pk})
 
@@ -670,15 +671,11 @@ class MeetingDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
         return reverse('class-details', kwargs={'pk': cls_pk})
 
 
-class MeetingDetailView(LoginRequiredMixin, UserPassesTestMixin, DetailView):
+class MeetingDetailView(LoginRequiredMixin, DetailView):
     model = Meeting
     template_name = 'classrooms/meetings/meeting-details.html'
     context_object_name = 'meeting'
 
-    def test_func(self):
-        if self.request.user.is_lecturer:
-            return True
-        return False
 
 
 """
@@ -691,7 +688,20 @@ class MeetingDetailView(LoginRequiredMixin, UserPassesTestMixin, DetailView):
 class QuizCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
     model = Quiz
     template_name = 'classrooms/quizzes/quiz-create.html'
-    form_class = QuizCreateForm
+
+    def get_form_class(self):
+        """
+        Setting some help texts
+        :return:
+        """
+        form = QuizCreateForm
+        accept_after_field = form.base_fields.get('accept_after_expired')
+        duration_field = form.base_fields.get('duration')
+
+        accept_after_field.help_text = 'Will allow students to submit' \
+                                       ' responses even after time exceeded'
+        duration_field.help_text = 'Time in minutes'
+        return form
 
     def form_valid(self, form):
         form.instance.classroom = Classroom.objects.get(pk=self.kwargs['pk'])
@@ -704,10 +714,9 @@ class QuizCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
         return False
 
     def get_success_url(self):
-        quiz = self.get_object()
-        print("Redirecting")
-        return reverse('quiz-questions-create', kwargs={
-            'class_name': quiz.classroom.name.replace(' ', '-').lower(),
+        quiz = self.get_form_kwargs().get('instance')
+        return reverse('quiz-questions', kwargs={
+            'class_name': slugify(quiz.classroom.name),
             'quiz_pk': quiz.pk,
         })
 
@@ -736,39 +745,39 @@ class QuizListView(LoginRequiredMixin, ListView):
         prof = self.request.user.profile
 
         if isinstance(prof, Student):
+            prof: Student
+
             if quiz_type == 'today':
-                return prof.get_today_meetings()
+                return prof.get_today_quizzes()
             elif quiz_type == 'upcoming':
-                return prof.get_upcoming_meetings()
-            elif quiz_type == 'previous':
-                return prof.get_prev_meetings()
+                return prof.get_upcoming_quizzes()
+            elif quiz_type == 'missing':
+                return prof.get_missing_quizzes()
+            elif quiz_type == 'completed':
+                return prof.get_completed_quizzes()
 
         elif isinstance(prof, Lecturer):
+            prof: Lecturer
+
             if quiz_type == 'today':
-                return prof.get_today_meetings()
+                return prof.get_today_quizzes()
             elif quiz_type == 'upcoming':
-                return prof.get_upcoming_meetings()
-            elif quiz_type == 'previous':
-                return prof.get_prev_meetings()
-            elif quiz_type == 'all':
-                return prof.get_all_quizzes()
+                return prof.get_upcoming_quizzes()
+            elif quiz_type == 'pending_review':
+                return prof.get_pending_review_quizzes()
+            elif quiz_type == 'reviewed':
+                return prof.get_review_done_quizzes()
 
 
 class QuizUpdateView(UpdateView):
     model = Quiz
     template_name = 'classrooms/quizzes/quiz-update.html'
     context_object_name = 'quiz'
-    fields = [
-        'title',
-        'description',
-        'start',
-        'duration',
-        'accept_after_expired',
-    ]
+    form_class = QuizUpdateForm
 
     def get_success_url(self):
         quiz = self.get_object()
-        cls_name = quiz.classroom.name.replace(' ', '-').lower()
+        cls_name = slugify(quiz.classroom.name)
         return reverse('quiz-details', kwargs={
             'class_name': cls_name, 'pk': quiz.pk})
 
@@ -779,10 +788,33 @@ class QuizDeleteView(DeleteView):
     context_object_name = 'quiz'
 
 
-class QuizDetailView(DetailView):
+from django.http import JsonResponse
+from http.client import OK
+
+
+class QuizDetailView(DetailView, LoginRequiredMixin):
     model = Quiz
-    template_name = 'classrooms/quizzes/quiz-details.html'
     context_object_name = 'quiz'
+
+    def get_template_names(self):
+        quiz = self.get_object()
+        return 'classrooms/quizzes/quiz-details.html'
+
+    def get_context_data(self, **kwargs):
+        user = self.request.user
+        quiz = self.get_object()
+
+        context = super().get_context_data(**kwargs)
+        context['time_counter'] = quiz.start_time
+
+        # Detect if user has already responded
+        responded = False
+        if user.is_student:
+            if len(quiz.quizstudentresponse_set.all()) > 0:
+                responded = True
+        context['responded'] = True if responded else False
+
+        return context
 
 
 """
@@ -792,14 +824,179 @@ class QuizDetailView(DetailView):
 """
 
 
-class QuizQuestionCreateView(CreateView):
-    model = QuizQuestion
-    template_name = 'classrooms/quizzes/quiz-questions/quiz-question-create.html'
-    context_object_name = 'quiz_question'
-    fields = '__all__'
+def _bubble_sort(array):
+    array = [i for i in array]
+    n = len(array)
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['quiz'] = Quiz.objects.get(pk=self.kwargs['quiz_pk'])
-        return context
+    for i in range(n):  # 3
+        already_sorted = True
 
+        for j in range(n - i - 1):
+            if array[j].number > array[j + 1].number:
+                array[j], array[j + 1] = array[j + 1], array[j]
+                already_sorted = False
+        if already_sorted:
+            break
+    return array
+
+
+def quiz_questions_and_answers_view(
+        request, class_name, quiz_pk, **kwargs):
+    """
+    ONLY FOR LECTURERS  (CALLED BY AJAX)
+
+    CREATING AND UPDATING QUIZ ANSWERS BOTH DONE IN THIS VIEW.
+    WHENEVER NEED TO CREATE OR UPDATE QUESTIONS AND ANSWERS,
+    ALL PREVIOUS QUESTIONS ANS ANSWERS GETS DELETED AND
+    QUIZ WILL BE REGENERATED COMPLETELY.
+    """
+    if not request.user.is_lecturer:
+        return HttpResponseNotAllowed([])
+
+    quiz = Quiz.objects.get(pk=quiz_pk)
+
+    if request.method == 'POST':
+        # If quiz has responses or starting time exceeded, no edits allowed
+        if len(quiz.quizstudentresponse_set.all()) > 0:
+            return JsonResponse({'msg': 'responses-available'})
+
+        # Delete all the existing question and answers
+        for record in quiz.quizquestion_set.all():
+            record.delete()
+
+        # Recreate all questions and answers with the latest datasets
+        q_objects = json.loads(request.POST.get('dom'))
+
+        for q_obj in q_objects.get('dom'):
+            # Creating <QuizQuestion> object
+            question = q_obj['question']
+            q_id = question['question-id']
+            q_text = question['text'].strip(' ')
+            q_question = QuizQuestion(
+                quiz=quiz,
+                number=q_id,
+                question=q_text,
+            )
+            q_question.save()
+
+            # Creating answers related for above question
+            for ans in q_obj['answers']:
+                q_answer = QuizQuestionAnswer(
+                    question=q_question,
+                    letter=ans['letter'],
+                    answer=ans['text'].strip(' '),
+                    correct=True if ans['correct'] == 'true' else False,
+                )
+                q_answer.save()
+
+    context = {'quiz': quiz}
+    return render(request, 'classrooms/quizzes/quiz-questions.html', context)
+
+
+def quiz_live_view(request, **kwargs):
+    """
+    ONLY FOR STUDENTS (CALLED BY AJAX)
+    """
+    if not request.user.is_student:
+        return HttpResponseNotAllowed([])
+
+    quiz = Quiz.objects.get(pk=kwargs['quiz_pk'])
+    context = {'quiz': quiz}
+
+    if request.method == 'POST':    # Student submitting a response
+        # Not allowed making more than 1 response for same quiz
+        if not len(request.user.profile.quizstudentresponse_set.filter(quiz=quiz)) > 0:
+            # creating <QuizStudentResponse> object
+            response = QuizStudentResponse(
+                quiz=quiz,
+                owner=request.user.profile,
+            )
+            response.save()
+
+            # Creating questions and answers related to the response
+            q_objects = json.loads(request.POST.get('dom'))
+
+            for q_obj in q_objects.get('dom'):
+                # Creating <QuizStudentResponseQuestion> object
+                question = q_obj['question']
+                q_id = question['question-id']
+                question = QuizQuestion.objects.get(number=q_id)
+                q_res_question = QuizStudentResponseQuestion(
+                    response=response,
+                    question=question,
+                )
+                q_res_question.save()
+
+                # Creating answers related for above question
+                for ans in q_obj['answers']:
+                    # Save answers that only selected as True by student
+                    if ans['correct'] == 'true':
+                        # detect the correct answer
+                        answer_letter = ans['letter']
+                        answer = question.quizquestionanswer_set.get(letter=answer_letter)
+
+                        q_res_answer = QuizStudentResponseQuestionAnswer(
+                            response_question=q_res_question,
+                            answer=answer,
+                        )
+                        q_res_answer.save()
+
+            """generate score for the response"""
+
+            _all_questions = quiz.quizquestion_set.filter()
+
+            # Finding all the correct answers of the actual quiz
+            _all_correct_ans = set()
+            _all_incorrect_ans = set()
+            for question in _all_questions:
+                for a in question.quizquestionanswer_set.all():
+                    if a.correct:
+                        _all_correct_ans.add(a)
+                    else:
+                        _all_incorrect_ans.add(a)
+
+            # Finding all the correct answers that student marked as correct
+            _all_correct_stu_answers = set()
+            _all_incorrect_stu_answers = set()
+            all_res_questions = response.quizstudentresponsequestion_set.all()
+            for q in all_res_questions:
+                for ans in q.quizstudentresponsequestionanswer_set.all():
+                    if ans.answer.correct:
+                        _all_correct_stu_answers.add(ans)
+                    else:
+                        _all_incorrect_stu_answers.add(ans)
+
+            correct_score = (len(_all_correct_stu_answers)/len(_all_correct_ans))/100
+            incorrect_score = (len(_all_incorrect_stu_answers)/len(_all_incorrect_ans))/100
+            response.score = (correct_score + incorrect_score)
+            response.save()
+
+        else:
+            print("You already have a response")
+            # return JsonResponse({'what_happened': 'Already responded'})
+
+    return render(request, 'classrooms/quizzes/quiz-live.html', context)
+
+
+def quiz_stu_response_view(request, **kwargs):
+    quiz = Quiz.objects.get(pk=kwargs['quiz_pk'])
+    response = request.user.profile.quizstudentresponse_set.filter(quiz=quiz).first()
+
+    # all the response question. Usually contains all the
+    # questions in the quiz.
+    # This is used for instead of quiz directly, because from these
+    # objects, student's answers can be directly accessed.
+    res_questions = response.quizstudentresponsequestion_set.all()
+
+    all_answers = set()
+    for q in res_questions:
+        for question in q.quizstudentresponsequestionanswer_set.all():
+            all_answers.add(question.answer)
+
+    context = {
+        'quiz': quiz,
+        'res_questions': res_questions,
+        'all_answers': all_answers,
+        'response': response
+    }
+    return render(request, 'classrooms/quizzes/quiz-stu-response.html', context)

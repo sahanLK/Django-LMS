@@ -1,17 +1,27 @@
 from django.urls import path
 from . import views
+from . import fetchviews
 
 
 urlpatterns = [
-    path('classrooms/', views.ClassroomListView.as_view(), name='classrooms'),
-    path('classroom/create-new/', views.ClassroomCreateView.as_view(), name='class-create'),
-    path('classroom/<str:pk>/', views.ClassroomDetailView.as_view(), name='class-details'),
-    path('classroom/<str:pk>/edit/', views.ClassroomUpdateView.as_view(), name='class-update'),
-    path('classroom/<str:pk>/delete/', views.ClassroomDeleteView.as_view(), name='class-delete'),
-    path('classroom/<str:pk>/post/create-new/', views.PostCreateView.as_view(), name='post-new'),
-    path('classroom/<str:class_pk>/post/<str:pk>/', views.PostDetailView.as_view(), name='post-details'),
-    path('classroom/<str:class_pk>/post/<str:pk>/update/', views.PostUpdateView.as_view(), name='post-update'),
-    path('classroom/<str:class_pk>/post/<str:pk>/delete/', views.PostDeleteView.as_view(), name='post-delete'),
+    path('classrooms/',
+         views.ClassroomListView.as_view(), name='classrooms'),
+    path('classroom/create-new/',
+         views.ClassroomCreateView.as_view(), name='class-create'),
+    path('classroom/<str:pk>/',
+         views.ClassroomDetailView.as_view(), name='class-details'),
+    path('classroom/<str:pk>/edit/',
+         views.ClassroomUpdateView.as_view(), name='class-update'),
+    path('classroom/<str:pk>/delete/',
+         views.ClassroomDeleteView.as_view(), name='class-delete'),
+    path('classroom/<str:pk>/post/create-new/',
+         views.PostCreateView.as_view(), name='post-new'),
+    path('classroom/<str:class_pk>/post/<str:pk>/',
+         views.PostDetailView.as_view(), name='post-details'),
+    path('classroom/<str:class_pk>/post/<str:pk>/update/',
+         views.PostUpdateView.as_view(), name='post-update'),
+    path('classroom/<str:class_pk>/post/<str:pk>/delete/',
+         views.PostDeleteView.as_view(), name='post-delete'),
     path('classroom/<str:class_pk>/assignment/create-new/',
          views.AssignmentCreateView.as_view(), name='assignment-new'),
     path('classroom/<str:class_name>/assignment/<str:pk>/',
@@ -32,10 +42,10 @@ urlpatterns = [
          views.AssignmentListView.as_view(), name='assignments-list'),
 
     # Quizzes Urls
-    path('classroom/<str:pk>/quiz/create-new/',
-         views.QuizCreateView.as_view(), name='quiz-create'),
     path('quizzes/<str:type>/',
          views.QuizListView.as_view(), name='quiz-list'),
+    path('classroom/<str:pk>/quiz/create-new/',
+         views.QuizCreateView.as_view(), name='quiz-create'),
     path('classroom/<str:class_name>/quiz/<str:pk>/details/',
          views.QuizDetailView.as_view(), name='quiz-details'),
     path('classroom/<str:class_name>/quiz/<str:pk>/delete/',
@@ -44,8 +54,19 @@ urlpatterns = [
          views.QuizUpdateView.as_view(), name='quiz-update'),
 
     # Quiz question url
-    path('classroom/<str:class_name>/quiz/<str:quiz_pk>/questions/create',
-         views.QuizQuestionCreateView.as_view(), name='quiz-questions-create'),
+    path('classroom/<str:class_name>/quiz/<str:quiz_pk>/questions/',
+         views.quiz_questions_and_answers_view, name='quiz-questions'),
+    path('classroom/<str:class_name>/quiz/<str:quiz_pk>/live',
+         views.quiz_live_view, name='quiz-live'),
+
+    # Quiz response details page made by a student
+    path('classroom/<str:class_name>/quiz/<str:quiz_pk>/response',
+         views.quiz_stu_response_view, name='quiz-response'),
+
+    # Other fetch views
+    path('classroom/<str:class_name>/quiz/<str:quiz_pk>/countdown',
+         fetchviews.quiz_start_time_view, name='quiz-countdown'),
+
 
     # Meeting Urls
     path('meetings/<str:type>/',

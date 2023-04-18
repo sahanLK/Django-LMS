@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'users.apps.UsersConfig',
     'classrooms.apps.ClassroomsConfig',
     'fontawesomefree',
+    'ckeditor',
 ]
 
 MIDDLEWARE = [

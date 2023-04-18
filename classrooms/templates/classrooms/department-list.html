@@ -25,10 +25,14 @@
                         <div class="card-footer text-center pb-3" id="deptFooter">
                             {% if user.profile in department.lecturer_set.all %}
                                 <a href="{% url 'dept-leave' dept_pk=department.pk %}"
-                                   class="btn btn-outline-danger">Leave</a>
+                                   id="deptLeaveBtn"
+                                   class="btn btn-outline-danger">Leave
+                                </a>
                             {% else %}
                                 <a href="{% url 'dept-enroll' dept_pk=department.pk %}"
-                                   class="btn btn-outline-primary">Enroll</a>
+                                   id="deptEnrollBtn"
+                                   class="btn btn-outline-primary">Enroll
+                                </a>
                             {% endif %}
                         </div><!-- .card-footer -->
                     </div><!-- .card -->

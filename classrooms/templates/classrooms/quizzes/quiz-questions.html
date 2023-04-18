@@ -1,0 +1,119 @@
+{% extends 'main/base.html' %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+    <div class="container pt-5 pb-5 min-body-height">
+        <form method="POST" id="quizForm">
+            {% csrf_token %}
+            <h6 class="roboto-title-muted mr-2 pr-2 text-right  ">Quiz Preview</h6>
+
+            <div class="card shadow-sm p-4 mb-4"><!-- .questions area -->
+                <div class="questions ml-2 mr-2 border-r-10" id="questionsArea">
+                    <legend class="roboto-title-muted pb-3 text-center">
+                        <a href="{% url 'quiz-details' class_name=quiz.classroom.name|slugify pk=quiz.pk %}">{{ quiz.title }}</a>
+                    </legend>
+                    <p class="roboto-title-muted pb-4 text-center">{{ quiz.description }}</p>
+
+                    <div class="quiz-info-row row border-bottom mb-5 mt-4 pb-2">
+                        <div class="col-6">
+                            <p class="m-0 roboto-title-muted">
+                                <small>No of Questions: </small>
+                                <a class="text-success" id="noOfQuestions">{{ quiz.quizquestion_set.all.count }}</a>
+                            </p>
+                        </div>
+                        <div class="col-6">
+                            <p class="roboto-title-muted m-0 text-right">
+                                <small>Duration:</small> <a class="text-danger">{{ quiz.duration }} Minutes</a>
+                            </p>
+                        </div>
+                    </div>
+
+                    {% for q in quiz.quizquestion_set.all|dictsort:"number" %}
+                        <div class='question p-2 mb-3'>
+                            <div class='row m-0 pb-3'>
+                                <div class='col-12 p-0 text-right'>
+                                    <a class='roboto-title text-primary pl-2 pr-2' id='addAnswerBtn'>Add Answer</a>
+                                    <a class='roboto-title text-danger pl-2 pr-2' id='deleteQuestionBtn'>Delete Question</a>
+                                </div>
+                            </div>
+
+                            <table class='w-100'>
+                                <tr>
+                                    <td>
+                                        <b class='roboto-title-muted' id='questionNumber'>{{ q.number }} )</b>
+                                    </td>
+                                    <td>
+                                        <textarea rows=2
+                                                  class="form-control"
+                                                  question-id="{{ q.number }}">{{ q.question }}</textarea>
+                                    </td>
+                                </tr>
+                            </table>
+
+                            <div class='row m-0 pt-3 answers-row w-100'>
+                                <div class='col-12 p-0' id='answersRow'>
+                                    <!-- All the answers goes here -->
+
+                                    {% for answer in q.quizquestionanswer_set.all|dictsort:"letter" %}
+                                        <div class='row w-100 m-0 mb-2 answer'>
+                                            <div class='col-1 mt-auto mb-auto'></div>
+
+                                            <div class='col-11'>
+                                                <table class='w-100'>
+                                                    <tr>
+                                                        <td class='mw-30' style="width: 25px;">
+                                                            <p class='roboto-title-muted m-0' id='answerLetter'>
+                                                                {{ answer.letter }}
+                                                            </p>
+                                                        </td>
+                                                        <td id='answersCol'>
+                                                            <input type='text'
+                                                                   class="form-control answer-input
+                                                                   {% if answer.correct|lower == 'true' %}bg-success text-light{% endif %}"
+                                                                   q-id="{{ answer.get_q_id }}"
+                                                                   letter="{{ answer.letter }}"
+                                                                   value="{{ answer.answer }}"
+                                                                   correct="{{ answer.correct|lower }}"
+                                                            >
+                                                        </td>
+                                                        <td class="pl-3 mw-20">
+                                                            <a class="answer-stat-toggle incorrect"
+                                                               id='answerToggle'>
+                                                                {% if answer.correct|lower == 'true' %}
+                                                                    <i class='fas fa-check-circle fa-lg text-success'></i>
+                                                                {% else %}
+                                                                    <i class='fas fa-check-circle fa-lg text-secondary'></i>
+                                                                {% endif %}
+                                                            </a>
+                                                        </td>
+                                                        <td class="pl-1 mw-20">
+                                                            <a class='text-danger delete-answer'>
+                                                                <i class="fas fa-trash-alt pr-4 text-danger"></i>
+                                                            </a>
+                                                        </td>
+                                                    </tr>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    {% endfor %}
+
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                    <!-- All the questions will be appended here -->
+
+                </div>
+                <div class="d-block text-center">
+                    <a class="btn btn-info text-light ml-2 pl-3 pr-3 small-100" id="questionCreateBtn" style="cursor: pointer;">
+                        Add Question
+                    </a>
+                </div>
+            </div><!-- .questions area -->
+            <a href="javascript:void(0);" class="btn btn-primary ml-auto" id="quizQuestionsCreateBtn"
+               data-url="{% url 'quiz-questions' class_name=quiz.classroom.name|slugify quiz_pk=quiz.pk %}">
+                Save and Continue
+            </a>
+        </form>
+    </div>
+{% endblock %}

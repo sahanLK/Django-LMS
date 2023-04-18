@@ -2,6 +2,16 @@
 
 {% block content %}
 <div class="container mt-5 mb-5 min-body-height text-muted text-center">
-  <h2 style="padding-top: 100px;">Sorry! We are not accepting any registrations right now.</h2>
+  <div class="card shadow-sm p-4 mw-700 ml-auto mr-auto" style="margin-top: 120px;">
+    <div class="card-header" style="line-height: 1.2px;">
+      <h5 class="roboto-title-muted">
+        Sorry! We are not accepting any registrations right now.</br>
+        Please come back later.
+      </h5>
+    </div>
+    <div class="card-body mt-4">
+      <a href="{% url 'home' %}" style="text-decoration: underline">Back to Home</a>
+    </div>
+  </div>
 </div>
 {% endblock %}

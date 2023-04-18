@@ -2,7 +2,7 @@ from datetime import datetime
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from main.models import Batch, Department
-from main.funcs import d_t
+from main.funcs import get_naive_dt
 
 
 class CustomizedUser(AbstractUser):
@@ -85,7 +85,7 @@ class Student(models.Model):
         """
         not_complete = self.__get_all_not_completed_assignments()
         now = datetime.now()
-        pending = set(ass for ass in not_complete if d_t(ass.date_due) > d_t(now))
+        pending = set(ass for ass in not_complete if get_naive_dt(ass.date_due) > get_naive_dt(now))
         return pending
 
     def get_no_of_pending_assignments(self):
@@ -109,7 +109,7 @@ class Student(models.Model):
         """
         not_complete = self.__get_all_not_completed_assignments()
         now = datetime.now()
-        missing = set(ass for ass in not_complete if d_t(ass.date_due) < d_t(now))
+        missing = set(ass for ass in not_complete if get_naive_dt(ass.date_due) < get_naive_dt(now))
         return missing
 
     def get_no_of_missing_assignmets(self):
@@ -207,12 +207,60 @@ class Student(models.Model):
 
     """
     =============================
+    QUIZZES
+    =============================
+    """
+
+    def _get_all_quizzes(self):
+        """
+        Returns all the quizzes from all the classrooms
+        available for the student.
+        :return:
+        """
+        classes = self.get_classrooms()
+        quizzes = set()
+
+        for cls in classes:
+            _all_ass = [q for q in cls.quiz_set.all()]
+            for ass in _all_ass:
+                quizzes.add(ass)
+        return quizzes
+
+    def get_today_quizzes(self):
+        today = set()
+
+        for q in self._get_all_quizzes():
+            if get_naive_dt(q.start).date() == datetime.today().date():
+                today.add(q)
+        return today
+
+    def get_upcoming_quizzes(self):
+        upcoming = set()
+
+        for q in self._get_all_quizzes():
+            if get_naive_dt(q.start).date() > datetime.today().date():
+                upcoming.add(q)
+        return upcoming
+
+    def get_missing_quizzes(self):
+        pass
+
+    def get_completed_quizzes(self):
+        pass
+
+    """
+    =============================
     OTHER
     =============================
     """
 
-    def get_recent_events(self):
-        pass
+    def recent_events(self):
+        """
+        Get a list of most recent events for a student
+        :return:
+        """
+        events = set()
+
 
 
 class Lecturer(models.Model):
@@ -270,7 +318,7 @@ class Lecturer(models.Model):
         :return:
         """
         _all = self.get_all_assignments()
-        ongoing = _all.filter(date_due__gte=d_t(datetime.now()))
+        ongoing = _all.filter(date_due__gte=get_naive_dt(datetime.now()))
         return ongoing
 
     def get_no_of_ongoing_assignments(self):
@@ -286,7 +334,7 @@ class Lecturer(models.Model):
         _all = self.get_all_assignments()
         pending_review = set(ass for ass in _all
                              if not ass.review_complete
-                             and d_t(ass.date_due) < d_t(datetime.now()))
+                             and get_naive_dt(ass.date_due) < get_naive_dt(datetime.now()))
         return pending_review
 
     def get_no_of_pending_review_assignments(self):
@@ -359,6 +407,46 @@ class Lecturer(models.Model):
     QUIZZES
     =============================
     """
-    def get_all_quizzes(self):
+
+    def _get_all_quizzes(self):
         quizzes = self.quiz_set.all()
         return quizzes
+
+    def get_today_quizzes(self):
+        today = set()
+
+        for q in self._get_all_quizzes():
+            if get_naive_dt(q.start).date() == datetime.today().date():
+                today.add(q)
+        return today
+
+    def get_upcoming_quizzes(self):
+        upcoming = set()
+
+        for q in self._get_all_quizzes():
+            if get_naive_dt(q.start).date() > datetime.today().date():
+                upcoming.add(q)
+        return upcoming
+
+    def get_pending_review_quizzes(self):
+        """
+        Returns all the quizzes that start date is expired and
+        also review_complete property is False
+        :return:
+        """
+        pending = set()
+
+        for q in self._get_all_quizzes():
+            if get_naive_dt(q.start).date() > datetime.today().date() \
+                    and q.accepting_answers:
+                pending.add(q)
+        return pending
+
+    def get_review_done_quizzes(self):
+        done = set()
+
+        for q in self._get_all_quizzes():
+            if get_naive_dt(q.start).date() > datetime.today().date() \
+                    and not q.accepting_answers:
+                done.add(q)
+        return done

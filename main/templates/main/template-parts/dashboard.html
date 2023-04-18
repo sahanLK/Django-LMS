@@ -21,7 +21,7 @@
                     </div>
                 </div>
             </div>
-        </div>
+        </div><!-- .col-xl-3 -->
 
         <!-- Assignments Card -->
         <div class="col-xl-3 col-md-6 mb-4">
@@ -45,7 +45,7 @@
                     </div>
                 </div>
             </div>
-        </div>
+        </div><!-- .col-xl-3 -->
 
         <!-- Quizzes Card -->
         <div class="col-xl-3 col-md-6 mb-4">
@@ -74,7 +74,7 @@
                     </div>
                 </div>
             </div>
-        </div>
+        </div><!-- .col-xl-3 -->
 
         <!-- Meetings Today -->
         <div class="col-xl-3 col-md-6 mb-4">
@@ -95,8 +95,8 @@
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
+        </div><!-- .col-xl-3 -->
+    </div><!-- .row -->
 
     <div class="row">
         <!-- Classrooms Card -->
@@ -121,7 +121,7 @@
                 </div>
             </div>
         {% endif %}
-    </div>
+    </div><!-- .row -->
 
     <!-- Content Row -->
     <div class="row pt-4">
@@ -130,7 +130,7 @@
             <div class="card shadow mb-4">
                 <!-- Card Header - Dropdown -->
                 <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                    <h6 class="m-0 font-weight-bold text-primary">Works done this week</h6>
+                    <h6 class="m-0 font-weight-bold text-primary">Today</h6>
                 </div>
                 <!-- Card Body -->
                 <div class="card-body">
@@ -140,12 +140,13 @@
                 </div>
             </div>
         </div>
+
         <!-- Pie Chart -->
         <div class="col-xl-4 col-lg-5">
             <div class="card shadow mb-4">
                 <!-- Card Header - Dropdown -->
                 <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                    <h6 class="m-0 font-weight-bold text-primary">Recent Events</h6>
+                    <h6 class="m-0 font-weight-bold text-primary">Upcoming Events</h6>
                 </div>
                 <!-- Card Body -->
                 <div class="card-body">
@@ -157,33 +158,13 @@
                 </div>
             </div>
         </div>
-    </div>
+    </div><!-- .row -->
 
     <!-- Content Row -->
     <div class="row">
         <!-- Content Column -->
         <div class="col-lg-6 mb-4">
 
-            <!-- Project Card Example -->
-            <div class="card shadow mb-4">
-                <div class="card-header py-3">
-                    <h6 class="m-0 font-weight-bold text-primary">Status</h6>
-                </div>
-                <div class="card-body">
-                    <h4 class="small font-weight-bold">Profile Setup <span
-                            class="float-right">{{ profile.completed }}% Done</span></h4>
-                    <div class="progress">
-                        <div class="progress-bar bg-success" role="progressbar"
-                             style="width: {{ profile.completed }}%"
-                            aria-valuenow="{{ profile.completed }}" aria-valuemin="0" aria-valuemax="100"></div>
-                    </div>
-                    <small class="text-right d-block pt-1">
-                        {% if profile.completed != 100 %}
-                            <a href="{% url 'profile' %}">Complete Profile</a>
-                        {% endif %}
-                    </small>
-                </div>
-            </div>
         </div>
         <div class="col-lg-6 mb-4">
         </div>

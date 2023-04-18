@@ -8,7 +8,7 @@
                     <div class="col-12">
                         <div class="row">
                             <div class="col-10">
-                                <h3 class="pl-3 pt-5">{{ class.name }}</h3>
+                                <h4 class="pl-3 pt-5 roboto-title">{{ class.name }}</h4>
                             </div>
                             <div class="col-2">
                                 {% if class.owner == user.profile %}
@@ -20,7 +20,7 @@
                         </div>
 
                         {% if class.description %}
-                            <p class="card-text pl-3 pt-3 pr-5 mw-600">{{ class.description }}</p>
+                            <p class="card-text pl-3 pt-3 pr-5 pb-3 mw-600">{{ class.description }}</p>
                         {% endif %}
                     </div>
                 </div>
@@ -41,30 +41,23 @@
                 </li>
             </ul><!-- End of Stream, Classwork and People -->
 
+            <!-- Nav Tabs for class details -->
             <div class="row text-muted">
                 <div class="col-lg-8 col-md-12 mb-5 tab-content">
                     <div class="tab-pane fade show active" id="stream" role="tabpanel" aria-labelledby="pills-home-tab"><!-- stream -->
 
                         {% if user.role == 'lecturer' %}
-                        <a href="{% url 'post-new' class.pk %}" class="card p-3 pl-4 shadow-sm">Announce something to your class</a>
+                            <a href="{% url 'post-new' class.pk %}" class="card p-3 pl-4 mb-5 shadow-sm">
+                                Announce something to your class
+                            </a>
                         {% endif %}
 
                         {% for post in posts %} <!--Class posts goes here-->
-                            <div class="card card-body pl-4 pr-3 pt-0 pb-0 mb-3 rounded">
-                                <div class="row">
-                                    <div class="col-1 pad-20">
-                                        <i class="fas fa-pen-alt w-100 h-100 size-20"></i>
-                                    </div>
-                                    <div class="col-11 pt-2 pb-2">
-                                        <a href="{% url 'post-details' class_pk=class.pk pk=post.pk %}"
-                                           class="m-0 text-info">{{ post.title }}
-                                        </a><br/>
-                                        <small class="m-0">{{ post.date_posted }}</small>
-                                    </div>
-                                </div>
-                            </div>
+                            {% include 'template-parts/class-post-item.html' %}
                         {% empty %}
-                            <h4 class="text-center d-block w-100 mt-5 mb-5 roboto-title-muted">No Posts Yet</h4>
+                            <h4 class="text-center d-block w-100 mb-5 roboto-title-muted" style="margin-top: 100px;">
+                                No Posts Yet
+                            </h4>
                         {% endfor %} <!-- end of class posts -->
 
                     </div><!-- stream -->
@@ -96,25 +89,18 @@
                             {% endif %}
 
                         </div>
-                        {% for assignment in assignments %}
-                            <div class="card card-body pl-4 pr-3 pt-0 pb-0 mb-3 rounded">
-                                <div class="row">
-                                    <div class="col-md-1 col-sm-1 pad-20">
-                                        <i class="fas fa-pen-alt w-100 h-100 size-20"></i>
-                                    </div>
-                                    <div class="col-md-8 col-sm-8 pt-2 pb-2">
-                                        <a href="{% url 'assignment-details' class_name=assignment.classroom.name|slugify pk=assignment.pk %}"
-                                           class="m-0 text-info">{{ assignment.title }}
-                                        </a><br/>
-                                        <small class="m-0">{{ assignment.date_posted }}</small>
-                                    </div>
-                                    <div class="col-md-3 col-sm-3 pad-20 text-right">
-                                        <span class="m-0">{{ assignment.status }}</span>
-                                    </div>
-                                </div>
-                            </div>
+                        {% for work in class_work %}
+                            {% if work.type == 'assignment' %}
+                                {% include 'template-parts/class-assignment-item.html' %}
+                            {% elif work.type == 'quiz' %}
+                                {% include 'template-parts/class-quiz-item.html' %}
+                            {% elif work.type == 'meeting' %}
+                                {% include 'template-parts/class-meeting-item.html' %}
+                            {% endif %}
                         {% empty %}
-                            <h4 class="text-center d-block w-100 mt-5 mb-5 roboto-title-muted">No Assignments</h4>
+                            <h4 class="text-center d-block w-100 mb-5 roboto-title-muted" style="margin-top: 100px;">
+                                No Assignments
+                            </h4>
                         {% endfor %}
                     </div><!-- classwork -->
 

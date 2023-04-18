@@ -164,12 +164,50 @@ $(document).ready( function() {
     }
 
     /*
-    * Department Enrollment
+    * Dealing with items when scrolling
     */
-/*    $('#deptEnrollBtn').on('click', function() {
-        var idElem = $(this).parent('#deptFooter');
-        var deptId =
-    });*/
+
+    // Add Question button for quiz edit page
+    var addQuizQuestionBtnRow = $('.fixed-internal-row');
+
+    var prevPos = $(document).scrollTop();   // Just as a position detector
+    $(document).on('scroll', function() {
+        // If nothing found, do not proceed.
+        if ( addQuizQuestionBtnRow.length == 0 ) {
+            return;
+        }
+
+        addQuizQuestionBtnRowPos = addQuizQuestionBtnRow.offset().top;
+        var currentPos = $(this).scrollTop();
+
+        if (currentPos > prevPos) {
+            prevPos = currentPos;
+            // Scrolling Down
+
+            if (addQuizQuestionBtnRowPos < currentPos) {
+                $('.fixed-internal-row').css(
+                    {'position': 'fixed',
+                     'z-index': 20,
+                     'padding-top': '20px',
+                     'top': nav_height},
+                  );
+            }
+
+        } else if (currentPos >= prevPos) {
+            prevPos = currentPos;
+            // Scrolling Up
+
+            if (addQuizQuestionBtnRowPos > currentPos) {
+                console.log('Make it sticky');
+                $('.fixed-internal-row').css(
+                    {'position': 'relative',
+                     'z-index': 20,
+                     'padding-top': '0px',
+                      'top': 0},
+                  );
+            }
+        }
+    });
 
     /*
     * Functions

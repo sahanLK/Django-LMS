@@ -23,12 +23,16 @@
             </div>
 
             <div class="post-title border-bottom pb-1">
-                <h2 class="pb-1">{{ post.title }}</h2>
-                <span class="w-100 text-muted due-date"><small><b>Uploaded</b>: {{ post.date_posted }},</small></span>
-                <span class="w-100 text-muted due-date ml-2"><small><b>Last Modified:</b> {{ post.date_modified }}</small></span>
+                <h3 class="pb-1 roboto-title-muted">{{ post.title }}</h3>
+                <span class="w-100 text-muted due-date">
+                    <small><b>Uploaded</b>: {{ post.date_posted }},</small>
+                </span>
+                <span class="w-100 text-muted due-date ml-2">
+                    <small><b>Last Modified:</b> {{ post.date_modified }}</small>
+                </span>
             </div>
             <div class="post-body mt-5">
-                <p>{{ post.content }}</p>
+                <p>{{ post.content|safe }}</p>
             </div>
         </div>
     </div>

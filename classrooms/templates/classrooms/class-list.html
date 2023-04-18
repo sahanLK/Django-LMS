@@ -8,7 +8,7 @@
         {% endif %}
     </div>
 
-    <div class="container mt-3 mb-5 p-4">
+    <div class="container mt-3 mb-5 p-4 min-body-height">
         <div class="card-columns row">
             {% for classroom in class_rooms  %}
                 <div class="card testimonial-card list-card mt-2 m-3">
@@ -29,20 +29,20 @@
                              class="rounded-circle img-fluid" alt="woman avatar">
                     </div>
                     <div class="card-body text-center pt-1 text-muted">
-                        <h5 class="card-title font-weight-bold mb-0">
+                        <h6 class="font-weight-bold mb-0" style="font-size: 1.1rem;">
                             <a href="{% url 'class-details' classroom.pk %}"
                                class="class-name">{{ classroom.name }}</a>
-                        </h5>
+                        </h6>
 
                         {% if user.role == 'lecturer' %}
-                            <p class="pb-3 pt-1 m-0">
+                            <small class="pb-3 pt-1 m-0 d-block">
                                 Owner:
                                 {% if classroom.owner == user.profile %}
                                     Me
                                 {% else %}
                                     {{ classroom.owner.user.get_full_name }}
                                 {% endif %}
-                            </p>
+                            </small>
                             <a class="btn btn-info text-light font-weight-bold shadow-sm">
                                 {{ classroom.department.batch.year|add:" Batch" }}</a>
                             <hr><p class="m-0">{{ classroom.department.name }}</p>
@@ -56,7 +56,9 @@
                     </div>
                 </div>
             {% empty %}
-                <h2 class="m-auto text-muted pt-5">No Classrooms</h2>
+                <h3 class="roboto-title-muted ml-auto mr-auto" style="margin-top: 150px;">
+                    No Classrooms Yet
+                </h3>
             {% endfor %}
         </div><!-- .card-columns -->
     </div><!-- .container -->

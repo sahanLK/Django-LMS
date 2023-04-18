@@ -95,10 +95,16 @@
             <div id="collapseQuizzes" class="collapse" aria-labelledby="headingUtilities"
                 data-parent="#accordionSidebar">
                 <div class="bg-white py-2 collapse-inner rounded">
-                    <a class="collapse-item" href="utilities-color.html">Live Quizzes</a>
-                    <a class="collapse-item" href="utilities-animation.html">Missing</a>
-                    <a class="collapse-item" href="utilities-border.html">Completed</a>
-                    <a class="collapse-item" href="{% url 'quiz-list' type='all' %}">All Temp</a>
+                    <a class="collapse-item" href="{% url 'quiz-list' type='today' %}">Today</a>
+                    <a class="collapse-item" href="{% url 'quiz-list' type='upcoming' %}">Upcoming</a>
+
+                    {% if user.is_lecturer %}
+                        <a class="collapse-item" href="{% url 'quiz-list' type='pending-reviewl' %}">Pending Review</a>
+                        <a class="collapse-item" href="{% url 'quiz-list' type='reviewed' %}">Reviewed</a>
+                    {% elif user.is_student %}
+                        <a class="collapse-item" href="{% url 'quiz-list' type='missing' %}">Missing</a>
+                        <a class="collapse-item" href="{% url 'quiz-list' type='completed' %}">Completed</a>
+                    {% endif %}
                 </div>
             </div>
         </li>

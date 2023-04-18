@@ -32,7 +32,6 @@ THIS TEMPLATE GETS INHERITED BY ALL OTHER TEMPLATES/PAGES IN THE APPLICATION.
         <!-- Custom CSS -->
         <link rel="stylesheet" type="text/css" href="{% static '/main/css/main.css' %}?{% now 'U' %}">
 
-
     </head>
     <body>
         {% include 'main/navbar.html' %}
@@ -75,6 +74,7 @@ THIS TEMPLATE GETS INHERITED BY ALL OTHER TEMPLATES/PAGES IN THE APPLICATION.
 
         <!-- Custom Js -->
         <script src="{% static 'main/js/main.js' %}?{% now 'U' %}"></script>
+        <script src="{% static 'main/js/ajax.js' %}?{% now 'U' %}"></script>
         <script src="{% static 'main/js/quiz.js' %}?{% now 'U' %}"></script>
 
         <script>

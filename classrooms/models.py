@@ -1,10 +1,12 @@
 import os.path
+import random
 from datetime import datetime
 from django.db import models
 from django.urls import reverse
 from users.models import CustomizedUser, Student, Lecturer
 from main.models import Batch, Department
-from main.funcs import d_t
+from main.funcs import get_naive_dt
+from ckeditor.fields import RichTextField
 
 
 class Classroom(models.Model):
@@ -14,6 +16,7 @@ class Classroom(models.Model):
     name = models.CharField(max_length=300)
     description = models.TextField(max_length=150, null=True,  blank=True)
     background_img = models.ImageField(null=True, blank=True)
+    date_created = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         unique_together = (('department', 'name'),)
@@ -26,12 +29,16 @@ class Post(models.Model):
     classroom = models.ForeignKey(Classroom, on_delete=models.CASCADE)
     owner = models.ForeignKey(Lecturer, on_delete=models.CASCADE)
     title = models.CharField(max_length=300)
-    date_pub = models.DateTimeField()
-    date_last_mod = models.DateTimeField()
-    content = models.TextField()
+    _date_created = models.DateTimeField(auto_now_add=True)
+    date_last_mod = models.DateTimeField(auto_now=True)
+    content = RichTextField(blank=True, null=True)
 
     class Meta:
         unique_together = (('classroom', 'title'),)
+
+    @property
+    def date_created(self):
+        return get_naive_dt(self._date_created)
 
     def __str__(self):
         return f"Post: {self.title} [{self.classroom}]"
@@ -51,10 +58,10 @@ class Assignment(models.Model):
                             choices=[('regular', 'Regular'),
                                      ('question', 'Question')])
     title = models.CharField(max_length=300)
-    date_pub = models.DateTimeField()
-    date_last_mod = models.DateTimeField()
+    _date_created = models.DateTimeField(auto_now_add=True)
+    date_last_mod = models.DateTimeField(auto_now=True)
     date_due = models.DateTimeField()
-    content = models.TextField()
+    content = RichTextField()
     file = models.FileField(null=True, blank=True)
     review_complete = models.BooleanField(default=False)
 
@@ -62,8 +69,12 @@ class Assignment(models.Model):
         return f"Assignment: {self.title} [ {self.classroom} ]"
 
     @property
+    def date_created(self):
+        return get_naive_dt(self._date_created)
+
+    @property
     def has_due_expired(self):
-        if d_t(self.date_due) < d_t(datetime.now()):
+        if get_naive_dt(self.date_due) < get_naive_dt(datetime.now()):
             return True
         return False
 
@@ -78,7 +89,7 @@ class Assignment(models.Model):
 class Submission(models.Model):
     assignment = models.ForeignKey(Assignment, on_delete=models.CASCADE)
     owner = models.ForeignKey(Student, on_delete=models.CASCADE)
-    date_sub = models.DateTimeField()
+    date_created = models.DateTimeField(auto_now_add=True)
     grade = models.CharField(max_length=20, null=True, blank=True)
     file = models.FileField(upload_to="submitted_assignments", blank=True, null=True)
     lec_comment = models.TextField(null=True, blank=True)
@@ -92,7 +103,7 @@ class Submission(models.Model):
         If the submission is a late submit or not.
         :return:
         """
-        if d_t(self.date_sub) > d_t(self.assignment.date_due):
+        if get_naive_dt(self.date_created) > get_naive_dt(self.assignment.date_created):
             return True
         return False
 
@@ -112,6 +123,7 @@ class Meeting(models.Model):
     classroom = models.ForeignKey(Classroom, on_delete=models.CASCADE)
     owner = models.ForeignKey(Lecturer, on_delete=models.CASCADE)
     topic = models.CharField(max_length=300)
+    _date_created = models.DateTimeField(auto_now_add=True)
     start = models.DateTimeField()
     description = models.TextField(null=True, blank=True)
     meeting_url = models.URLField(null=True, blank=True)
@@ -121,6 +133,10 @@ class Meeting(models.Model):
 
     class Meta:
         unique_together = (('classroom', 'topic'),)
+
+    @property
+    def date_created(self):
+        return get_naive_dt(self._date_created)
 
     def __str__(self):
         return f"Meeting: {self.topic} [Class-> {self.classroom.name}" \
@@ -137,7 +153,7 @@ class Meeting(models.Model):
     def is_today(self):
         now = datetime.now()
         t_year, t_month, t_day = now.year, now.month, now.day
-        start = d_t(self.start)
+        start = get_naive_dt(self.start)
         s_year, s_month, s_day = start.year, start.month, start.day
 
         if t_year == s_year and t_month == s_month and t_day == s_day:
@@ -146,23 +162,8 @@ class Meeting(models.Model):
 
     @property
     def is_expired(self):
-        if datetime.today() > d_t(self.start):
+        if datetime.today() > get_naive_dt(self.start):
             return True
-
-
-
-
-"""
-=================================
-    QUESTION
-=================================
-"""
-
-
-class Question(models.Model):
-    title = models.CharField(max_length=300)
-    question = models.TextField()
-    answer_type = models.CharField(max_length=8, choices=[('fixed', 'Fixed'), ('variable', 'Variable')])
 
 
 """
@@ -177,23 +178,115 @@ class Quiz(models.Model):
     owner = models.ForeignKey(Lecturer, on_delete=models.CASCADE)
     title = models.CharField(max_length=300)
     description = models.TextField(null=True, blank=True)
-    date_created = models.DateTimeField(default=datetime.now())
+    _date_created = models.DateTimeField(auto_now_add=True)
+    _date_modified = models.DateTimeField(auto_now=True)
     start = models.DateTimeField()
     duration = models.IntegerField()
     accept_after_expired = models.BooleanField(default=True)
 
+    # Can be used by a lecturer, to manually stop submissions
+    accepting_answers = models.BooleanField(default=True)
+
     def __str__(self):
         return f"Quiz: {self.title}"
+
+    @property
+    def date_created(self):
+        return get_naive_dt(self._date_created)
+
+    @property
+    def date_modified(self):
+        return get_naive_dt(self._date_modified)
+
+    @property
+    def has_started(self):
+        return random.choice([True, False])
+
+    @property
+    def start_time(self):
+        return get_naive_dt(self.start) - get_naive_dt(datetime.utcnow())
 
 
 class QuizQuestion(models.Model):
     quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE)
+    number = models.PositiveIntegerField()
+    question = models.TextField(default="")
+
+    def __str__(self):
+        return f"Question: {self.question} -> [<Quiz: {self.quiz.title}>]"
+
+    @property
+    def correct_answers(self):
+        return self.answer_set.filter(correct=True)
+
+    @property
+    def incorrect_answers(self):
+        return self.answer_set.filter(correct=False)
+
+
+LETTER_CHOICES = [
+    ('A', 'A'),
+    ('B', 'B'),
+    ('C', 'C'),
+    ('D', 'D'),
+    ('E', 'E'),
+    ('F', 'F'),
+]
 
 
 class QuizQuestionAnswer(models.Model):
     question = models.ForeignKey(QuizQuestion, on_delete=models.CASCADE)
+    letter = models.CharField(max_length=1, choices=LETTER_CHOICES)
+    answer = models.CharField(max_length=300, default="")
+    correct = models.BooleanField(default=False)    # Whether answer is a correct or incorrect
+
+    def __str__(self):
+        return f"Answer: {self.answer} -> " \
+               f"[<Quiz: {self.question.quiz.title}> -> " \
+               f"<Question: {self.question.question}>]"
+
+    @property
+    def get_q_id(self):
+        id_map = {'A': 1, 'B': 2, 'C': 3, 'D': 4, 'E': 5, 'F': 6}
+        return id_map.get(str(self.letter))
 
 
-class QuizStuResponse(models.Model):
-    pass
+class QuizStudentResponse(models.Model):
+    """
+    One single student response made by a student.
+    """
+    quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE)
+    owner = models.ForeignKey(Student, on_delete=models.CASCADE)
+    date_created = models.DateTimeField(auto_now_add=True)
+    score = models.PositiveIntegerField(default=0)
 
+    def __str__(self):
+        return f"Quiz Response by: {self.owner.user.get_full_name()}"
+
+
+class QuizStudentResponseQuestion(models.Model):
+    """
+    <QuizStudentResponse> related.
+
+    ONLY RELATED TO A ONE SINGLE <QuizStudentResponse> MADE BY A STUDENT.
+    Do not use for anything else.
+    """
+    response = models.ForeignKey(QuizStudentResponse, on_delete=models.CASCADE)
+    question = models.ForeignKey(QuizQuestion, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f"StudentResponseQuestion: {self.question.question}"
+
+
+class QuizStudentResponseQuestionAnswer(models.Model):
+    """
+    <QuizStudentResponse> related.
+
+    ONLY RELATED TO A ONE SINGLE <QuizStudentResponseQuestion>.
+    Do not use for anything else.
+    """
+    response_question = models.ForeignKey(QuizStudentResponseQuestion, on_delete=models.CASCADE)
+    answer = models.ForeignKey(QuizQuestionAnswer, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f"StudentResponseQuestionAnswer: {self.answer.answer}"

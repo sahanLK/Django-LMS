@@ -1,0 +1,39 @@
+{% extends 'main/base.html' %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+    <div class="container-fluid">
+
+        <!-- Edit and delete options for publisher -->
+        <div class="row post-author mw-800 ml-auto mr-auto mb-3 mt-5">
+            <div class="col-8 text-left">
+                <a href="{% url 'class-details' meeting.classroom.pk %}" class="text-left">
+                    <i class="fas fa-long-arrow-left pr-2"></i>Back to Classroom
+                </a>
+            </div>
+            <div class="col-4 text-right">
+                <a href="{% url 'meeting-delete' class_name=meeting.classroom.name|slugify pk=meeting.pk %}">
+                    <i class="fas fa-trash-alt ml-3 text-danger"></i>
+                </a>
+            </div>
+        </div>
+
+        <div class="container text-muted mt-3 mb-5 mw-800 p-5 background-light rounded shadow-sm">
+            <form method="POST" class="mb-2" enctype="multipart/form-data">
+                {% csrf_token %}
+                <h4 class="mb-5 pb-2 roboto-title-muted border-bottom">
+                    Edit:
+                    <a href="{% url 'meeting-details' class_name=meeting.classroom.name|slugify pk=meeting.pk %}">
+                        {{ meeting.topic }}
+                    </a>
+                </h4>
+
+                {{ form.media }}
+                {{ form|crispy }}
+                <button type="submit" class="btn btn-primary pl-3 pr-3 mt-4 shadow mobile-100">
+                    Update Meeting
+                </button>
+            </form>
+        </div><!-- .container -->
+    </div>
+{% endblock %}
