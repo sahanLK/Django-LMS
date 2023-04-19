@@ -32,6 +32,10 @@ button[data-toggle='tab']:focus {
     outline: none !important;
 }
 
+button[type='submit'] {
+    letter-spacing: 0.5px;
+}
+
 
 /*
 * CK Editor overrides
