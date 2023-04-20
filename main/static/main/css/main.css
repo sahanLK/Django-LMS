@@ -1078,6 +1078,10 @@ MEDIA QUERIES
         width: 100% !important;
     }
 
+    .dev-contact {
+        text-align: center !important;
+    }
+
 }
 
 /* Small devices (portrait tablets and large phones, 600px and up) */

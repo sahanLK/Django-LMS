@@ -218,7 +218,8 @@ $(document).ready(function() {
         var emptyFound = false;
         // check all the question fields
         $( $(form).find('textarea') ).each( function(index, elem) {
-            if ( $.trim($(elem).text()) == '' ) {
+            if ( $.trim($(elem).val()) == '' ) {
+                console.log('Empty question found');
                 emptyFound = true;
             }
         });
@@ -226,6 +227,7 @@ $(document).ready(function() {
         // check all the answer fields
         $( $(form).find('input') ).each( function(index, elem) {
             if ( $.trim($(elem).val()) == '' ) {
+                console.log('Empty answer found');
                 emptyFound = true;
             }
         });
