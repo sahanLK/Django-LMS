@@ -25,7 +25,11 @@ SECRET_KEY = 'django-insecure-dz0hc=@=j309k15yl5gm%@%q8s)3pk_(gx_2bg$e$x8)*p(5sm
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+
+# A variable for differ the settings
+PRODUCTION = True
+
+ALLOWED_HOSTS = ['localhost', 'ucrlms.online']
 
 
 # Application definition
@@ -89,17 +93,30 @@ WSGI_APPLICATION = 'django_LMS.wsgi.application'
 #     }
 # }
 
-# Using MySql Database Engine
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'ucr_lms',
-        'HOST': '127.0.0.1',
-        'PORT': '3306',
-        'USER': 'root',
-        'PASSWORD': '',
+if PRODUCTION:
+    # Using MySql Database Engine
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.mysql',
+            'NAME': 'ucr_lms',
+            'HOST': '128.199.203.5',
+            'PORT': '3306',
+            'USER': 'root',
+            'PASSWORD': '@UCRlmsdb@2023@',
+        }
     }
-}
+else:
+    # Using MySql Database Engine
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.mysql',
+            'NAME': 'ucr_lms',
+            'HOST': '127.0.0.1',
+            'PORT': '3306',
+            'USER': 'root',
+            'PASSWORD': '',
+        }
+    }
 
 
 # Password validation
