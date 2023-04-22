@@ -99,7 +99,7 @@ if PRODUCTION:
         'default': {
             'ENGINE': 'django.db.backends.mysql',
             'NAME': 'ucr_lms',
-            'HOST': '128.199.203.5',
+            'HOST': 'localhost',
             'PORT': '3306',
             'USER': 'ucrlms_user',
             'PASSWORD': '@UCRlmsdb@2023@',
