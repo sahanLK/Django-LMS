@@ -101,7 +101,7 @@ if PRODUCTION:
             'NAME': 'ucr_lms',
             'HOST': '128.199.203.5',
             'PORT': '3306',
-            'USER': 'root',
+            'USER': 'ucrlms_user',
             'PASSWORD': '@UCRlmsdb@2023@',
         }
     }
