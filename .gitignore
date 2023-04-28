@@ -1,2 +1,5 @@
 *.pyc
+/classrooms/migrations
+/users/migrations
+/main/migrations
 /media

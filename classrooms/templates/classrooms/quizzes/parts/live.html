@@ -5,8 +5,6 @@
     <div class="container pt-5 pb-5 min-body-height">
         <form method="POST" id="quizForm">
             {% csrf_token %}
-            <h6 class="roboto-title-muted mr-2 pr-2 text-right  ">Quiz Preview</h6>
-
             <div class="card shadow-sm p-4 mb-4"><!-- .questions area -->
                 <div class="questions ml-2 mr-2 border-r-10" id="questionsArea">
                     <legend class="roboto-title-muted pb-2 text-center">{{ quiz.title }}</legend>
@@ -90,13 +88,18 @@
 
                 </div>
             </div><!-- .questions area -->
-            <a href="javascript:void(0);" class="btn btn-primary ml-auto" id="quizStudentResponseCreateBtn"
-               data-url="{% url 'quiz-live' class_name=quiz.classroom.name|slugify quiz_pk=quiz.pk %}">
-                Submit Response
-            </a>
-            <input type="hidden"
-                   id="redirectFromQuizLive"
-                   value="{% url 'quiz-response' class_name=quiz.classroom.name|slugify quiz_pk=quiz.pk %}">
+
+            <div class="row">
+                <div class="col-12 text-center">
+                    <a href="javascript:void(0);" class="btn btn-primary pl-4 pr-4 shadow-sm small-100" id="quizStudentResponseCreateBtn"
+                       data-url="{% url 'quiz-live' class_name=quiz.classroom.name|slugify quiz_pk=quiz.pk %}">
+                        Submit Response
+                    </a>
+                    <input type="hidden"
+                           id="redirectFromQuizLive"
+                           value="{% url 'quiz-response' class_name=quiz.classroom.name|slugify quiz_pk=quiz.pk %}">
+                </div>
+            </div>
         </form>
     </div>
 {% endblock %}

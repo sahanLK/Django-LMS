@@ -1,0 +1,35 @@
+<!--   Only for a lecturer   -->
+{% extends 'main/base.html' %}
+
+{% block content %}
+    <div class="container-fluid pt-3 min-body-height">
+        <div class="container mt-3 mb-5">
+            <legend class="roboto-title-muted border-bottom pb-2 mb-5 mt-4">Results for:
+                <a href="{% url 'quiz-details' class_name=quiz.classroom.name|slugify pk=quiz.pk %}">
+                    {{ quiz.title }}
+                </a>
+            </legend>
+
+            {% for result in responses %}
+                <table class="w-100 p-3 bg-white shadow-sm text-muted table rounded">
+                    <tr>
+                        <td class="col-5 m-auto border-0">
+                            <h6 class="m-0 roboto-title-muted">{{ result.owner.user.get_full_name }}</h6>
+                        </td>
+                        <td class="col-4 m-auto border-0">
+                            <h6 class="m-0">{{ result.owner.reg_no }}</h6>
+                        </td>
+                        <td class="col-3 m-auto border-0 text-center">
+                            <h6 class="m-0">{{ result.score }}%</h6>
+                        </td>
+                    </tr>
+                </table>
+            {% empty %}
+                <h3 class="roboto-title-muted ml-auto mr-auto" style="margin-top: 150px;">
+                    No Responses
+                </h3>
+            {% endfor %}
+
+        </div><!-- .container -->
+    </div><!-- .container-fluid -->
+{% endblock %}

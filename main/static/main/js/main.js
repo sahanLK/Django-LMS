@@ -1,8 +1,4 @@
 $(document).ready( function() {
-    /* content wrapper */
-    /*$('#wrapper').fadeOut(2)
-    $('#wrapper').fadeIn(500);*/
-
     /* Common interactive elements */
     const sidebar = $('#accordionSidebar');
     const navbar = $("#navbar");
@@ -46,6 +42,12 @@ $(document).ready( function() {
     /*
     * MESSAGES
     */
+
+    // position messages to center of the window
+    var messages = $('#messages');
+    var left = ($(window).width() - messages.width())/2;
+    $(messages).css({'left': left});
+
     // Disappear in few seconds
     setInterval(function() {
         $('#messages').slideUp(200);
@@ -64,25 +66,6 @@ $(document).ready( function() {
     });
     $('#stu-form').on('click', function() {
         $(lecForm)[0].reset();
-    });
-
-
-    /* Dealing with select option for batch in registration form */
-    if ( $('#reg_role').val() == 'Lecturer' ) {
-        $('#reg_batch').val(null);
-        $('#reg_batch').attr('disabled', 'disabled');
-    }
-
-    $('#reg_role').change( function() {
-        if ( $(this).val() == 'Lecturer' ) {
-            $('#reg_batch').val(null);
-            $('#reg_batch').attr('disabled', 'disabled');
-        } else {
-            $('#reg_batch').attr('disabled', false);
-            // Select first value from available options
-            var firstOption = $('#reg_batch').children('option')[0];
-            $('#reg_batch').val(firstOption.text);
-        }
     });
 
     /* Display the selected assignment files */

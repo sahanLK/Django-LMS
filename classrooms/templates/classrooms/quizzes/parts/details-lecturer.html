@@ -1,0 +1,24 @@
+<!-- Quiz details page body for a lecturer -->
+
+<div class="card-body">
+    <table class="table table-borderless text-muted">
+        <tr>
+            <th>Scheduled at:</th>
+            <td>{{ quiz.start }}</td>
+        </tr>
+        <tr>
+            <th>Responses</th>
+            <td>{{ quiz.quizstudentresponse_set.all.count }}</td>
+        </tr>
+    </table>
+
+    <div class="row mt-4">
+        <div class="col-12 text-center">
+            {% if quiz.accepting_answers %}
+                <a href="" class="btn btn-warning ml-auto">Stop Accepting Responses</a>
+            {% endif %}
+            <a href="{% url 'quiz-results' class_name=quiz.classroom.name|slugify quiz_pk=quiz.pk %}"
+               class="btn btn-info">View Responses</a>
+        </div>
+    </div>
+</div>

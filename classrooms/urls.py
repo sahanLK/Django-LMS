@@ -63,6 +63,10 @@ urlpatterns = [
     path('classroom/<str:class_name>/quiz/<str:quiz_pk>/response',
          views.quiz_stu_response_view, name='quiz-response'),
 
+    # Quiz results page (for lecturer)
+    path('classroom/<str:class_name>/quiz/<str:quiz_pk>/results',
+         views.QuizResultsView.as_view(), name='quiz-results'),
+
     # Other fetch views
     path('classroom/<str:class_name>/quiz/<str:quiz_pk>/countdown',
          fetchviews.quiz_start_time_view, name='quiz-countdown'),

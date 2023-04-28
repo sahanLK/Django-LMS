@@ -2,121 +2,118 @@
 {% load crispy_forms_tags %}
 
 {% block content %}
+<div class="container pt-5 pb-5 min-body-height">
+    <form method="POST" id="quizForm">
+        {% csrf_token %}
 
-<div class="container pt-5 pb-5 min-body-height" xmlns="http://www.w3.org/1999/html"
-     xmlns="http://www.w3.org/1999/html" xmlns="http://www.w3.org/1999/html" xmlns="http://www.w3.org/1999/html"
-     xmlns="http://www.w3.org/1999/html">
-        <form method="POST" id="quizForm">
-            {% csrf_token %}
+        <div class="card shadow-sm p-4 mb-4"><!-- .questions area -->
+            <div class="questions ml-2 mr-2 border-r-10" id="questionsArea">
+                <h3 class="roboto-title-muted pb-3 text-center">
+                    <a href="{% url 'quiz-details' class_name=quiz.classroom.name|slugify pk=quiz.pk %}">
+                        {{ quiz.title }}
+                    </a>
+                </h3>
+                <p class="roboto-title-muted pb-2 text-center">{{ quiz.description }}</p>
 
-            <div class="card shadow-sm p-4 mb-4"><!-- .questions area -->
-                <div class="questions ml-2 mr-2 border-r-10" id="questionsArea">
-                    <h3 class="roboto-title-muted pb-3 text-center">
-                        <a href="{% url 'quiz-details' class_name=quiz.classroom.name|slugify pk=quiz.pk %}">
-                            {{ quiz.title }}
-                        </a>
-                    </h3>
-                    <p class="roboto-title-muted pb-2 text-center">{{ quiz.description }}</p>
+                <!-- view instructions -->
+                <div class="view-instructions pt-3 border-top pb-4">
+                    <small class="d-block pb-1 font-weight-bold"><i class='fas fa-check-circle fa-lg text-success mr-3'></i>
+                        Correct answer selected
+                    </small>
+                    <small class="d-block mb-2 font-weight-bold"><i class='fas fa-times-circle fa-lg text-danger mr-3'></i>
+                        Incorrect answer selected
+                    </small>
+                    <small><i class="fa-solid fa-circle mr-3 text-secondary"></i>
+                        Selected answers are in Gray color.
+                    </small></br>
+                    <small><i class="fa-solid fa-circle mr-3 text-success"></i>
+                        Correct answers are in Green color.
+                    </small>
+                </div>
 
-                    <!-- view instructions -->
-                    <div class="view-instructions pt-3 border-top pb-4">
-                        <small class="d-block pb-1 font-weight-bold"><i class='fas fa-check-circle fa-lg text-success mr-3'></i>
-                            Correct answer selected
-                        </small>
-                        <small class="d-block mb-2 font-weight-bold"><i class='fas fa-times-circle fa-lg text-danger mr-3'></i>
-                            Incorrect answer selected
-                        </small>
-                        <small><i class="fa-solid fa-circle mr-3 text-secondary"></i>
-                            Selected answers are in Gray color.
-                        </small></br>
-                        <small><i class="fa-solid fa-circle mr-3 text-success"></i>
-                            Correct answers are in Green color.
-                        </small>
+                <div class="quiz-info-row row border-bottom mb-5 mt-4 pb-2">
+                    <div class="col-lg-4 col-sm-12">
+                        <p class="m-0 roboto-title-muted">
+                            <small>No of Questions: </small>
+                            <a class="text-success" id="noOfQuestions">{{ quiz.quizquestion_set.all.count }}</a>
+                        </p>
                     </div>
-
-                    <div class="quiz-info-row row border-bottom mb-5 mt-4 pb-2">
-                        <div class="col-4">
-                            <p class="m-0 roboto-title-muted">
-                                <small>No of Questions: </small>
-                                <a class="text-success" id="noOfQuestions">{{ quiz.quizquestion_set.all.count }}</a>
-                            </p>
-                        </div>
-                        <div class="col-4">
-                            <h5 class="roboto-title-muted">Score: {{ response.score }}</h5>
-                        </div>
-                        <div class="col-4">
-                            <p class="roboto-title-muted m-0 text-right">
-                                <small>Duration:</small> <a class="text-danger">{{ quiz.duration }} Minutes</a>
-                            </p>
-                        </div>
+                    <div class="col-lg-4 col-sm-12 text-center">
+                        <h5 class="roboto-title-muted">Score: {{ response.score }}%</h5>
                     </div>
+                    <div class="col-lg-4 col-sm-12">
+                        <p class="roboto-title-muted m-0 text-right">
+                            <small>Duration:</small> <a class="text-danger">{{ quiz.duration }} Minutes</a>
+                        </p>
+                    </div>
+                </div>
 
-                    {% for rq in res_questions|dictsort:"question.number" %}
-                        <div class='question p-2 mb-3'>
-                            <table class='w-100'>
-                                <tr>
-                                    <td style="width: 40px;">
-                                        <b class="roboto-title-muted" id='questionNumber'>{{ rq.question.number }} )</b>
-                                    </td>
-                                    <td>
-                                        <p question-id="{{ q.number }}"
-                                           class="mb-0 border p-2 pl-3 rounded"
-                                           style="background-color: #fff;">{{ rq.question.question }}</p>
-                                    </td>
-                                </tr>
-                            </table>
+                {% for rq in res_questions|dictsort:"question.number" %}
+                    <div class='question p-2 mb-3'>
+                        <table class='w-100'>
+                            <tr>
+                                <td style="width: 40px;">
+                                    <b class="roboto-title-muted" id='questionNumber'>{{ rq.question.number }} )</b>
+                                </td>
+                                <td>
+                                    <p question-id="{{ q.number }}"
+                                       class="mb-0 border p-2 pl-3 rounded"
+                                       style="background-color: #fff;">{{ rq.question.question }}</p>
+                                </td>
+                            </tr>
+                        </table>
 
-                            <div class='row m-0 pt-3 answers-row w-100'>
-                                <div class='col-12 p-0' id='answersRow'>
-                                    <!-- All the answers goes here -->
+                        <div class='row m-0 pt-3 answers-row w-100'>
+                            <div class='col-12 p-0' id='answersRow'>
+                                <!-- All the answers goes here -->
 
-                                    {% for answer in rq.question.quizquestionanswer_set.all|dictsort:"letter" %}
-                                        <div class='row w-100 m-0 mb-2 answer'>
-                                            <div class='col-1 mt-auto mb-auto'></div>
+                                {% for answer in rq.question.quizquestionanswer_set.all|dictsort:"letter" %}
+                                    <div class='row w-100 m-0 mb-2 answer'>
+                                        <div class='col-1 mt-auto mb-auto'></div>
 
-                                            <div class="col-11 p-0">
-                                                <table class='w-100'>
-                                                    <tr>
-                                                        <td class='mw-30' style="width: 25px;">
-                                                            <p class='roboto-title-muted m-0' id='answerLetter'>
-                                                                {{ answer.letter }}
-                                                            </p>
-                                                        </td>
-                                                        <td id="answersCol" class="w-100 pl-3">
-                                                            <p class="answer-input mb-0 pt-2 pb-2 pl-3 pr-3 rounded
-                                                               {% if answer in all_answers %}
-                                                                    bg-secondary text-light
-                                                                {% else %}
-                                                                    {% if answer.correct|lower == 'true' %}
-                                                                        bg-success text-light
-                                                                    {% endif %}
-                                                                {% endif %}"
-                                                            >{{ answer.answer }}</p>
-                                                        </td>
-                                                        <td class="pl-3 mw-20">
-                                                            {% if answer in all_answers and answer.correct|lower == 'true' %}
-                                                                <i class='fas fa-check-circle fa-lg text-success'></i>
-                                                            {% elif answer in all_answers and answer.correct|lower == 'false' %}
-                                                                <i class='fas fa-times-circle fa-lg text-danger'></i>
+                                        <div class="col-11 p-0">
+                                            <table class='w-100'>
+                                                <tr>
+                                                    <td class='mw-30' style="width: 25px;">
+                                                        <p class='roboto-title-muted m-0' id='answerLetter'>
+                                                            {{ answer.letter }}
+                                                        </p>
+                                                    </td>
+                                                    <td id="answersCol" class="w-100 pl-3">
+                                                        <p class="answer-input mb-0 pt-2 pb-2 pl-3 pr-3 rounded
+                                                           {% if answer in all_answers %}
+                                                                bg-secondary text-light
                                                             {% else %}
-                                                                <!-- fake and useless icon to keep proper width -->
-                                                                <i class="fa-solid fa-circle" style="color: #fff;"></i>
-                                                            {% endif %}
-                                                        </td>
-                                                    </tr>
-                                                </table>
-                                            </div>
+                                                                {% if answer.correct|lower == 'true' %}
+                                                                    bg-success text-light
+                                                                {% endif %}
+                                                            {% endif %}"
+                                                        >{{ answer.answer }}</p>
+                                                    </td>
+                                                    <td class="pl-3 mw-20">
+                                                        {% if answer in all_answers and answer.correct|lower == 'true' %}
+                                                            <i class='fas fa-check-circle fa-lg text-success'></i>
+                                                        {% elif answer in all_answers and answer.correct|lower == 'false' %}
+                                                            <i class='fas fa-times-circle fa-lg text-danger'></i>
+                                                        {% else %}
+                                                            <!-- fake and useless icon to keep proper width -->
+                                                            <i class="fa-solid fa-circle" style="color: #fff;"></i>
+                                                        {% endif %}
+                                                    </td>
+                                                </tr>
+                                            </table>
                                         </div>
-                                    {% endfor %}
+                                    </div>
+                                {% endfor %}
 
-                                </div>
                             </div>
                         </div>
-                    {% endfor %}
-                    <!-- All the questions will be appended here -->
+                    </div>
+                {% endfor %}
+                <!-- All the questions will be appended here -->
 
-                </div>
-            </div><!-- .questions area -->
-        </form>
-    </div>
+            </div>
+        </div><!-- .questions area -->
+    </form>
+</div>
 {% endblock %}

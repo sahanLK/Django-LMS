@@ -11,6 +11,9 @@ GENDER_CHOICES = [
 ]
 
 
+BATCHES = [(batch, batch) for batch in Batch.objects.all()]
+
+
 class UserRegisterForm(UserCreationForm):
     gender = forms.ChoiceField(choices=GENDER_CHOICES)
     gender.widget.attrs = {'class': 'mw-150'}
@@ -34,6 +37,10 @@ class StudentCreationForm(forms.ModelForm):
     class Meta:
         model = Student
         fields = ['department']
+
+    def __init__(self, *args,  **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['department'].widget.attrs.update({'id': 'deptSelect'})
 
 
 class StudentUpdateForm(forms.ModelForm):

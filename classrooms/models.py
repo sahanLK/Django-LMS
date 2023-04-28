@@ -1,12 +1,17 @@
 import os.path
 import random
-from datetime import datetime
+from datetime import datetime, timedelta
 from django.db import models
 from django.urls import reverse
 from users.models import CustomizedUser, Student, Lecturer
 from main.models import Batch, Department
 from main.funcs import get_naive_dt
 from ckeditor.fields import RichTextField
+from main.funcs import (local_to_utc_aware,
+                        local_to_utc_naive,
+                        utc_to_local_aware,
+                        utc_to_local_naive,
+                        get_naive_dt)
 
 
 class Classroom(models.Model):
@@ -59,22 +64,37 @@ class Assignment(models.Model):
                                      ('question', 'Question')])
     title = models.CharField(max_length=300)
     _date_created = models.DateTimeField(auto_now_add=True)
-    date_last_mod = models.DateTimeField(auto_now=True)
-    date_due = models.DateTimeField()
-    content = RichTextField()
+    _date_last_mod = models.DateTimeField(auto_now=True)
+    _date_due = models.DateTimeField()
+    content = RichTextField()   # From CK Editor
     file = models.FileField(null=True, blank=True)
     review_complete = models.BooleanField(default=False)
+
+    class Meta:
+        unique_together = (('title', 'classroom'),)
 
     def __str__(self):
         return f"Assignment: {self.title} [ {self.classroom} ]"
 
     @property
-    def date_created(self):
-        return get_naive_dt(self._date_created)
+    def type(self):
+        return 'assignment'
 
     @property
-    def has_due_expired(self):
-        if get_naive_dt(self.date_due) < get_naive_dt(datetime.now()):
+    def date_created(self):
+        return utc_to_local_naive(self._date_created)
+
+    @property
+    def date_due(self):
+        return utc_to_local_naive(self._date_due)
+
+    @property
+    def date_mod(self):
+        return utc_to_local_naive(self._date_last_mod)
+
+    @property
+    def expired(self):
+        if get_naive_dt(self.date_due) < get_naive_dt(datetime.utcnow()):
             return True
         return False
 
@@ -89,7 +109,7 @@ class Assignment(models.Model):
 class Submission(models.Model):
     assignment = models.ForeignKey(Assignment, on_delete=models.CASCADE)
     owner = models.ForeignKey(Student, on_delete=models.CASCADE)
-    date_created = models.DateTimeField(auto_now_add=True)
+    _date_created = models.DateTimeField(auto_now_add=True)
     grade = models.CharField(max_length=20, null=True, blank=True)
     file = models.FileField(upload_to="submitted_assignments", blank=True, null=True)
     lec_comment = models.TextField(null=True, blank=True)
@@ -98,12 +118,16 @@ class Submission(models.Model):
         return f"Submission By: {self.owner.user.username} [Assignment-> {self.assignment.title}]"
 
     @property
+    def date_created(self):
+        return utc_to_local_naive(self._date_created)
+
+    @property
     def is_late_submit(self):
         """
         If the submission is a late submit or not.
         :return:
         """
-        if get_naive_dt(self.date_created) > get_naive_dt(self.assignment.date_created):
+        if self.date_created > self.assignment.date_due:
             return True
         return False
 
@@ -124,7 +148,8 @@ class Meeting(models.Model):
     owner = models.ForeignKey(Lecturer, on_delete=models.CASCADE)
     topic = models.CharField(max_length=300)
     _date_created = models.DateTimeField(auto_now_add=True)
-    start = models.DateTimeField()
+    _date_mod = models.DateTimeField(auto_now=True)
+    _start = models.DateTimeField()
     description = models.TextField(null=True, blank=True)
     meeting_url = models.URLField(null=True, blank=True)
     meeting_id = models.CharField(null=True, blank=True, max_length=300)
@@ -134,13 +159,25 @@ class Meeting(models.Model):
     class Meta:
         unique_together = (('classroom', 'topic'),)
 
-    @property
-    def date_created(self):
-        return get_naive_dt(self._date_created)
-
     def __str__(self):
         return f"Meeting: {self.topic} [Class-> {self.classroom.name}" \
                f" {self.classroom.department.batch.year} Batch]"
+
+    @property
+    def type(self):
+        return 'meeting'
+
+    @property
+    def date_created(self):
+        return utc_to_local_naive(self._date_created)
+
+    @property
+    def date_mod(self):
+        return utc_to_local_naive(self._date_mod)
+
+    @property
+    def start(self):
+        return utc_to_local_naive(self._start)
 
     @property
     def get_short_meeting_topic(self):
@@ -151,18 +188,14 @@ class Meeting(models.Model):
 
     @property
     def is_today(self):
-        now = datetime.now()
-        t_year, t_month, t_day = now.year, now.month, now.day
-        start = get_naive_dt(self.start)
-        s_year, s_month, s_day = start.year, start.month, start.day
-
-        if t_year == s_year and t_month == s_month and t_day == s_day:
+        if self.start.date() == datetime.today().date():
             return True
+        print("not today:", self.start)
         return False
 
     @property
     def is_expired(self):
-        if datetime.today() > get_naive_dt(self.start):
+        if get_naive_dt(datetime.utcnow()).date() > get_naive_dt(self._start).date():
             return True
 
 
@@ -180,31 +213,44 @@ class Quiz(models.Model):
     description = models.TextField(null=True, blank=True)
     _date_created = models.DateTimeField(auto_now_add=True)
     _date_modified = models.DateTimeField(auto_now=True)
-    start = models.DateTimeField()
+    _start = models.DateTimeField()
     duration = models.IntegerField()
     accept_after_expired = models.BooleanField(default=True)
-
-    # Can be used by a lecturer, to manually stop submissions
-    accepting_answers = models.BooleanField(default=True)
 
     def __str__(self):
         return f"Quiz: {self.title}"
 
     @property
+    def type(self):
+        return 'quiz'
+
+    @property
     def date_created(self):
-        return get_naive_dt(self._date_created)
+        return utc_to_local_naive(self._date_created)
 
     @property
     def date_modified(self):
-        return get_naive_dt(self._date_modified)
+        return utc_to_local_naive(self._date_modified)
 
     @property
-    def has_started(self):
-        return random.choice([True, False])
+    def live(self):
+        if self.start < datetime.now() < self.end:
+            return True
+        return False
 
     @property
-    def start_time(self):
-        return get_naive_dt(self.start) - get_naive_dt(datetime.utcnow())
+    def expired(self):
+        if datetime.now() > self.end:
+            return True
+        return False
+
+    @property
+    def start(self):
+        return utc_to_local_naive(self._start)
+
+    @property
+    def end(self):
+        return self.start + timedelta(minutes=float(self.duration))
 
 
 class QuizQuestion(models.Model):
@@ -257,11 +303,15 @@ class QuizStudentResponse(models.Model):
     """
     quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE)
     owner = models.ForeignKey(Student, on_delete=models.CASCADE)
-    date_created = models.DateTimeField(auto_now_add=True)
-    score = models.PositiveIntegerField(default=0)
+    _date_created = models.DateTimeField(auto_now_add=True)
+    score = models.FloatField(default=0)
 
     def __str__(self):
         return f"Quiz Response by: {self.owner.user.get_full_name()}"
+
+    @property
+    def date_created(self):
+        return utc_to_local_naive(self._date_created)
 
 
 class QuizStudentResponseQuestion(models.Model):

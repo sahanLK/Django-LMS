@@ -1,15 +1,25 @@
-from django.test import TestCase
+from datetime import datetime
+import pytz
 
-import time
-import datetime
-
-
-
-
-
+format = "%Y/%m/%d %H:%M:%S"
+dt_str = str(datetime.now().strftime(format))
+print(type(datetime.now()))
+# dt_str = "10/21/2021 11:00:29"
 
 
+# Create datetime object in local timezone
+local_dt = datetime.strptime(dt_str, format)
 
+print('Datetime in Local Time zone: ', local_dt)
+
+# Convert local datetime to UTC time-zone datetime
+dt_utc = local_dt.astimezone(pytz.UTC)
+
+print('Datetime in UTC Time zone: ', dt_utc)
+
+dt_utc_str = dt_utc.strftime(format)
+
+print('Datetime string in UTC Time zone: ', dt_utc_str)
 
 
 # def countdown(stop):
@@ -35,8 +45,6 @@ import datetime
 #
 # end_time = datetime.datetime(2023, 4, 16, 20, 12, 0)
 # countdown(end_time)
-
-
 
 
 # def bubble_sort(array):
@@ -72,4 +80,3 @@ import datetime
 #
 # arr = [10, 100, 800, 1, 20, 40, 4, 5, 30, 40, 50]
 # print(bubble_sort(arr))
-

@@ -33,24 +33,24 @@ class ClassroomUpdateForm(forms.ModelForm):
 
 
 class AssignmentCreationForm(forms.ModelForm):
-    date_due = forms.DateTimeField(widget=forms.TextInput(attrs={'type': 'datetime-local'}))
+    _date_due = forms.DateTimeField(
+        widget=forms.TextInput(attrs={'type': 'datetime-local', 'class': 'mw-250'}))
     documents = forms.FileField(
         widget=forms.ClearableFileInput(attrs={'class': 'custom-file-input'}),
-        required=False,
-    )
+        required=False)
 
     class Meta:
         model = Assignment
-        fields = ['title', 'content', 'date_due']
+        fields = ['title', 'content', '_date_due']
 
 
 class AssignmentUpdateForm(forms.ModelForm):
-    date_due = forms.DateTimeField(
+    _date_due = forms.DateTimeField(
         widget=forms.TextInput(attrs={'type': 'datetime-local', 'class': 'mw-250'}))
 
     class Meta:
         model = Assignment
-        fields = ['title', 'content', 'date_due']
+        fields = ['title', 'content', '_date_due']
 
 
 class AssignmentSubmitForm(forms.ModelForm):
@@ -92,7 +92,8 @@ class AssignmentGradeForm(forms.ModelForm):
 class MeetingCreationForm(forms.ModelForm):
     description = forms.CharField(required=False, widget=forms.Textarea(attrs={'rows': 3}))
     meeting_url = forms.URLField(required=False, widget=forms.URLInput())
-    start = forms.DateTimeField(widget=forms.TextInput(attrs={'type': 'datetime-local'}))
+    _start = forms.DateTimeField(
+        widget=forms.TextInput(attrs={'type': 'datetime-local', 'class': 'mw-250'}))
     recording_url = forms.URLField(required=False, widget=forms.URLInput())
 
     class Meta:
@@ -100,7 +101,7 @@ class MeetingCreationForm(forms.ModelForm):
         fields = [
             'classroom',
             'topic',
-            'start',
+            '_start',
             'description',
             'meeting_url',
             'meeting_id',
@@ -112,7 +113,7 @@ class MeetingCreationForm(forms.ModelForm):
 class MeetingUpdateForm(forms.ModelForm):
     description = forms.CharField(required=False, widget=forms.Textarea(attrs={'rows': 3}))
     meeting_url = forms.URLField(required=False, widget=forms.URLInput())
-    start = forms.DateTimeField(widget=forms.TextInput(
+    _start = forms.DateTimeField(widget=forms.TextInput(
         attrs={'type': 'datetime-local', 'class': 'mw-250'}))
     recording_url = forms.URLField(required=False, widget=forms.URLInput())
 
@@ -120,7 +121,7 @@ class MeetingUpdateForm(forms.ModelForm):
         model = Meeting
         fields = [
             'topic',
-            'start',
+            '_start',
             'description',
             'meeting_url',
             'meeting_id',
@@ -137,23 +138,25 @@ class MeetingUpdateForm(forms.ModelForm):
 
 
 class QuizCreateForm(forms.ModelForm):
-    duration = forms.CharField(widget=forms.NumberInput(attrs={'min': 1, 'max': 300}))
-    start = forms.DateTimeField(label="Start Time",
-                                widget=forms.TextInput(attrs={'type': 'date'},))
-    description = forms.CharField(required=False, widget=forms.Textarea(attrs={'rows': 3}))
+    duration = forms.CharField(
+        widget=forms.NumberInput(attrs={'min': 1, 'max': 300}))
+    _start = forms.DateTimeField(
+        label="Start Time", widget=forms.TextInput(attrs={'type': 'datetime-local', 'class': 'mw-250'}))
+    description = forms.CharField(
+        required=False, widget=forms.Textarea(attrs={'rows': 3}))
 
     class Meta:
         model = Quiz
         fields = ['title',
                   'description',
-                  'start',
+                  '_start',
                   'duration',
-                  'accept_after_expired'
+                  'accept_after_expired',
                   ]
 
 
 class QuizUpdateForm(forms.ModelForm):
-    start = forms.DateTimeField(label="Start Time", widget=forms.TextInput(
+    _start = forms.DateTimeField(label="Start Time", widget=forms.TextInput(
         attrs={'type': 'datetime-local', 'class': 'mw-250'},))
     description = forms.CharField(widget=forms.Textarea(attrs={'rows': 3}), required=False)
 
@@ -161,7 +164,7 @@ class QuizUpdateForm(forms.ModelForm):
         model = Quiz
         fields = ['title',
                   'description',
-                  'start',
+                  '_start',
                   'duration',
                   'accept_after_expired'
                   ]

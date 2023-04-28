@@ -1,6 +1,5 @@
-import datetime
 import json
-import re
+from datetime import datetime
 
 from django.contrib import messages
 from django.http import HttpResponseRedirect, HttpResponse, HttpResponseForbidden, HttpResponseNotAllowed
@@ -38,8 +37,19 @@ from .models import (
     Meeting, QuizStudentResponseQuestion, QuizStudentResponse, QuizStudentResponseQuestionAnswer
 )
 from users.models import Lecturer, Student
-from main.funcs import is_lecturer, is_student, get_naive_dt
+from main.funcs import (
+    is_lecturer,
+    is_student,
+    get_naive_dt,
+    local_to_utc_aware,
+    local_to_utc_naive,
+    utc_to_local_aware,
+    utc_to_local_naive,
+    get_naive_dt)
+from django.http import JsonResponse
+from http.client import OK
 from .forms import MeetingUpdateForm, QuizCreateForm
+from main.funcs import local_to_utc_aware
 
 
 class ClassroomListView(LoginRequiredMixin, ListView):
@@ -81,13 +91,13 @@ class ClassroomDetailView(LoginRequiredMixin, DetailView):
         work.update(set(m for m in meetings))
         work.update(set(q for q in quizzes))
 
-        for w in work:
-            if isinstance(w, Meeting):
-                w.type = 'meeting'
-            elif isinstance(w, Quiz):
-                w.type = 'quiz'
-            elif isinstance(w, Assignment):
-                w.type = 'assignment'
+        # for w in work:
+        #     if isinstance(w, Meeting):
+        #         w.type = 'meeting'
+        #     elif isinstance(w, Quiz):
+        #         w.type = 'quiz'
+        #     elif isinstance(w, Assignment):
+        #         w.type = 'assignment'
 
         # Sort the classwork by date_posted using BUBBLE-SORT ALGORITHM
         def bubble_sort(array):
@@ -312,7 +322,16 @@ class AssignmentCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
     def form_valid(self, form):
         form.instance.owner = self.request.user.profile
         form.instance.classroom = Classroom.objects.filter(pk=self.kwargs['class_pk']).first()
+        form.instance._date_due = local_to_utc_aware(form.instance._date_due)
         # grade field has a default value. so it is not here
+
+        # Manually validating form for checking assignment title is unique for a particular classroom
+        cls = Classroom.objects.get(pk=form.instance.classroom.pk)
+        title = form.instance.title
+        exists = cls.assignment_set.filter(title=title).first()
+        if exists:
+            form.add_error('title', 'Assignment with this title already exists in this classroom')
+            return self.form_invalid(form)
         return super().form_valid(form)
 
     def get_success_url(self):
@@ -326,6 +345,47 @@ class AssignmentCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
         if self.request.user.role == 'lecturer':
             return True
         return False
+
+
+class AssignmentUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+    model = Assignment
+    template_name = "classrooms/assignments/assignment-update.html"
+    context_object_name = "assignment"
+    form_class = AssignmentUpdateForm
+
+    def get_form_kwargs(self):
+        # Converting UTC _date_due into local time. UTC should not show up in update form
+        kwargs = super().get_form_kwargs()
+        instance = kwargs.get('instance')
+        instance._date_due = utc_to_local_naive(instance._date_due)
+        kwargs.update({'instance': instance})
+        return kwargs
+
+    def form_valid(self, form):
+        form.instance._date_due = local_to_utc_aware(form.instance._date_due)   # Convert to UTC when updating
+
+        # Manually validating form for checking assignment title is unique for a particular classroom
+        assignment = self.get_object()
+        exists = assignment.classroom.assignment_set.filter(
+            title=form.instance.title).exclude(pk=assignment.pk)
+        if exists:
+            form.add_error('title', 'Assignment with this title already exists in this classroom')
+            return self.form_invalid(form)
+        return super().form_valid(form)
+
+    def test_func(self):
+        """
+        Assignment update only allowed for the author of the assignment.
+        :return:
+        """
+        if self.request.user.profile == self.get_object().owner:
+            return True
+        return False
+
+    def get_success_url(self):
+        return reverse('assignment-details', kwargs={
+            'class_name': slugify(self.kwargs['class_name']),
+            'pk': self.kwargs['pk']})
 
 
 class AssignmentListView(LoginRequiredMixin, ListView):
@@ -427,27 +487,6 @@ def assignment_unsubmit_view(request, **kwargs):
     return redirect('assignment-details',
                     class_name=slugify(assignment.classroom.name),
                     pk=assignment.pk)
-
-
-class AssignmentUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
-    model = Assignment
-    template_name = "classrooms/assignments/assignment-update.html"
-    context_object_name = "assignment"
-    form_class = AssignmentUpdateForm
-
-    def test_func(self):
-        """
-        Assignment update only allowed for the author of the assignment.
-        :return:
-        """
-        if self.request.user.profile == self.get_object().owner:
-            return True
-        return False
-
-    def get_success_url(self):
-        return reverse('assignment-details', kwargs={
-            'class_name': slugify(self.kwargs['class_name']),
-            'pk': self.kwargs['pk']})
 
 
 class AssignmentDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
@@ -677,7 +716,6 @@ class MeetingDetailView(LoginRequiredMixin, DetailView):
     context_object_name = 'meeting'
 
 
-
 """
 =============================
     QUIZ VIEWS
@@ -706,6 +744,7 @@ class QuizCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
     def form_valid(self, form):
         form.instance.classroom = Classroom.objects.get(pk=self.kwargs['pk'])
         form.instance.owner = self.request.user.profile
+        form.instance._start = local_to_utc_aware(form.instance._start)
         return super().form_valid(form)
 
     def test_func(self):
@@ -763,10 +802,8 @@ class QuizListView(LoginRequiredMixin, ListView):
                 return prof.get_today_quizzes()
             elif quiz_type == 'upcoming':
                 return prof.get_upcoming_quizzes()
-            elif quiz_type == 'pending_review':
-                return prof.get_pending_review_quizzes()
-            elif quiz_type == 'reviewed':
-                return prof.get_review_done_quizzes()
+            elif quiz_type == 'previous':
+                return prof.get_previous_quizzes()
 
 
 class QuizUpdateView(UpdateView):
@@ -774,6 +811,18 @@ class QuizUpdateView(UpdateView):
     template_name = 'classrooms/quizzes/quiz-update.html'
     context_object_name = 'quiz'
     form_class = QuizUpdateForm
+
+    def get_form_kwargs(self):
+        # Converting UTC _date_due into local time. UTC should not show up in update form
+        kwargs = super().get_form_kwargs()
+        instance = kwargs.get('instance')
+        instance._start = utc_to_local_naive(instance._start)
+        kwargs.update({'instance': instance})
+        return kwargs
+
+    def form_valid(self, form):
+        form.instance._start = local_to_utc_aware(form.instance._start)
+        return super().form_valid(form)
 
     def get_success_url(self):
         quiz = self.get_object()
@@ -788,33 +837,32 @@ class QuizDeleteView(DeleteView):
     context_object_name = 'quiz'
 
 
-from django.http import JsonResponse
-from http.client import OK
-
-
 class QuizDetailView(DetailView, LoginRequiredMixin):
     model = Quiz
     context_object_name = 'quiz'
 
     def get_template_names(self):
         quiz = self.get_object()
-        return 'classrooms/quizzes/quiz-details.html'
+        if quiz.live and not self.response and self.request.user.is_student:
+            return 'classrooms/quizzes/parts/live.html'
+        else:
+            return 'classrooms/quizzes/quiz-details.html'
 
     def get_context_data(self, **kwargs):
-        user = self.request.user
         quiz = self.get_object()
-
         context = super().get_context_data(**kwargs)
-        context['time_counter'] = quiz.start_time
-
-        # Detect if user has already responded
-        responded = False
-        if user.is_student:
-            if len(quiz.quizstudentresponse_set.all()) > 0:
-                responded = True
-        context['responded'] = True if responded else False
-
+        context['time_counter'] = quiz.start
+        context['response'] = self.response
         return context
+
+    @property
+    def response(self):
+        user = self.request.user
+        if user.is_student:
+            response = QuizStudentResponse.objects.filter(
+                owner=user.profile,
+                quiz=self.get_object(),).first()
+            return response
 
 
 """
@@ -966,19 +1014,24 @@ def quiz_live_view(request, **kwargs):
                     else:
                         _all_incorrect_stu_answers.add(ans)
 
-            correct_score = (len(_all_correct_stu_answers)/len(_all_correct_ans))/100
-            incorrect_score = (len(_all_incorrect_stu_answers)/len(_all_incorrect_ans))/100
-            response.score = (correct_score + incorrect_score)
+            correct_score = (len(_all_correct_stu_answers)/len(_all_correct_ans))*100
+            incorrect_score = len(_all_incorrect_stu_answers)
+
+            response.score = correct_score - (incorrect_score * 0.1)
             response.save()
 
         else:
             print("You already have a response")
             # return JsonResponse({'what_happened': 'Already responded'})
 
-    return render(request, 'classrooms/quizzes/quiz-live.html', context)
+    return render(request, 'classrooms/quizzes/parts/live.html', context)
 
 
 def quiz_stu_response_view(request, **kwargs):
+    """
+    The view that displays the student response anytime.
+    """
+
     quiz = Quiz.objects.get(pk=kwargs['quiz_pk'])
     response = request.user.profile.quizstudentresponse_set.filter(quiz=quiz).first()
 
@@ -1000,3 +1053,20 @@ def quiz_stu_response_view(request, **kwargs):
         'response': response
     }
     return render(request, 'classrooms/quizzes/quiz-stu-response.html', context)
+
+
+class QuizResultsView(LoginRequiredMixin, UserPassesTestMixin, ListView):
+    model = QuizStudentResponse
+    context_object_name = 'responses'
+    template_name = 'classrooms/quizzes/parts/results.html'
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['quiz'] = Quiz.objects.get(pk=self.kwargs['quiz_pk'])
+        return context
+
+    def test_func(self):
+        if self.request.user.is_lecturer:
+            return True
+        return False
+

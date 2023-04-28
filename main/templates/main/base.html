@@ -16,6 +16,8 @@ THIS TEMPLATE GETS INHERITED BY ALL OTHER TEMPLATES/PAGES IN THE APPLICATION.
         rel="stylesheet">
         <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@300&display=swap">
         <link href="https://fonts.googleapis.com/css2?family=Roboto+Slab&display=swap" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400&display=swap" rel="stylesheet">
+
 
         <!-- Bootstrap -->
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css"
@@ -33,9 +35,16 @@ THIS TEMPLATE GETS INHERITED BY ALL OTHER TEMPLATES/PAGES IN THE APPLICATION.
         <link rel="stylesheet" type="text/css" href="{% static '/main/css/main.css' %}?{% now 'U' %}">
 
     </head>
-    <body>
+    <body class="{% if not user.is_authenticated %}gradient-apply{% endif %}">
         {% include 'main/navbar.html' %}
-        {% include 'main/messages.html' %}
+
+        {% if messages %}
+            <ul class="messages p-0 ml-auto mr-auto mt-4 position-fixed" id="messages">
+                {% for message in messages %}
+                    <li class="alert alert-{{ message.tags }} mw-400 m-auto shadow">{{ message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
 
         <div class="wrapper" id="wrapper">
             {% if user.is_authenticated %}
@@ -76,45 +85,6 @@ THIS TEMPLATE GETS INHERITED BY ALL OTHER TEMPLATES/PAGES IN THE APPLICATION.
         <script src="{% static 'main/js/main.js' %}?{% now 'U' %}"></script>
         <script src="{% static 'main/js/ajax.js' %}?{% now 'U' %}"></script>
         <script src="{% static 'main/js/quiz.js' %}?{% now 'U' %}"></script>
-
-        <script>
-            var sectionSet = $('#sectionSet');
-            var sections = $(sectionSet).find('section');
-
-            var children = $(sections[0]).children();
-            console.log(children[children.length-1]);
-
-
-
-            $(sections).each(function(index, elem) {
-                $(elem).hide();
-            });
-
-            $(sections[0]).show(); // display first section
-
-            // Go to next section
-            $('.nextBtn').on('click', function() {
-                var currentSection = $(this).parent('section');
-                var nextSection = $(currentSection).next('section');
-
-                if ( nextSection.length != 0 ) {
-                    $(nextSection).show("fade", { direction: "right" }, 500);
-                    $(currentSection).hide();
-                }
-            });
-
-            // Go to previous section
-            $('.prevBtn').on('click', function() {
-                var currentSection = $(this).parent('section');
-                var prevSection = $(currentSection).prev('section');
-
-                if ( prevSection.length != 0 ) {
-                    $(prevSection).show("fade", { direction: "left" }, 500);
-                    $(currentSection).hide();
-                }
-            });
-
-        </script>
 
         {% include 'main/charts.html' %}
     </body>

@@ -1,0 +1,38 @@
+<!-- Quiz details page body for a student -->
+
+{% if quiz.description %}
+    <div class="text-center p-4 card-header">
+        {% if quiz.description %}
+            <p class="mb-0">{{ quiz.description }}</p>
+        {% endif %}
+    </div>
+{% endif %}
+
+<div class="card-body">
+    <div class="p-3 pt-0 text-center">
+        {% if response %}
+            <h4 class="roboto-title-muted mb-4">Score: {{ response.score }}%</h4>
+            <a href="{% url 'quiz-response' class_name=quiz.classroom.name|slugify quiz_pk=quiz.pk %}"
+               class="btn btn-success pl-4 pr-4 ml-auto ls-1">View Response</a>
+            <h6 class="m-0 pt-4 roboto-title-muted">Responded on: {{ response.date_created }}</h6>
+        {% else %}
+            {% if quiz.expired and quiz.accept_after_expired %}
+                <h5 class="pb-4 roboto-title text-danger">Missing</h5>
+                <a href="{% url 'quiz-live' class_name=quiz.classroom.name|slugify quiz_pk=quiz.pk %}"
+                   class="btn btn-success pl-4 pr-4 ml-auto">Start Quiz</a>
+            {% elif quiz.expired and not quiz.accept_after_expired %}
+                <h5 class="pb-4 roboto-title text-danger">Missing</h5>
+                <h5 class="mb-0 roboto-title-muted mb-4">Started at: {{ quiz.start }}</h5>
+            {% else %}
+                <div class="row">
+                    <div class="col-12">
+                        <h5 class="mb-0 roboto-title-muted mb-4">Quiz starts in:</h5>
+                        <h4 id="quizCountDown" class="roboto-title text-warning ml-2 mt-3 d-inline">
+                            {{ time_counter }}
+                        </h4>
+                    </div>
+                </div>
+            {% endif %}
+        {% endif %}<!-- not responded -->
+    </div>
+</div><!-- .card-body -->

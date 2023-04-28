@@ -309,20 +309,20 @@ $(document).ready(function() {
     }
 
     // Update the quiz countdown timer in each second
-    var countDown = $('#quizCountDown');
-    if ( countDown.length > 0 ) {
-        setInterval(function() {
-            $.ajax({
-                type: 'GET',
-                url: $('#quizCountDownUrl').val(),
-                data: {},
-                success: function(response) {
-                    console.log(response);
-                    countDown.text(response.countdown);
-                },
-            });
-        }, 1000);
-    }
+//    var countDown = $('#quizCountDown');
+//    if ( countDown.length > 0 ) {
+//        setInterval(function() {
+//            $.ajax({
+//                type: 'GET',
+//                url: $('#quizCountDownUrl').val(),
+//                data: {},
+//                success: function(response) {
+//                    console.log(response);
+//                    countDown.text(response.countdown);
+//                },
+//            });
+//        }, 1000);
+//    }
 
     // Detect quiz edit page reload and confirm it
 //    $(window).bind('beforeunload', function() {

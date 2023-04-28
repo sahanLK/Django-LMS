@@ -2,7 +2,11 @@ from datetime import datetime
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from main.models import Batch, Department
-from main.funcs import get_naive_dt
+from main.funcs import (utc_to_local_naive,
+                        utc_to_local_aware,
+                        local_to_utc_naive,
+                        local_to_utc_aware,
+                        get_naive_dt)
 
 
 class CustomizedUser(AbstractUser):
@@ -85,11 +89,18 @@ class Student(models.Model):
         """
         not_complete = self.__get_all_not_completed_assignments()
         now = datetime.now()
-        pending = set(ass for ass in not_complete if get_naive_dt(ass.date_due) > get_naive_dt(now))
+        pending = set(ass for ass in not_complete if ass.date_due > now)
         return pending
 
     def get_no_of_pending_assignments(self):
         return len(self.get_pending_assignments())
+
+    def today_assignments(self):
+        today = set()
+        for a in self.get_pending_assignments():
+            if a.date_due.date() == datetime.today().date():
+                today.add(a)
+        return today
 
     def get_all_completed_assignments(self):
         """
@@ -109,10 +120,10 @@ class Student(models.Model):
         """
         not_complete = self.__get_all_not_completed_assignments()
         now = datetime.now()
-        missing = set(ass for ass in not_complete if get_naive_dt(ass.date_due) < get_naive_dt(now))
+        missing = set(ass for ass in not_complete if ass.date_due < now)
         return missing
 
-    def get_no_of_missing_assignmets(self):
+    def get_no_of_missing_assignments(self):
         return len(self.get_missing_assignments())
 
     def __get_all_assignments(self):
@@ -234,6 +245,9 @@ class Student(models.Model):
                 today.add(q)
         return today
 
+    def get_no_of_today_quizzes(self):
+        return len(self.get_today_quizzes())
+
     def get_upcoming_quizzes(self):
         upcoming = set()
 
@@ -254,13 +268,54 @@ class Student(models.Model):
     =============================
     """
 
-    def recent_events(self):
+    def today_events(self):
         """
         Get a list of most recent events for a student
-        :return:
         """
         events = set()
+        events.update(self.today_assignments())
+        events.update(self.get_today_meetings())
+        events.update(self.get_today_quizzes())
+        return list(events)
 
+    def this_month_assignments(self):
+        """
+        Current month's assignments are taken based on the
+        due_date instead of created data
+        """
+        today = datetime.today().date()
+        assignments = set()
+        for ass in self.__get_all_assignments():
+            if ass.date_due.date().year == today.year \
+                    and ass.date_due.date().month == today.month:
+                assignments.add(ass)
+        return assignments
+
+    def this_month_quizzes(self):
+        """
+        Current month's quizzes are taken based on the
+        start date instead of created data
+        """
+        today = datetime.today().date()
+        quizzes = set()
+        for quiz in self._get_all_quizzes():
+            if quiz.start.date().year == today.year \
+                    and quiz.start.date().month == today.month:
+                quizzes.add(quiz)
+        return quizzes
+
+    def this_month_meetings(self):
+        """
+        Current month's assignments are taken based on the
+        start date instead of created data
+        """
+        today = datetime.today().date()
+        meetings = set()
+        for meet in self.get_all_meetings():
+            if meet.start.date().year == today.year \
+                    and meet.start.date().month == today.month:
+                meetings.add(meet)
+        return meetings
 
 
 class Lecturer(models.Model):
@@ -296,7 +351,7 @@ class Lecturer(models.Model):
 
     """
     =============================
-    ASSIGNMETS
+    ASSIGNMENTS
     =============================
     """
 
@@ -317,8 +372,10 @@ class Lecturer(models.Model):
         Get all the assignments that due date has not exceeded.
         :return:
         """
-        _all = self.get_all_assignments()
-        ongoing = _all.filter(date_due__gte=get_naive_dt(datetime.now()))
+        ongoing = set()
+        for a in self.get_all_assignments():
+            if a.date_due >= datetime.now():
+                ongoing.add(a)
         return ongoing
 
     def get_no_of_ongoing_assignments(self):
@@ -334,7 +391,7 @@ class Lecturer(models.Model):
         _all = self.get_all_assignments()
         pending_review = set(ass for ass in _all
                              if not ass.review_complete
-                             and get_naive_dt(ass.date_due) < get_naive_dt(datetime.now()))
+                             and ass.date_due < datetime.now())
         return pending_review
 
     def get_no_of_pending_review_assignments(self):
@@ -345,8 +402,7 @@ class Lecturer(models.Model):
         Returns all the review completed assignments
         :return:
         """
-        reviewed = set(ass for ass in self.get_all_assignments() if ass.review_complete)
-        return reviewed
+        return set(ass for ass in self.get_all_assignments() if ass.review_complete)
 
     def get_recent_activities(self):
         pass
@@ -416,37 +472,66 @@ class Lecturer(models.Model):
         today = set()
 
         for q in self._get_all_quizzes():
-            if get_naive_dt(q.start).date() == datetime.today().date():
+            if q.start.date() == datetime.today().date():
                 today.add(q)
         return today
+
+    def get_no_of_today_quizzes(self):
+        return len(self.get_today_quizzes())
 
     def get_upcoming_quizzes(self):
         upcoming = set()
 
         for q in self._get_all_quizzes():
-            if get_naive_dt(q.start).date() > datetime.today().date():
+            if q.start.date() > datetime.today().date():
                 upcoming.add(q)
         return upcoming
 
-    def get_pending_review_quizzes(self):
-        """
-        Returns all the quizzes that start date is expired and
-        also review_complete property is False
-        :return:
-        """
-        pending = set()
-
-        for q in self._get_all_quizzes():
-            if get_naive_dt(q.start).date() > datetime.today().date() \
-                    and q.accepting_answers:
-                pending.add(q)
-        return pending
-
-    def get_review_done_quizzes(self):
+    def get_previous_quizzes(self):
         done = set()
-
         for q in self._get_all_quizzes():
-            if get_naive_dt(q.start).date() > datetime.today().date() \
-                    and not q.accepting_answers:
+            if q.expired:
                 done.add(q)
         return done
+
+    """
+    =============================
+    OTHER
+    =============================
+    """
+
+    def today_events(self):
+        """
+        Get a list of most recent events for a lecturer
+        """
+        events = set()
+        events.update(self.get_today_meetings())
+        events.update(self.get_today_quizzes())
+        return list(events)
+
+    def this_month_assignments(self):
+        today = datetime.today().date()
+        return self.assignment_set.filter(
+            _date_due__year=today.year,
+            _date_due__month=today.month,
+        )
+
+    def this_month_quizzes(self):
+        """
+        Current month's quizzes are taken based on the
+        start date instead of created data
+        """
+        today = datetime.today().date()
+        return self.quiz_set.filter(
+            _start__year=today.year,
+            _start__month=today.month,)
+
+    def this_month_meetings(self):
+        """
+        Current month's assignments are taken based on the
+        start date instead of created data
+        """
+        today = datetime.today().date()
+        return self.meeting_set.filter(
+            _start__year=today.year,
+            _start__month=today.month,)

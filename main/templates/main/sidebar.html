@@ -1,6 +1,7 @@
 
     <!-- Sidebar -->
-<div class="sidebar sidebar-dark bg-secondary navbar-nav accordion shadow pb-4" id="accordionSidebar">
+<div class="sidebar sidebar-dark bg-secondary navbar-nav accordion shadow pb-4"
+     id="accordionSidebar">
     <ul class="pb-3 pl-0">
         <!-- Divider -->
         <hr class="sidebar-divider my-0 pb-3">
@@ -99,8 +100,7 @@
                     <a class="collapse-item" href="{% url 'quiz-list' type='upcoming' %}">Upcoming</a>
 
                     {% if user.is_lecturer %}
-                        <a class="collapse-item" href="{% url 'quiz-list' type='pending-reviewl' %}">Pending Review</a>
-                        <a class="collapse-item" href="{% url 'quiz-list' type='reviewed' %}">Reviewed</a>
+                        <a class="collapse-item" href="{% url 'quiz-list' type='previous' %}">Previous</a>
                     {% elif user.is_student %}
                         <a class="collapse-item" href="{% url 'quiz-list' type='missing' %}">Missing</a>
                         <a class="collapse-item" href="{% url 'quiz-list' type='completed' %}">Completed</a>
@@ -124,11 +124,11 @@
                 <span>People</span></a>
         </li>
         <!-- Nav Item - Statistics -->
-        <li class="nav-item">
-            <a class="nav-link" href="{% url 'statistics' %}">
-                <i class="fas fa-chart-line pr-2"></i>
-                <span>Statistics</span></a>
-        </li>
+<!--        <li class="nav-item">-->
+<!--            <a class="nav-link" href="{% url 'statistics' %}">-->
+<!--                <i class="fas fa-chart-line pr-2"></i>-->
+<!--                <span>Statistics</span></a>-->
+<!--        </li>-->
     </ul>
 </div>
 <!-- End of Sidebar -->

@@ -1,0 +1,19 @@
+{% extends 'main/base.html' %}
+
+{% block content %}
+    <div class="container-fluid pt-3 min-body-height">
+        <div class="container mt-3 mb-5">
+            <div class="card-columns row">
+                <legend class="roboto-title-muted border-bottom pb-2 mb-5">Today Events</legend>
+                {% for event in events %}
+                   {{ event }}
+                {% empty %}
+                    <h3 class="roboto-title-muted ml-auto mr-auto" style="margin-top: 150px;">
+                        No Events Today
+                    </h3>
+                {% endfor %}
+
+            </div>
+        </div><!-- .container -->
+    </div><!-- .container-fluid -->
+{% endblock %}

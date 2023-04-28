@@ -3,7 +3,11 @@
 
 {% block content %}
     {% if user.is_authenticated %}
-        {% include 'main/template-parts/dashboard.html' %}
+        {% if user.is_lecturer %}
+            {% include 'main/template-parts/dashboard-lecturer.html' %}
+        {% elif user.is_student %}
+            {% include 'main/template-parts/dashboard-student.html' %}
+        {% endif %}
     {% else %}
         {% include 'main/template-parts/visitor-home.html' %}
     {% endif %}
