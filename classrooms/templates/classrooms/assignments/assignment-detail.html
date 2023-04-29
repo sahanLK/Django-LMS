@@ -35,6 +35,12 @@
                 <div class="row pt-4"><!-- body row -->
                     <div class="col-12">
                         {{ assignment.content|safe }}
+
+                        <div class="files mt-5 pt-4">
+                            {% if assignment.file %}
+                                {% include 'template-parts/file.html' with file=assignment.file %}
+                            {% endif %}
+                        </div>
                     </div>
                 </div>
             </div>

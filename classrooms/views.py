@@ -1,6 +1,4 @@
 import json
-from datetime import datetime
-
 from django.contrib import messages
 from django.http import HttpResponseRedirect, HttpResponse, HttpResponseForbidden, HttpResponseNotAllowed
 from django.shortcuts import render, redirect
@@ -31,6 +29,7 @@ from .models import (
     Post,
     Assignment,
     Submission,
+    SubmissionFile,
     Quiz,
     QuizQuestion,
     QuizQuestionAnswer,
@@ -455,11 +454,19 @@ def assignment_detail_view(request, **kwargs):  # Consider using update view
         # Student is trying to make a submission for this assignment.
         form = AssignmentSubmitForm(
             request.POST, request.FILES, instance=submission if submission else None)
+
         if form.is_valid():
             sub = form.save(commit=False)
             sub.assignment = assignment
             sub.owner = request.user.profile
+            sub.file = None     # Files will be saved with <SubmissionFile> model
             sub.save()
+
+            # Saving all the selected files
+            for f in request.FILES.getlist('file'):
+                file = SubmissionFile(submission=sub, file=f)
+                file.save()
+
             messages.success(request, "Submission Successful !")
             return redirect('assignment-details',
                             class_name=assignment.classroom.name.replace(' ', '-'),
@@ -624,7 +631,7 @@ class MeetingCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
         return form
 
     def form_valid(self, form):
-        # form.instance.classroom = Classroom.objects.get(pk=self.kwargs['pk'])
+        form.instance._start = local_to_utc_aware(form.instance._start)
         form.instance.owner = self.request.user.profile
         return super().form_valid(form)
 
@@ -745,6 +752,13 @@ class QuizCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
         form.instance.classroom = Classroom.objects.get(pk=self.kwargs['pk'])
         form.instance.owner = self.request.user.profile
         form.instance._start = local_to_utc_aware(form.instance._start)
+
+        # Manually validate for quizzes with same title
+        exists = Quiz.objects.filter(title=form.instance.title)
+        if exists:
+            form.add_error('title', 'Quiz with this title already exists in this classroom.')
+            return self.form_invalid(form)
+
         return super().form_valid(form)
 
     def test_func(self):
@@ -822,6 +836,13 @@ class QuizUpdateView(UpdateView):
 
     def form_valid(self, form):
         form.instance._start = local_to_utc_aware(form.instance._start)
+
+        # Manually check if quiz title is not using by another quiz except this one.
+        exists = Quiz.objects.filter(
+            title=form.instance.title).exclude(pk=self.get_object().pk)
+        if exists:
+            form.add_error('title', 'Quiz with this title already exists in the classroom.')
+            return self.form_invalid(form)
         return super().form_valid(form)
 
     def get_success_url(self):
@@ -835,6 +856,11 @@ class QuizDeleteView(DeleteView):
     model = Quiz
     template_name = 'classrooms/quizzes/quiz-delete.html'
     context_object_name = 'quiz'
+
+    def get_success_url(self):
+        quiz = self.get_object()
+        return reverse('class-details', kwargs={
+            'pk': quiz.classroom.pk,})
 
 
 class QuizDetailView(DetailView, LoginRequiredMixin):
@@ -1003,21 +1029,35 @@ def quiz_live_view(request, **kwargs):
                     else:
                         _all_incorrect_ans.add(a)
 
-            # Finding all the correct answers that student marked as correct
-            _all_correct_stu_answers = set()
-            _all_incorrect_stu_answers = set()
+            # Finding all the correct and incorrect answers that student has marked
+            correct_stu = set()
+            incorrect_stu = set()
             all_res_questions = response.quizstudentresponsequestion_set.all()
             for q in all_res_questions:
+
+                # <quizstudentresponsequestionanswer_set> only contains the
+                # answers that student selected as correct
                 for ans in q.quizstudentresponsequestionanswer_set.all():
                     if ans.answer.correct:
-                        _all_correct_stu_answers.add(ans)
+                        correct_stu.add(ans)
                     else:
-                        _all_incorrect_stu_answers.add(ans)
+                        incorrect_stu.add(ans)
 
-            correct_score = (len(_all_correct_stu_answers)/len(_all_correct_ans))*100
-            incorrect_score = len(_all_incorrect_stu_answers)
+            correct_actual = len(_all_correct_ans)
+            correct_stu = len(correct_stu)
 
-            response.score = correct_score - (incorrect_score * 0.1)
+            try:
+                correct_score = (correct_stu/correct_actual)*100
+                incorrect_score = len(incorrect_stu)
+                score = correct_score - (incorrect_score * 0.1)
+            except ZeroDivisionError:   # No actual correct answers for the quiz
+                if len(incorrect_stu) == 0:
+                    score = 100
+                else:
+                    score = 0
+
+            score = 0 if score < 0 else score
+            response.score = round(score, 2)
             response.save()
 
         else:

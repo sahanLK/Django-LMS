@@ -1,7 +1,7 @@
 {% extends 'main/base.html' %}
 
 {% block content %}
-    <div class="container-fluid p-0">
+<div class="container-fluid p-0" xmlns="http://www.w3.org/1999/html">
         <div class="container mt-4 mb-5 min-body-height">
             <div class="card card-header mb-3 text-light bg-gradient-info class-detail-header bg-dark shadow mt-3">
                 <div class="row">
@@ -125,40 +125,19 @@
                 </div>
 
                 <!-- classroom right sidebar (recent activities) -->
-                <div class="col-lg-4 col-md-12 pl-4">
-                    <div id="accordion">
-                        <div class="card mb-4">
-                            {% if user.profile.role == 'Student' %}
-                                <div class="card-header p-1">
-                                    <h6 class="mb-0"><span class="btn btn-link font-weight-bold">Upcoming</span></h6>
-                                </div>
-                                <ul class="list-group upcoming-events">
-                                    {% for assignment in events %}
-                                        <li class="list-group-item event bl-0 border-left-0 border-right-0">
-                                            <a href="{% url 'assignment-details' class_pk=class.pk pk=assignment.pk %}">
-                                                {{ assignment }}
-                                            </a><br/>
-                                            <small class="font-weight-bold">Due {{ assignment.date_due }}</small>
-                                        </li>
-                                    {% endfor %}
-                                </ul>
-                            {% else %}
-                                <div class="card-header p-1">
-                                    <h6 class="mb-0"><span class="btn btn-link font-weight-bold">Recent Student Activities</span></h6>
-                                </div>
-                                <ul class="list-group upcoming-events">
-                                    {% for assignment in events %}
-                                        <li class="list-group-item event bl-0 border-left-0 border-right-0">
-                                            <a href="{% url 'assignment-details' class_pk=class.pk pk=assignment.pk %}">
-                                                {{ assignment }}
-                                            </a><br/>
-                                            <small class="font-weight-bold">Due {{ assignment.date_due }}</small>
-                                        </li>
-                                    {% endfor %}
-                                </ul>
-                            {% endif %}
-                        </div><!-- card 1-->
-                    </div><!-- accordian -->
+                <div class="col-lg-4 col-md-12 pl-4 class-sidebar">
+                    <div class="card border-0 pt-4 shadow-sm">
+                        <div class="card-body text-center">
+                            <h6 class="roboto-title">Posts</h6>
+                            <h4 class="mb-4 font-weight-bold">{{ class.post_set.all.count }}</h4></br>
+
+                            <h6 class="roboto-title">Assignments</h6>
+                            <h4 class="mb-4 font-weight-bold">{{ class.assignment_set.all.count }}</h4></br>
+
+                            <h6 class="roboto-title">Quizzes</h6>
+                            <h4 class="mb-4 font-weight-bold">{{ class.quiz_set.all.count }}</h4>
+                        </div>
+                    </div>
                 </div><!-- col -->
 
             </div><!-- row -->

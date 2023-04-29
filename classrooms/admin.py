@@ -4,6 +4,7 @@ from .models import (
     Assignment,
     Post,
     Submission,
+    SubmissionFile,
     Quiz,
     Meeting,
     QuizQuestion,
@@ -18,6 +19,7 @@ admin.site.register(Post)
 admin.site.register(Meeting)
 admin.site.register(Assignment)
 admin.site.register(Submission)
+admin.site.register(SubmissionFile)
 admin.site.register(Quiz)
 admin.site.register(QuizQuestion)
 admin.site.register(QuizQuestionAnswer)

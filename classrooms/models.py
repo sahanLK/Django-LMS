@@ -1,11 +1,8 @@
 import os.path
-import random
 from datetime import datetime, timedelta
 from django.db import models
-from django.urls import reverse
 from users.models import CustomizedUser, Student, Lecturer
 from main.models import Batch, Department
-from main.funcs import get_naive_dt
 from ckeditor.fields import RichTextField
 from main.funcs import (local_to_utc_aware,
                         local_to_utc_naive,
@@ -67,7 +64,7 @@ class Assignment(models.Model):
     _date_last_mod = models.DateTimeField(auto_now=True)
     _date_due = models.DateTimeField()
     content = RichTextField()   # From CK Editor
-    file = models.FileField(null=True, blank=True)
+    file = models.FileField(null=True, blank=True, upload_to='assignment-files')  # This won't be used actually
     review_complete = models.BooleanField(default=False)
 
     class Meta:
@@ -111,7 +108,7 @@ class Submission(models.Model):
     owner = models.ForeignKey(Student, on_delete=models.CASCADE)
     _date_created = models.DateTimeField(auto_now_add=True)
     grade = models.CharField(max_length=20, null=True, blank=True)
-    file = models.FileField(upload_to="submitted_assignments", blank=True, null=True)
+    file = models.FileField(blank=True, null=True)  # this should not be saved. instead, <SubmissionFile> will be used.
     lec_comment = models.TextField(null=True, blank=True)
 
     def __str__(self):
@@ -130,6 +127,14 @@ class Submission(models.Model):
         if self.date_created > self.assignment.date_due:
             return True
         return False
+
+
+class SubmissionFile(models.Model):
+    """
+    Used for multiple file upload functionality
+    """
+    submission = models.ForeignKey(Submission, on_delete=models.CASCADE)
+    file = models.FileField(upload_to='submission-files')
 
     def get_short_file_name(self):
         name = self.file.name
@@ -216,6 +221,9 @@ class Quiz(models.Model):
     _start = models.DateTimeField()
     duration = models.IntegerField()
     accept_after_expired = models.BooleanField(default=True)
+
+    class Meta:
+        unique_together = (('classroom', 'title'),)
 
     def __str__(self):
         return f"Quiz: {self.title}"

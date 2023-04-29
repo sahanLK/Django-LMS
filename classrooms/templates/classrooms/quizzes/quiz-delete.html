@@ -1,0 +1,20 @@
+{% extends 'main/base.html' %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+    <div class="container text-muted mt-5 mb-5">
+        <div class="card">
+            <div class="card-body">
+                <form method="POST" class="mb-4 mt-3">
+                    {% csrf_token %}
+                    {{ form|crispy }}
+                    <h5 class="card-title">Sure you want to delete this Quiz ?</h5>
+                    <p class="card-text pb-4">{{ quiz.title }}</p>
+                    <a href="{% url 'quiz-details' class_name=quiz.classroom.name|slugify pk=quiz.pk %}"
+                       class="btn btn-secondary">Cancel</a>
+                    <button type="submit" class="btn btn-danger">Yes, Delete</button>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}

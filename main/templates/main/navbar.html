@@ -20,9 +20,6 @@
             </a>
             <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
                 <p class="nav-username text-center text-muted">@{{ user.username }}</p>
-                <a href="#" class="nav-link text-secondary" name="Notifications">
-                    <i class="fas fa-bell"></i>Notifications
-                </a>
                 <a class="nav-link text-secondary" href="{% url 'profile' %}">
                     <i class="fas fa-user"></i>Profile
                 </a>
@@ -40,7 +37,7 @@
             <div class="visitor-menu collapse navbar-collapse" id="navbarText">
                 <ul class="navbar-nav ml-auto">
                     <li class="nav-item pl-3"><a href="{% url 'login' %}" class="nav-link login-btn">Login</a></li>
-                    <li class="nav-item pl-3"><a href="{% url 'register' %}" class="nav-link reg-btn">Sign Up</a></li>
+                    <li class="nav-item pl-3"><a href="{% url 'register' %}" class="nav-link reg-btn shadow-sm">Sign Up</a></li>
                 </ul>
             </div>
         {% endif %}

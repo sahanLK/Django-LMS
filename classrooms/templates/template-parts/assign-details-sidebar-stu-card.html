@@ -13,7 +13,7 @@
                              <b class="text-success">Turned In</b>
                         {% endif %}
                     {% else %}
-                        {% if assignment.has_due_expired %}
+                        {% if assignment.expired %}
                              <b class="text-danger">Missing</b>
                         {% else %}
                              <b class="text-secondary">Pending</b>
@@ -27,25 +27,28 @@
     <div class="card-body">
         <div class="row">
             <div class="col-12">
-                <div class="selected-files pt-3 pb-5" id="selectedFiles">
-                    {% if not submission.file %}
-                        <span class="" id="noFileChosenMsg">No Files Chosen</span>
-                    {% endif %}
-                    {% if submission.file %}
-                        <a href="{{ submission.file.url }}"
-                           class="border p-2 w-100 d-block rounded shadow-sm"
-                           target="_blank">{{ submission.get_short_file_name }}</a>
+                <div class="selected-files pt-3 pb-4" id="selectedFiles">
+                    {% if submission %}
+                        {% for f in submission.submissionfile_set.all %}
+                            <a class="border p-2 w-100 d-block rounded mb-2 shadow-sm"
+                                href="{{ f.file.url }}" target="_blank">
+                                {{ f.get_short_file_name }}
+                            </a>
+                        {% empty %}
+                            <p class="m-0">No Files Submitted</p>
+                        {% endfor %}
                     {% endif %}
                 </div>
 
                 {% if not submission %}
                     {% if not assignment.review_complete %}
                         <form method="POST" enctype="multipart/form-data" class="assignment-file-input">
-                            <div class="custom-file">
+                            <div class="custom-file mb-2">
                                 {% csrf_token %}
                                 {{ form }}
                             </div>
-                            <button class="btn btn-success w-100 mt-3">Submit</button>
+                            <small>maximum of 3 files allowed</small>
+                            <button class="btn btn-success w-100 mt-4">Submit</button>
                         </form>
                     {% else %}
                         <a class="btn btn-info disabled text-light w-100">Submissions Not Accepting</a>

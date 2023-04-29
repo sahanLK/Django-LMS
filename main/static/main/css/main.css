@@ -150,7 +150,7 @@ html {
     font-weight: 800;
     font-size: 35px;
     color: #f2f2f2;
-    letter-spacing: 1px;
+    letter-spacing: 2px;
 }
 
 .visitor-middle .msg {
@@ -814,9 +814,11 @@ body {
     font-size: 15px;
 }
 
-/*
-* Classwork Tab
-*/
+.class-sidebar h6 {
+    font-size: 20px;
+    color: #b3b3b3;
+    letter-spacing: 2px;
+}
 
 
 /*
@@ -1132,6 +1134,15 @@ Letter Spacings
 
 .ls-2 {
     letter-spacing: 2px !important;
+}
+
+
+/*
+Letter Spacings
+*/
+
+.text-white {
+    color: #fff !important;
 }
 
 

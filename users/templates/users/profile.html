@@ -9,18 +9,19 @@
                 <div class="col-lg-5 col-md-5 text-center text-muted">
                     <img src="{{ user.profile.profile_pic.url }}" class="rounded-circle shadow-lg"
                          style="width: 250px; height: 250px">
-                    <h4 class="username text-light mt-3 font-weight-bold">@{{ user.username }}</h4>
+                    <h4 class="username mt-3 mb-4 font-weight-bold" style="color: #d9d9d9;">
+                        @{{ user.username }}
+                    </h4>
                 </div>
                 <div class="col-lg-7 col-md-7 p-3 text-center profile-info">
-                    <h2 class="name mt-5">{{ user.get_full_name }}
-                        <small class="ml-3 btn btn-info shadow-lg role-badge">{{ user.role|upper }}</small>
-                    </h2>
-                    <h5 class="mt-5 mb-3">{{ user.profile.department.name }}</h5>
-                    <h5>
+                    <h2 class="name mt-5 mb-4 roboto-title ls-1">{{ user.get_full_name }}</h2>
+                    <small class="ml-3 btn btn-info shadow-lg role-badge">{{ user.role|upper }}</small>
+                    <h6 class="mt-5 mb-3 ls-1 roboto-title">{{ user.profile.department.name }}</h6>
+                    <h6 class="ls-1">
                         {% if user.profile.department.batch %}
                             {{ user.profile.department.batch.year|add:' Batch' }}
                         {% endif %}
-                    </h5>
+                    </h6>
                 </div>
             </div><!-- row -->
         </div>
@@ -28,10 +29,10 @@
             <div class="background-light p-5 text-muted shadow-sm">
                 <form method="POST" enctype="multipart/form-data" class="mw-600 m-auto pb-4">
                     {% csrf_token %}
-                    <legend class="border-bottom pb-1 mb-4">Profile Info</legend>
+                    <legend class="border-bottom pb-1 mb-4 roboto-title ls-1">Profile Info</legend>
                     {{ u_form|crispy }}
                     {{ p_form|crispy }}
-                    <button type="submit" class="btn btn-primary mt-4 shadow">Update Profile</button>
+                    <button type="submit" class="btn btn-info mt-4 shadow">Update Profile</button>
                 </form>
             </div><!-- .container -->
         </div><!-- .container -->

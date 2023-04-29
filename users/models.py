@@ -1,4 +1,6 @@
+
 from datetime import datetime
+from PIL import Image
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from main.models import Batch, Department
@@ -64,6 +66,26 @@ class Student(models.Model):
 
     def __str__(self):
         return f"Student: {self.user.username} [{self.department.name}]"
+
+    def save(self,
+             force_insert=False,
+             force_update=False,
+             using=None,
+             update_fields=None):
+        super().save()
+
+        images = [self.profile_pic, self.id_pic]
+
+        output_size = (250, 250)
+        for img in images:
+            try:
+                im = Image.open(img.path)
+            except ValueError:  # No file associated
+                continue
+
+            if im.height > 250 or im.width > 250:
+                im.thumbnail(output_size)
+                im.save(img.path)
 
     """
     =============================
@@ -170,13 +192,13 @@ class Student(models.Model):
         :return:
         """
         classes = self.get_classrooms()
-        meetings_all = set()
+        _all = set()
 
         for cls in classes:
             meets = cls.meeting_set.all()
             for meet in meets:
-                meetings_all.add(meet)
-        return meetings_all
+                _all.add(meet)
+        return _all
 
     def get_today_meetings(self):
         """
@@ -203,7 +225,7 @@ class Student(models.Model):
         upcoming = set()
 
         for meet in _all:
-            if not meet.is_today:
+            if meet.start.date() > datetime.now().date():
                 upcoming.add(meet)
         return upcoming
 
@@ -241,7 +263,7 @@ class Student(models.Model):
         today = set()
 
         for q in self._get_all_quizzes():
-            if get_naive_dt(q.start).date() == datetime.today().date():
+            if q.start.date() == datetime.today().date():
                 today.add(q)
         return today
 
@@ -252,15 +274,40 @@ class Student(models.Model):
         upcoming = set()
 
         for q in self._get_all_quizzes():
-            if get_naive_dt(q.start).date() > datetime.today().date():
+            if q.start.date() > datetime.today().date():
                 upcoming.add(q)
         return upcoming
 
+    def expired_quizzes(self):
+        expired = set()
+        for q in self._get_all_quizzes():
+            if q.expired:
+                expired.add(q)
+        return expired
+
     def get_missing_quizzes(self):
-        pass
+        missing = set()
+        for q in self.expired_quizzes():
+            # check if a response has been made for the quiz or not
+            from classrooms.models import QuizStudentResponse
+            response = QuizStudentResponse.objects.filter(
+                quiz=q,
+                owner=self).first()
+            if not response:
+                missing.add(q)
+        return missing
 
     def get_completed_quizzes(self):
-        pass
+        done = set()
+        for q in self.expired_quizzes():
+            # check if a response has been made for the quiz or not
+            from classrooms.models import QuizStudentResponse
+            response = QuizStudentResponse.objects.filter(
+                quiz=q,
+                owner=self).first()
+            if response:
+                done.add(q)
+        return done
 
     """
     =============================
@@ -326,6 +373,24 @@ class Lecturer(models.Model):
     def __str__(self):
         return f"Lecturer: {self.user.username}"
 
+    def save(self,
+             force_insert=False,
+             force_update=False,
+             using=None,
+             update_fields=None):
+        super().save()
+
+        output_size = (250, 250)
+        try:
+            img = Image.open(self.profile_pic.path)
+            if img.height > 250 or img.width > 250:
+                img.thumbnail(output_size)
+                img.save(self.profile_pic.path)
+        except ValueError:  # No file associated
+            pass
+
+
+
     """
     =============================
     CLASSROOMS
@@ -374,7 +439,8 @@ class Lecturer(models.Model):
         """
         ongoing = set()
         for a in self.get_all_assignments():
-            if a.date_due >= datetime.now():
+            if a.date_due >= datetime.now() \
+                    and not a.review_complete:
                 ongoing.add(a)
         return ongoing
 
@@ -445,7 +511,7 @@ class Lecturer(models.Model):
         upcoming = set()
 
         for meet in _all:
-            if not meet.is_today:
+            if meet.start.date() > datetime.today().date():
                 upcoming.add(meet)
         return upcoming
 
@@ -454,7 +520,7 @@ class Lecturer(models.Model):
         prev = set()
 
         for meet in _all:
-            if meet.is_expired:
+            if meet.start.date() < datetime.today().date():
                 prev.add(meet)
         return prev
 

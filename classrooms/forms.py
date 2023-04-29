@@ -41,22 +41,29 @@ class AssignmentCreationForm(forms.ModelForm):
 
     class Meta:
         model = Assignment
-        fields = ['title', 'content', '_date_due']
+        fields = ['title', 'content', '_date_due', 'file']
 
 
 class AssignmentUpdateForm(forms.ModelForm):
     _date_due = forms.DateTimeField(
         widget=forms.TextInput(attrs={'type': 'datetime-local', 'class': 'mw-250'}))
+    file = forms.FileField(
+        widget=forms.FileInput(attrs={'class': 'custom-file-input'}),
+        required=False,
+    )
 
     class Meta:
         model = Assignment
-        fields = ['title', 'content', '_date_due']
+        fields = ['title', 'content', '_date_due', 'file']
 
 
 class AssignmentSubmitForm(forms.ModelForm):
     file = forms.FileField(
         widget=forms.ClearableFileInput(
-            attrs={'class': 'custom-file-input no-mw no-inside-name', 'id': 'assignment-submit'}),
+            attrs={
+                'class': 'custom-file-input no-mw no-inside-name',
+                'id': 'assignment-submit',
+                'multiple': True}),
         label='',
         required=False,
     )

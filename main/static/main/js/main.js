@@ -68,12 +68,35 @@ $(document).ready( function() {
         $(lecForm)[0].reset();
     });
 
+    /*
+     * ASSIGNMENTS
+    */
+
+    const validExt = ['jpg', 'jpeg', 'pdf', 'png', 'ico', 'docx', 'accdb', 'pptx', 'html', 'txt', 'zip', 'rar']
+
     /* Display the selected assignment files */
     $('#assignment-submit').change( function() {
+        const fileInput = $(this)
         var files = $(this)[0].files; // All the selected files (from input field)
 
-        var noFileChosenMsg = $('#noFileChosenMsg');
-        $(noFileChosenMsg).css({'display': 'block'});
+        if (files.length > 3) {
+            alert('Maximum of 3 files are allowed.');
+            $(this).val('');
+            return;
+        }
+
+        // Limit file types (extensions)
+        $(files).each(function(index, elem){
+            var ext = elem.name.split('.');
+            ext = ext[ext.length - 1].toLowerCase();
+            if ( ! validExt.includes(ext) ) {
+                $(fileInput).val('');
+                alert('Invalid file type selected.' + ext);
+                return;
+            }
+        });
+
+        var selectedFiles = $('#selectedFiles');
 
         // Clear the previous file widgets
         var prevFiles = $("#selectedFiles").find('a');
@@ -84,9 +107,8 @@ $(document).ready( function() {
         // Add new selected files
         for (let i=0; i < files.length; i++) {
             var name = getShortFileName(files[i].name);
-            var file = "<a class='border p-2 w-100 d-block rounded shadow-sm'>" + name + "</a>";
-            $( noFileChosenMsg ).css({'display': 'none'});
-            $( noFileChosenMsg ).after(file);
+            var file = "<a class='border p-2 w-100 d-block rounded mb-2 shadow-sm'>" + name + "</a>";
+            $( selectedFiles ).append(file);
         }
     });
 

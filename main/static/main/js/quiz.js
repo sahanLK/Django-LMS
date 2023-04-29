@@ -21,28 +21,24 @@ $(document).ready(function() {
         $('#noOfQuestions').text(noOfQuestions);
 
         var questionField = `
-            <div class='question p-2 mb-3'>
-                <div class='row m-0 pb-3'>
-                    <div class='col-12 p-0 text-right'>
-                        <a class='roboto-title text-primary pl-2 pr-2' id='addAnswerBtn'>Add Answer</a>
-                        <a class='roboto-title text-danger pl-2 pr-2' id='deleteQuestionBtn'>Delete Question</a>
-                    </div>
-                </div>
-
-                <table class='w-100'>
-                    <tr>
-                        <td>
+            <div class='row mt-4 question mb-3 pb-4 pt-3 rounded' style='background-color: #f2f2f2;'>
+                <div class='col-12'>
+                    <a class='roboto-title text-primary d-block mb-2 float-right' id='addAnswerBtn' style='margin-right: 40px;'>Add Answer</a>
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend m-auto pr-3">
                             <b class='roboto-title-muted' id='questionNumber'>${noOfQuestions} )</b>
-                        </td>
-                        <td>
-                            <textarea rows=2 class='form-control' question-id='${noOfQuestions}'></textarea>
-                        </td>
-                    </tr>
-                </table>
-
-                <div class='row m-0 pt-3 answers-row w-100'>
-                    <div class='col-12 p-0' id='answersRow'>
-                        <!-- All the answers goes here -->
+                        </div>
+                        <textarea rows=2 class='form-control' question-id='${noOfQuestions}'></textarea>
+                        <div class="input-group-append m-auto pl-2" style='width: 35px;'>
+                            <a class="btn" type="button" id='deleteQuestionBtn'>
+                                <i class="fas fa-trash-alt text-danger"></i>
+                            </a>
+                        </div>
+                    </div>
+                    <div class='row m-0 pt-3 answers-row w-100'>
+                        <div class='col-12 p-0' id='answersRow'>
+                            <!-- All the answers goes here -->
+                        </div>
                     </div>
                 </div>
             </div>`;
@@ -88,8 +84,10 @@ $(document).ready(function() {
         var relatedQuestion = $(this).closest('.question');
         var relatedQuestionTextArea = $(relatedQuestion).find('textarea');
         var relatedQuestionId = $(relatedQuestionTextArea).attr('question-id');
-
         var answersElem = $(relatedQuestion).find('#answersRow');
+
+        console.log(answersElem);
+
         var currentAnswersCount = $(answersElem).find('.answer').length + 1;
 
         // Do not allow more than 6 answers for a question.
@@ -100,40 +98,35 @@ $(document).ready(function() {
 
         let answerItem = `
             <div class='row w-100 m-0 mb-2 answer'>
-                <div class='col-1 mt-auto mb-auto'>
-                </div>
-
+                <div class='col-1'></div>
                 <div class='col-11'>
-                    <table class='w-100'>
-                        <tr>
-                            <td class='mw-30' style="width: 25px;">
-                                <p class='roboto-title-muted m-0' id='answerLetter'>
-                                    ${answersMap[currentAnswersCount]} .
-                                </p>
-                            </td>
-                            <td>
-                                <input type='text'
-                                    name='answer-${answersMap[currentAnswersCount]}'
-                                    q-id=${relatedQuestionId}
-                                    letter=${answersMap[currentAnswersCount]}
-                                    correct=false
-                                    class='form-control answer-input'>
-                            </td>
-                            <td class='pl-3 mw-20'>
-                                <a class='text-danger make-correct-answer answer-stat-toggle'>
-                                    <i class='fas fa-times-circle fa-lg text-danger'></i>
-                                </a>
-                            </td>
-                            <td class='pl-1 mw-20'>
-                                <a class='text-danger delete-answer'>
-                                    <i class="fas fa-trash-alt pr-4 text-danger"></i>
-                                </a>
-                            </td>
-                        </tr>
-                    </table>
+                    <div class="input-group">
+                        <div class='input-group-prepend m-auto'>
+                            <p class='btn btn-secondary roboto-title-muted m-0 text-white' id='answerLetter'>
+                                ${answersMap[currentAnswersCount]}
+                            </p>
+                        </div>
+
+                        <input type='text'
+                            name='answer-${answersMap[currentAnswersCount]}'
+                            q-id=${relatedQuestionId}
+                            letter=${answersMap[currentAnswersCount]}
+                            correct=false
+                            class='form-control answer-input'>
+                        <div class="input-group-append m-auto">
+                            <a class='btn text-secondary make-correct-answer answer-stat-toggle'>
+                                <i class="fas fa-check-circle fa-lg"></i>
+                            </a>
+                            <a class='btn text-white delete-answer'>
+                                <i class="fas fa-trash-alt text-danger"></i>
+                            </a>
+                        </div>
+                    </div>
                 </div>
             </div>`;
+
         $(answersElem).append(answerItem);
+        console.log("Done");
     });
 
     // Delete an Answer
@@ -150,7 +143,7 @@ $(document).ready(function() {
         var allAnswers = $(question).find('.answer');
 
         $(allAnswers).each(function(index, elem) {
-            $(elem).find('#answerLetter').text(answersMap[index + 1] + ' .');
+            $(elem).find('#answerLetter').text(answersMap[index + 1]);
             var answerInputField = $(elem).find('input');
             $(answerInputField).attr({'q-id': index});
             $(answerInputField).attr({'letter': answersMap[index + 1]});
@@ -307,30 +300,4 @@ $(document).ready(function() {
         });
         return qObjects;
     }
-
-    // Update the quiz countdown timer in each second
-//    var countDown = $('#quizCountDown');
-//    if ( countDown.length > 0 ) {
-//        setInterval(function() {
-//            $.ajax({
-//                type: 'GET',
-//                url: $('#quizCountDownUrl').val(),
-//                data: {},
-//                success: function(response) {
-//                    console.log(response);
-//                    countDown.text(response.countdown);
-//                },
-//            });
-//        }, 1000);
-//    }
-
-    // Detect quiz edit page reload and confirm it
-//    $(window).bind('beforeunload', function() {
-//        if ($('#quizForm').length == 1) {
-//            if ( confirm("Your work will not be saved. Continue?") == false) {
-//                return false;
-//            }
-//        }
-//    });
-
 });

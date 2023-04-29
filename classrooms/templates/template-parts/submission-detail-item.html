@@ -17,9 +17,13 @@
                 <div class="col-3">
                     <a class="btn btn-link">
                         {% if submission %}
-                            Submitted
+                            {% if submission.grade %}
+                                <b class="text-success">Graded</b>
+                            {% else %}
+                                <b class="text-warning">Pending Review</b>
+                            {% endif %}
                         {% else %}
-                            Pending
+                            Not Submitted
                         {% endif %}
                     </a>
                 </div>
@@ -43,13 +47,11 @@
                         <h6 class="pb-2 pt-2 roboto-title">Files</h6>
                     </div>
                     <div class="p-3">
-                        {% if submission %}
-                            {% if submission.file %}
-                                {% include "template-parts/file.html" with file=submission.file design="box" download='download' %}
-                            {% else %}
-                                <h6 class="mt-5">No Files Submitted</h6>
-                            {% endif %}
-                        {% endif %}
+                        {% for sub in submission.submissionfile_set.all %}
+                            {% include "template-parts/file.html" with file=sub.file design="box" download='download' %}
+                        {% empty %}
+                            <h6 class="mt-5">No Files Submitted</h6>
+                        {% endfor %}
                     </div>
                 </div><!-- .col-lg-4 -->
                 <div class="col-sm-12 col-lg-4 p-0 mb-3 border-right">
@@ -61,7 +63,7 @@
                             <tbody>
                                 <tr>
                                     <th scope="row">Date:</th>
-                                    <td>{{ submission.date_sub }}</td>
+                                    <td>{{ submission.date_created }}</td>
                                 </tr>
                                 <tr>
                                     <th scope="row">Reg No:</th>
