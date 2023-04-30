@@ -2,4 +2,11 @@
 /classrooms/migrations
 /users/migrations
 /main/migrations
-/media
+/media/lec_profile_pics
+/media/stu_id_pics
+/media/assignment-files
+/media/assignments
+/media/id_photos
+/media/submitted_assignments
+/media/submission-files
+/media/stu_profile_pics
