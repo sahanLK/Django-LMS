@@ -1,7 +1,4 @@
 *.pyc
-/classrooms/migrations
-/users/migrations
-/main/migrations
 /media/lec_profile_pics
 /media/stu_id_pics
 /media/assignment-files
