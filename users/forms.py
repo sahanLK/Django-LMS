@@ -2,7 +2,7 @@ from django.contrib.auth.forms import UserCreationForm
 from .models import CustomizedUser, Student, Lecturer
 from main.models import Batch, Department
 from django import forms
-from django.db.utils import OperationalError
+from django.db.utils import ProgrammingError
 
 
 GENDER_CHOICES = [
@@ -11,12 +11,15 @@ GENDER_CHOICES = [
 ]
 
 
-def get_genders():
-    return [(batch, batch) for batch in Batch.objects.all()]
+def get_batches():
+    try:
+        return [(batch, batch) for batch in Batch.objects.all()]
+    except ProgrammingError:
+        return []
 
 
 class UserRegisterForm(UserCreationForm):
-    gender = forms.ChoiceField(choices=get_genders())
+    gender = forms.ChoiceField(choices=get_batches())
     gender.widget.attrs = {'class': 'mw-150'}
 
     class Meta:
