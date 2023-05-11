@@ -11,11 +11,12 @@ GENDER_CHOICES = [
 ]
 
 
-BATCHES = [(batch, batch) for batch in Batch.objects.all()]
+def get_genders():
+    return [(batch, batch) for batch in Batch.objects.all()]
 
 
 class UserRegisterForm(UserCreationForm):
-    gender = forms.ChoiceField(choices=GENDER_CHOICES)
+    gender = forms.ChoiceField(choices=get_genders())
     gender.widget.attrs = {'class': 'mw-150'}
 
     class Meta:
