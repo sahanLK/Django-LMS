@@ -68,27 +68,28 @@ class Student(models.Model):
     def __str__(self):
         return f"Student: {self.user.username} [{self.department.name}]"
 
-    # def save(self,
-    #          force_insert=False,
-    #          force_update=False,
-    #          using=None,
-    #          update_fields=None):
-    #     super().save()
-    #
-    #     images = [self.profile_pic, self.id_pic]
-    #
-    #     output_size = (250, 250)
-    #     for img in images:
-    #         try:
-    #             im = Image.open(img.path)
-    #
-    #             if im.height > 250 or im.width > 250:
-    #                 im.thumbnail(output_size)
-    #                 im.save(img.path)
-    #         except ValueError:  # No file associated
-    #             continue
-    #         except UnidentifiedImageError:
-    #             print("Unidentified Image. Probably someone is trying to sign in with svg")
+    def save(self,
+             force_insert=False,
+             force_update=False,
+             using=None,
+             update_fields=None):
+        super().save()
+
+        images = [self.profile_pic, self.id_pic]
+
+        output_size = (250, 250)
+        for img in images:
+            try:
+                im = Image.open(img.path)
+
+                if im.height > 250 or im.width > 250:
+                    im.thumbnail(output_size)
+                    im.save(img.path)
+            except ValueError:  # No file associated
+                continue
+            except UnidentifiedImageError:
+                print("Unidentified Image. Probably someone is trying to sign in with svg")
+                continue
 
 
     """
