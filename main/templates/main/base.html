@@ -32,7 +32,7 @@ THIS TEMPLATE GETS INHERITED BY ALL OTHER TEMPLATES/PAGES IN THE APPLICATION.
         <link rel="stylesheet" type="text/css" href="{% static '/main/css/jquery-ui.min.css' %}">
 
         <!-- Custom CSS -->
-        <link rel="stylesheet" type="text/css" href="{% static '/main/css/main.css' %}?{% now 'U' %}">
+        <link rel="stylesheet" type="text/css" href="{% static '/main/css/main.css' %}?">
 
     </head>
     <body class="{% if not user.is_authenticated %}gradient-apply{% endif %}">
@@ -82,9 +82,9 @@ THIS TEMPLATE GETS INHERITED BY ALL OTHER TEMPLATES/PAGES IN THE APPLICATION.
         <script src="{% static 'main/js/jquery-ui.min.js' %}"></script>
 
         <!-- Custom Js -->
-        <script src="{% static 'main/js/main.js' %}?{% now 'U' %}"></script>
-        <script src="{% static 'main/js/ajax.js' %}?{% now 'U' %}"></script>
-        <script src="{% static 'main/js/quiz.js' %}?{% now 'U' %}"></script>
+        <script src="{% static 'main/js/main.js' %}?"></script>
+        <script src="{% static 'main/js/ajax.js' %}?"></script>
+        <script src="{% static 'main/js/quiz.js' %}?"></script>
 
         {% include 'main/charts.html' %}
     </body>
