@@ -88,11 +88,9 @@ if PRODUCTION:
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.mysql',
-            'NAME': 'ucr_lms',
-            'HOST': '127.0.0.1',
-            'PORT': '3306',
-            'USER': os.environ.get('DB_USER'),
-            'PASSWORD': os.environ.get('DB_PWD'),
+            'OPTIONS': {
+                'read_default_file': '/etc/mysql/my.cnf',
+            },
         }
     }
 else:
