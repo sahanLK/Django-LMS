@@ -89,7 +89,7 @@ if PRODUCTION:
         'default': {
             'ENGINE': 'django.db.backends.mysql',
             'NAME': 'ucr_lms',
-            'HOST': 'localhost',
+            'HOST': '127.0.0.1',
             'PORT': '3306',
             'USER': os.environ.get('DB_USER'),
             'PASSWORD': os.environ.get('DB_PWD'),
