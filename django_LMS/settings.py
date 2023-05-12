@@ -19,7 +19,7 @@ DEBUG = False
 # A variable for differ the settings
 PRODUCTION = True
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', '143.110.241.4']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', '143.110.241.4', 'ucrlms.online']
 
 
 # Application definition

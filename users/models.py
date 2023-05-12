@@ -91,7 +91,6 @@ class Student(models.Model):
                 print("Unidentified Image. Probably someone is trying to sign in with svg")
                 continue
 
-
     """
     =============================
     ASSIGNMENTS
