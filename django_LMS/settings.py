@@ -22,7 +22,7 @@ DEBUG = True
 # A variable for differ the settings
 PRODUCTION = True
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', '139.59.40.70']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', '143.110.241.4']
 
 
 # Application definition
