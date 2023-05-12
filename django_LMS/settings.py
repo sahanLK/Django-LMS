@@ -1,6 +1,10 @@
 import os.path
 from pathlib import Path
 
+
+print("DB USER", os.environ.get('DB_USER'))
+print("DB PASSWORD", os.environ.get('DB_PWD'))
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
