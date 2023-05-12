@@ -396,8 +396,6 @@ class Lecturer(models.Model):
         except UnidentifiedImageError:
             print("Unidentified Image. Probably someone is trying to sign in with svg")
 
-
-
     """
     =============================
     CLASSROOMS
