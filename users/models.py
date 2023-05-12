@@ -1,6 +1,7 @@
 
 from datetime import datetime
 from PIL import Image
+from PIL import UnidentifiedImageError
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from main.models import Batch, Department
@@ -80,12 +81,15 @@ class Student(models.Model):
         for img in images:
             try:
                 im = Image.open(img.path)
+
+                if im.height > 250 or im.width > 250:
+                    im.thumbnail(output_size)
+                    im.save(img.path)
             except ValueError:  # No file associated
                 continue
+            except UnidentifiedImageError:
+                print("Unidentified Image. Probably someone is trying to sign in with svg")
 
-            if im.height > 250 or im.width > 250:
-                im.thumbnail(output_size)
-                im.save(img.path)
 
     """
     =============================
@@ -388,6 +392,8 @@ class Lecturer(models.Model):
                 img.save(self.profile_pic.path)
         except ValueError:  # No file associated
             pass
+        except UnidentifiedImageError:
+            print("Unidentified Image. Probably someone is trying to sign in with svg")
 
 
 
