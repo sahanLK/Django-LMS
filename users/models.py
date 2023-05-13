@@ -64,6 +64,7 @@ class Student(models.Model):
     department = models.ForeignKey(Department, on_delete=models.CASCADE)
     profile_pic = models.ImageField(null=True, upload_to="stu_profile_pics")
     id_pic = models.ImageField(null=True, blank=True, upload_to="stu_id_pics")
+    reg_no = models.CharField(max_length=13, default="")
 
     def __str__(self):
         return f"Student: {self.user.username} [{self.department.name}]"
