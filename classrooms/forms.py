@@ -35,7 +35,7 @@ class ClassroomUpdateForm(forms.ModelForm):
 class AssignmentCreationForm(forms.ModelForm):
     _date_due = forms.DateTimeField(
         widget=forms.TextInput(attrs={'type': 'datetime-local', 'class': 'mw-250'}))
-    documents = forms.FileField(
+    file = forms.FileField(
         widget=forms.ClearableFileInput(attrs={'class': 'custom-file-input'}),
         required=False)
 

@@ -38,7 +38,7 @@
 
                         <div class="files mt-5 pt-4">
                             {% if assignment.file %}
-                                {% include 'template-parts/file.html' with file=assignment.file %}
+                                {% include 'template-parts/file.html' with file=assignment.file download='download' %}
                             {% endif %}
                         </div>
                     </div>
