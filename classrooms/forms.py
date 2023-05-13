@@ -14,7 +14,7 @@ class ClassroomCreateForm(forms.ModelForm):
 
     class Meta:
         model = Classroom
-        fields = ['name', 'description']
+        fields = ['department', 'name', 'description']
 
 
 class ClassroomUpdateForm(forms.ModelForm):
