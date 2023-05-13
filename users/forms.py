@@ -60,7 +60,7 @@ class StudentUpdateForm(forms.ModelForm):
 
     class Meta:
         model = Student
-        fields = ['id_pic', 'profile_pic']
+        fields = ['reg_no', 'id_pic', 'profile_pic']
 
 
 class LecturerCreationForm(forms.ModelForm):
