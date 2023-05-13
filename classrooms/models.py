@@ -4,11 +4,13 @@ from django.db import models
 from users.models import CustomizedUser, Student, Lecturer
 from main.models import Batch, Department
 from ckeditor.fields import RichTextField
-from main.funcs import (local_to_utc_aware,
-                        local_to_utc_naive,
-                        utc_to_local_aware,
-                        utc_to_local_naive,
-                        get_naive_dt)
+from main.funcs import (
+    local_to_utc_aware,
+    local_to_utc_naive,
+    utc_to_local_aware,
+    utc_to_local_naive,
+    get_naive_dt
+)
 
 
 class Classroom(models.Model):
@@ -75,7 +77,7 @@ class Assignment(models.Model):
 
     @property
     def type(self):
-        return 'assignment'
+        return "assignment"
 
     @property
     def date_created(self):
@@ -112,7 +114,8 @@ class Submission(models.Model):
     lec_comment = models.TextField(null=True, blank=True)
 
     def __str__(self):
-        return f"Submission By: {self.owner.user.username} [Assignment-> {self.assignment.title}]"
+        return f"Submission By: {self.owner.user.username}" \
+               f" [Assignment-> {self.assignment.title}]"
 
     @property
     def date_created(self):

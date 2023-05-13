@@ -1184,6 +1184,10 @@ MEDIA QUERIES
         font-size: 1.1rem;
     }
 
+    .sm-heading-2 {
+        font-size: 1.2rem;
+    }
+
     .visitor-menu {
         margin-top: 25px;
         margin-bottom: 30px;

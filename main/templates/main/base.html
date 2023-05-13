@@ -32,7 +32,7 @@ THIS TEMPLATE GETS INHERITED BY ALL OTHER TEMPLATES/PAGES IN THE APPLICATION.
         <link rel="stylesheet" type="text/css" href="{% static '/main/css/jquery-ui.min.css' %}">
 
         <!-- Custom CSS -->
-        <link rel="stylesheet" type="text/css" href="{% static '/main/css/main.css' %}?">
+        <link rel="stylesheet" type="text/css" href="{% static '/main/css/main.css' %}">
 
     </head>
     <body class="{% if not user.is_authenticated %}gradient-apply{% endif %}">

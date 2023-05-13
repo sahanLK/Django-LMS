@@ -90,14 +90,6 @@ class ClassroomDetailView(LoginRequiredMixin, DetailView):
         work.update(set(m for m in meetings))
         work.update(set(q for q in quizzes))
 
-        # for w in work:
-        #     if isinstance(w, Meeting):
-        #         w.type = 'meeting'
-        #     elif isinstance(w, Quiz):
-        #         w.type = 'quiz'
-        #     elif isinstance(w, Assignment):
-        #         w.type = 'assignment'
-
         # Sort the classwork by date_posted using BUBBLE-SORT ALGORITHM
         def bubble_sort(array):
             n = len(array)
