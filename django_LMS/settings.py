@@ -19,11 +19,8 @@ PRODUCTION = True
 DEBUG = False if PRODUCTION else True
 
 ALLOWED_HOSTS = [
-    'localhost',
     '127.0.0.1',
     '34.93.153.171',
-    'ucrlms.online',
-    'www.ucrlms.online'
 ]
 
 
