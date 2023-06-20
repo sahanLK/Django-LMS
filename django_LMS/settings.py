@@ -22,6 +22,8 @@ DEBUG = True
 ALLOWED_HOSTS = [
     '127.0.0.1',
     '34.143.228.90',
+    'ucrlms.online',
+    'www.ucrlms.online',
 ]
 
 
