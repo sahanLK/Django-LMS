@@ -20,7 +20,7 @@ DEBUG = False if PRODUCTION else True
 
 ALLOWED_HOSTS = [
     '127.0.0.1',
-    '34.93.153.171',
+    '34.143.228.90',
 ]
 
 
