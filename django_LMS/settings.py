@@ -21,7 +21,7 @@ DEBUG = False if PRODUCTION else True
 ALLOWED_HOSTS = [
     'localhost',
     '127.0.0.1',
-    '143.110.241.4',
+    '34.93.153.171',
     'ucrlms.online',
     'www.ucrlms.online'
 ]
@@ -90,12 +90,15 @@ WSGI_APPLICATION = 'django_LMS.wsgi.application'
 
 if PRODUCTION:
     # Using MySql Database Engine
+    # Using MySql Database Engine
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.mysql',
-            'OPTIONS': {
-                'read_default_file': '/etc/mysql/my.cnf',
-            },
+            'NAME': 'ucr_lms',
+            'HOST': '127.0.0.1',
+            'PORT': '3306',
+            'USER': 'sahan',
+            'PASSWORD': '@sahan@199978@',
         }
     }
 else:
@@ -106,8 +109,8 @@ else:
             'NAME': 'ucr_lms',
             'HOST': '127.0.0.1',
             'PORT': '3306',
-            'USER': os.environ.get('DB_USER'),
-            'PASSWORD': '',
+            'USER': 'sahan',
+            'PASSWORD': '@sahan@199978@',
         }
     }
 
