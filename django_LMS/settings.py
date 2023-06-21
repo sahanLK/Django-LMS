@@ -17,7 +17,7 @@ PRODUCTION = True
 
 # SECURITY WARNING: don't run with debug turned on in production!
 # DEBUG = False if PRODUCTION else True
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = [
     '127.0.0.1',
