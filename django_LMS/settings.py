@@ -5,19 +5,15 @@ from pathlib import Path
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
-
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-dz0hc=@=j309k15yl5gm%@%q8s)3pk_(gx_2bg$e$x8)*p(5sm'
 
 # A variable for differ the settings
-PRODUCTION = True
+PRODUCTION = False
 
 # SECURITY WARNING: don't run with debug turned on in production!
 # DEBUG = False if PRODUCTION else True
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = [
     '127.0.0.1',
@@ -109,8 +105,8 @@ else:
             'NAME': 'ucr_lms',
             'HOST': '127.0.0.1',
             'PORT': '3306',
-            'USER': 'sahan',
-            'PASSWORD': '@sahan@199978@',
+            'USER': 'root',
+            'PASSWORD': '',
         }
     }
 
