@@ -1,6 +1,7 @@
 import os.path
 from pathlib import Path
 
+from django.core.mail import DNS_NAME
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -9,7 +10,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-dz0hc=@=j309k15yl5gm%@%q8s)3pk_(gx_2bg$e$x8)*p(5sm'
 
 # A variable for differ the settings
-PRODUCTION = True
+PRODUCTION = False
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False if PRODUCTION else True
@@ -84,17 +85,21 @@ WSGI_APPLICATION = 'django_LMS.wsgi.application'
 #     }
 # }
 
+DB_USER = os.getenv('DB_USER')
+DB_NAME = os.getenv('DB_NAME')
+DB_PASSWORD = os.getenv('DB_PASSWORD')
+
 if PRODUCTION:
     # Using MySql Database Engine
     # Using MySql Database Engine
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.mysql',
-            'NAME': 'ucr_lms',
+            'NAME': DB_NAME,
             'HOST': '127.0.0.1',
             'PORT': '3306',
-            'USER': 'sahan',
-            'PASSWORD': '@sahan@199978@',
+            'USER': DB_USER,
+            'PASSWORD': DB_PASSWORD,
         }
     }
 else:
@@ -102,11 +107,11 @@ else:
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.mysql',
-            'NAME': 'ucr_lms',
+            'NAME': DB_NAME,
             'HOST': '127.0.0.1',
             'PORT': '3306',
-            'USER': 'root',
-            'PASSWORD': '',
+            'USER': DB_USER,
+            'PASSWORD': DB_PASSWORD,
         }
     }
 
@@ -154,7 +159,6 @@ STATIC_URL = '/static/'
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
 
 LOGIN_URL = 'login'
 LOGIN_REDIRECT_URL = 'home'
